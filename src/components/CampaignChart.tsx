@@ -10,9 +10,9 @@ interface CampaignChartProps {
 
 export function CampaignChart({ data, title, metric }: CampaignChartProps) {
   return (
-    <Card className="hover:shadow-lg transition-shadow">
+    <Card className="hover:shadow-lg transition-shadow bg-gradient-to-br from-blue-50/50 to-indigo-50/50 dark:from-blue-950/50 dark:to-indigo-950/50 border border-blue-100/50 dark:border-blue-800/50">
       <CardHeader>
-      <CardTitle>{title}</CardTitle>
+        <CardTitle className="text-blue-900/80 dark:text-blue-100/80">{title}</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="h-[300px]">
@@ -21,12 +21,13 @@ export function CampaignChart({ data, title, metric }: CampaignChartProps) {
               data={data}
               margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
             >
-              <CartesianGrid strokeDasharray="3 3" className="stroke-muted/20" />
+              <CartesianGrid strokeDasharray="3 3" className="stroke-blue-200/20 dark:stroke-blue-700/20" />
               <XAxis 
                 dataKey="date_start" 
                 tick={{ fill: 'hsl(var(--muted-foreground))' }}
                 axisLine={{ stroke: 'hsl(var(--border))' }}
                 tickLine={{ stroke: 'hsl(var(--border))' }}
+                tickFormatter={(value) => new Date(value).toLocaleDateString()}
               />
               <YAxis 
                 tick={{ fill: 'hsl(var(--muted-foreground))' }}
@@ -44,7 +45,7 @@ export function CampaignChart({ data, title, metric }: CampaignChartProps) {
                   const numValue = parseFloat(value);
                   return isNaN(numValue) ? ['$0.00', 'Spend'] : [`$${numValue.toFixed(2)}`, 'Spend'];
                 }}
-                labelFormatter={(label) => `Date: ${label}`}
+                labelFormatter={(label) => new Date(label).toLocaleDateString()}
               />
               <Line
                 type="monotone"
