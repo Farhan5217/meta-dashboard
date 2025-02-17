@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState , useEffect} from "react";
 import { useQuery } from "@tanstack/react-query";
 import { getAdAccountInsights, getCampaignInsights } from "@/services/api";
 import { toast } from "sonner";
@@ -21,18 +21,43 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { AD_ACCOUNT_STATUS, CAMPAIGN_STATUS, CAMPAIGN_OBJECTIVES } from "@/config/constants";
+const getLast30Days = () => {
+  const today = new Date();
+  const last30Days = new Date(today);
+  last30Days.setDate(today.getDate() - 30);
+  return { from: last30Days, to: today };
+};
 
 const Index = () => {
   const navigate = useNavigate();
-  const [selectedAccount, setSelectedAccount] = useState<string>();
+  // const [selectedAccount, setSelectedAccount] = useState<string>();
+  const [selectedAccount, setSelectedAccount] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState<number>();
   const [campaignStatusFilter, setCampaignStatusFilter] = useState<string>();
   const [objectiveFilter, setObjectiveFilter] = useState<string>();
   const [showDemographics, setShowDemographics] = useState(false);
-  const [dateRange, setDateRange] = useState<DateRange>();
+  // const [dateRange, setDateRange] = useState<DateRange>();
+  const [dateRange, setDateRange] = useState<DateRange>(getLast30Days());
 
   const { accounts } = useAdAccounts(statusFilter);
   const { campaigns } = useCampaigns(selectedAccount, campaignStatusFilter, objectiveFilter);
+
+// Set default date range if account is selected
+useEffect(() => {
+  if (selectedAccount) {
+    setDateRange(getLast30Days());
+    // Store selected account in sessionStorage
+    sessionStorage.setItem("selectedAccount", selectedAccount);
+  }
+}, [selectedAccount]);
+
+// Load selected account and filters from sessionStorage on page load
+useEffect(() => {
+  const storedAccount = sessionStorage.getItem("selectedAccount");
+  if (storedAccount) {
+    setSelectedAccount(storedAccount);
+  }
+}, []);
 
   // Get insights with time increment for time series
   const { data: timeSeriesInsights, isLoading: timeSeriesLoading } = useQuery({

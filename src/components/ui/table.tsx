@@ -5,11 +5,11 @@ const Table = React.forwardRef<
   HTMLTableElement,
   React.HTMLAttributes<HTMLTableElement>
 >(({ className, ...props }, ref) => (
-  <div className="relative w-full overflow-hidden rounded-lg shadow-lg">
+  <div className="relative w-full overflow-hidden rounded-lg shadow-lg ">
     <table
       ref={ref}
       className={cn(
-        "w-full text-sm border-collapse bg-white dark:bg-gray-900",
+        "w-full text-sm border-collapse bg-white dark:bg-gray-900 ",
         className
       )}
       {...props}
@@ -24,7 +24,7 @@ const TableHeader = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <thead
     ref={ref}
-    className={cn("bg-gray-300 dark:bg-gray-800 text-gray-700 dark:text-gray-300", className)}
+    className={cn("bg-gradient-to-r from-blue-500 to-blue-700 text-white  ", className)}
     {...props}
   />
 ));
@@ -36,7 +36,7 @@ const TableBody = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <tbody
     ref={ref}
-    className={cn("divide-y divide-gray-200 dark:divide-gray-700", className)}
+    className={cn("divide-y divide-gray-200 ", className)}
     {...props}
   />
 ));
@@ -61,7 +61,7 @@ const TableRow = React.forwardRef<
   <tr
     ref={ref}
     className={cn(
-      "border-b border-gray-200 dark:border-gray-700 transition-all hover:bg-gray-50 dark:hover:bg-gray-800",
+      "border-b border-gray-200 dark:border-gray-700 transition-all   ",
       className
     )}
     {...props}
@@ -76,7 +76,7 @@ const TableHead = React.forwardRef<
   <th
     ref={ref}
     className={cn(
-      "px-6 py-3 text-left text-sm font-semibold uppercase tracking-wider text-gray-700 dark:text-gray-300",
+      "px-6 py-3 text-left text-sm font-semibold uppercase tracking-wider text-white dark:text-gray-300 ",
       className
     )}
     {...props}
