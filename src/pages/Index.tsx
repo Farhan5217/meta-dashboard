@@ -143,6 +143,8 @@ useEffect(() => {
   const latestFrequency = timeSeriesInsights?.length 
     ? (parseInt(timeSeriesInsights[timeSeriesInsights.length - 1].frequency) || 0).toFixed(2)
     : "0";
+    
+    console.log("Campaign Objectives:", CAMPAIGN_OBJECTIVES);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-gray-950 dark:to-slate-950">
@@ -257,19 +259,25 @@ useEffect(() => {
         Campaign Objective:
       </Label>
       <div className="relative w-full sm:w-[220px]">
-        <select
-          id="campaign-objective"
-          className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-3 text-sm bg-white dark:bg-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-primary focus:border-primary outline-none appearance-none pr-8 transition ease-in-out duration-200"
-          value={objectiveFilter}
-          onChange={(e) => setObjectiveFilter(e.target.value)}
-        >
-          <option value="">All</option>
-          {CAMPAIGN_OBJECTIVES.map((objective) => (
-            <option key={objective} value={objective}>
-              {objective.replace("OUTCOME_", "")}
-            </option>
-          ))}
-        </select>
+      <select
+  id="campaign-objective"
+  className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-3 text-sm bg-white dark:bg-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-primary focus:border-primary outline-none appearance-none pr-8 transition ease-in-out duration-200"
+  value={objectiveFilter}
+  onChange={(e) => {
+    console.log("Selected Filter:", e.target.value);
+    setObjectiveFilter(e.target.value);
+  }}
+>
+  <option value="">All</option>
+  {CAMPAIGN_OBJECTIVES.map((objective, index) => {
+    console.log(`Rendering: ${objective}`);
+    return (
+      <option key={index} value={objective}>
+        {objective.replace("OUTCOME_", "")}
+      </option>
+    );
+  })}
+</select>
         {/* Custom arrow styling */}
         <div className="absolute top-1/2 right-4 transform -translate-y-1/2 pointer-events-none">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="text-gray-400 dark:text-gray-200" viewBox="0 0 16 16">
