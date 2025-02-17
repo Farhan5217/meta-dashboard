@@ -95,11 +95,14 @@ const Campaign = () => {
               date={dateRange} 
               onRangeChange={(range) => setDateRange(range as DateRange)}
             />
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-2 points-even-none"
+              aria-disabled="true"
+            >
               <Switch
                 id="demographics"
                 checked={showDemographics}
                 onCheckedChange={setShowDemographics}
+                disabled
               />
               <Label htmlFor="demographics">Show Demographics</Label>
             </div>
