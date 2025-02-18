@@ -290,20 +290,39 @@ useEffect(() => {
   </div>
 
   {/* Campaigns Table Section */}
-  <h2 className="text-2xl font-semibold text-gray-800 dark:text-gray-100 mt-6 mb-4">
-    Campaigns
-  </h2>
+  {/* Campaigns Section */}
+<div className="mt-10 space-y-6 bg-white dark:bg-gray-800/50 rounded-xl shadow-lg p-6">
+  <div className="flex justify-between items-center">
+    <h2 className="text-2xl font-semibold text-gray-800 dark:text-gray-100">
+      Campaigns Overview
+    </h2>
+    <div className="text-sm text-gray-500 dark:text-gray-400">
+      {campaigns.length}  Campaigns
+    </div>
+  </div>
   
-  <div className="overflow-x-auto rounded-lg shadow-lg border dark:border-gray-800">
+  <div className="overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700">
     <Table>
       <TableHeader>
-        <TableRow className="dark:bg-gray-900 text-gray-700 dark:text-gray-300">
-          <TableHead>Name</TableHead>
-          <TableHead>Status</TableHead>
-          <TableHead>Objective</TableHead>
-          <TableHead>Spend</TableHead>
-          <TableHead>Impressions</TableHead>
-          <TableHead>Clicks</TableHead>
+        <TableRow className=" dark:bg-gray-800/60">
+          <TableHead className="py-4 px-6 text-left text-sm font-semibold text-white dark:text-gray-100">
+            Name
+          </TableHead>
+          <TableHead className="py-4 px-6 text-left text-sm font-semibold text-white dark:text-gray-100">
+            Status
+          </TableHead>
+          <TableHead className="py-4 px-6 text-left text-sm font-semibold text-white dark:text-gray-100">
+            Objective
+          </TableHead>
+          <TableHead className="py-4 px-6 text-left text-sm font-semibold text-white dark:text-gray-100">
+            Spend
+          </TableHead>
+          <TableHead className="py-4 px-6 text-left text-sm font-semibold text-white dark:text-gray-100">
+            Impressions
+          </TableHead>
+          <TableHead className="py-4 px-6 text-left text-sm font-semibold text-white dark:text-gray-100">
+            Clicks
+          </TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -312,21 +331,42 @@ useEffect(() => {
           return (
             <TableRow
               key={campaign.id}
-              className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 transition duration-200"
+              className="group cursor-pointer border-t border-gray-200 dark:border-gray-700 hover:bg-gray-50/50 dark:hover:bg-gray-700/50 transition-colors duration-200"
               onClick={() => navigate(`/campaign/${campaign.id}`)}
             >
-              <TableCell>{campaign.name}</TableCell>
-              <TableCell>{campaign.status}</TableCell>
-              <TableCell>{campaign.objective.replace("OUTCOME_", "")}</TableCell>
-              <TableCell>${parseFloat(insights.spend || "0").toFixed(2)}</TableCell>
-              <TableCell>{parseInt(insights.impressions || "0").toLocaleString()}</TableCell>
-              <TableCell>{parseInt(insights.clicks || "0").toLocaleString()}</TableCell>
+              <TableCell className="py-4 px-6">
+                <div className="font-medium text-gray-900 dark:text-gray-100">
+                  {campaign.name}
+                </div>
+              </TableCell>
+              <TableCell className="py-4 px-6">
+                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                  ${campaign.status === 'ACTIVE' 
+                    ? 'bg-green-300 text-green-800 dark:bg-green-800/20 dark:text-green-400'
+                    : 'bg-red-200 text-gray-800 dark:bg-gray-800/20 dark:text-gray-400'
+                  }`}>
+                  {campaign.status}
+                </span>
+              </TableCell>
+              <TableCell className="py-4 px-6 text-gray-700 dark:text-gray-300">
+                {campaign.objective.replace("OUTCOME_", "")}
+              </TableCell>
+              <TableCell className="py-4 px-6 text-gray-700 dark:text-gray-300">
+                <span className="font-medium">${parseFloat(insights.spend || "0").toFixed(2)}</span>
+              </TableCell>
+              <TableCell className="py-4 px-6 text-gray-700 dark:text-gray-300">
+                {parseInt(insights.impressions || "0").toLocaleString()}
+              </TableCell>
+              <TableCell className="py-4 px-6 text-gray-700 dark:text-gray-300">
+                {parseInt(insights.clicks || "0").toLocaleString()}
+              </TableCell>
             </TableRow>
           );
         })}
       </TableBody>
     </Table>
   </div>
+</div>
 </div>
 
       </>

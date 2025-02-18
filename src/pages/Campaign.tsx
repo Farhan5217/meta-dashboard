@@ -161,7 +161,7 @@ const Campaign = () => {
             />
 
             {/* Ad Sets Section */}
-            <div className="mt-8">
+            {/* <div className="mt-8">
               <h2 className="text-xl font-semibold mb-4">Ad Sets</h2>
               {adSetsLoading ? (
                 <div className="flex items-center justify-center p-8">
@@ -195,7 +195,7 @@ const Campaign = () => {
                   </TableBody>
                 </Table>
               )}
-            </div>
+            </div> */}
           </>
         )}
 
