@@ -1,79 +1,141 @@
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-} from "recharts";
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface DemographicsChartProps {
-  data: any[];
+  data: Array<{
+    impressions: string;
+    clicks: string;
+    spend: string;
+    reach: string;
+    frequency: string;
+    ctr: string;
+    cpm: string;
+    date_start: string;
+    date_stop: string;
+    age?: string;
+    gender?: string;
+  }>;
   title: string;
 }
 
 export function DemographicsChart({ data, title }: DemographicsChartProps) {
-  // Process data to group by age and gender
-  const processedData = data.reduce((acc, curr) => {
-    if (curr.age && curr.gender) {
-      const key = curr.age;
-      if (!acc[key]) {
-        acc[key] = {
-          age: key,
-          male: 0,
-          female: 0,
-          unknown: 0,
-        };
-      }
-      acc[key][curr.gender.toLowerCase()] += parseFloat(curr.spend) || 0;
+  // Process data to aggregate spend by gender only
+  const genderTotals = data.reduce((acc, curr) => {
+    if (!curr.gender) return acc;
+    
+    const gender = curr.gender.toLowerCase();
+    const spend = parseFloat(curr.spend) || 0;
+    
+    if (!acc[gender]) {
+      acc[gender] = 0;
     }
+    
+    acc[gender] += spend;
     return acc;
-  }, {} as Record<string, { age: string; male: number; female: number; unknown: number }>);
+  }, {} as Record<string, number>);
 
-  const chartData = Object.values(processedData);
+  // Convert to chart data format
+  const chartData = Object.entries(genderTotals).map(([gender, total]) => ({
+    name: gender.charAt(0).toUpperCase() + gender.slice(1),
+    value: total
+  }));
+
+  const COLORS = {
+    Male: "#3b82f6",
+    Female: "#ec4899",
+    Unknown: "#94a3b8"
+  };
+
+  const CustomTooltip = ({ active, payload }: any) => {
+    if (active && payload && payload.length) {
+      const data = payload[0];
+      return (
+        <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700">
+          <p className="font-medium text-gray-900 dark:text-gray-100">
+            {data.name}
+          </p>
+          <p className="text-gray-600 dark:text-gray-400">
+            ${data.value.toFixed(2)}
+          </p>
+        </div>
+      );
+    }
+    return null;
+  };
+
+  // If no data or no gender data, show empty state
+  if (chartData.length === 0) {
+    return (
+      <Card className="border border-blue-200/50 dark:border-blue-800/50">
+        <CardHeader>
+          <CardTitle className="text-blue-900/80 dark:text-blue-100/80">{title}</CardTitle>
+        </CardHeader>
+        <CardContent className="h-[400px] flex items-center justify-center">
+          <p className="text-gray-500 dark:text-gray-400">No gender data available</p>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card className="border border-blue-200/50 dark:border-blue-800/50 hover:shadow-lg transition-shadow">
       <CardHeader>
-        <CardTitle className="text-blue-900/80 dark:text-blue-100/80">{title}</CardTitle>
+        <CardTitle className="text-blue-900/80 dark:text-blue-100/80">
+          {title}
+        </CardTitle>
       </CardHeader>
       <CardContent>
         <div className="h-[400px]">
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart
-              data={chartData}
-              margin={{ top: 20, right: 30, left: 20, bottom: 10 }}
-              barGap={5}
-              barCategoryGap={20}
-            >
-              <CartesianGrid strokeDasharray="3 3" className="stroke-blue-200/20 dark:stroke-blue-700/20" />
-              <XAxis
-                dataKey="age"
-                tick={{ fill: 'hsl(var(--muted-foreground))' }}
-                axisLine={{ stroke: 'hsl(var(--border))' }}
-                tickLine={{ stroke: 'hsl(var(--border))' }}
-              />
-              <YAxis
-                tick={{ fill: 'hsl(var(--muted-foreground))' }}
-                axisLine={{ stroke: 'hsl(var(--border))' }}
-                tickLine={{ stroke: 'hsl(var(--border))' }}
-              />
-              <Tooltip 
-                contentStyle={{
-                  backgroundColor: 'hsl(var(--card))',
-                  border: '1px solid hsl(var(--border))',
-                  borderRadius: '8px',
+            <PieChart>
+              <Pie
+                data={chartData}
+                cx="50%"
+                cy="50%"
+                innerRadius={80}
+                outerRadius={140}
+                paddingAngle={2}
+                dataKey="value"
+                labelLine={false}
+                label={({
+                  cx,
+                  cy,
+                  midAngle,
+                  innerRadius,
+                  outerRadius,
+                  percent,
+                  name
+                }) => {
+                  const radius = innerRadius + (outerRadius - innerRadius) * 1.4;
+                  const x = cx + radius * Math.cos(-midAngle * (Math.PI / 180));
+                  const y = cy + radius * Math.sin(-midAngle * (Math.PI / 180));
+                  return (
+                    <text
+                      x={x}
+                      y={y}
+                      fill="currentColor"
+                      textAnchor={x > cx ? "start" : "end"}
+                      dominantBaseline="central"
+                    >
+                      {`${name} (${(percent * 100).toFixed(0)}%)`}
+                    </text>
+                  );
                 }}
-                formatter={(value: number) => `$${value.toFixed(2)}`}
+              >
+                {chartData.map((entry, index) => (
+                  <Cell
+                    key={`cell-${index}`}
+                    fill={COLORS[entry.name as keyof typeof COLORS]}
+                    strokeWidth={2}
+                  />
+                ))}
+              </Pie>
+              <Tooltip content={<CustomTooltip />} />
+              <Legend
+                verticalAlign="bottom"
+                height={36}
               />
-              <Legend wrapperStyle={{ color: 'hsl(var(--muted-foreground))' }} />
-              <Bar name="Male" dataKey="male" fill="#3b82f6" radius={[4, 4, 0, 0]} />
-              <Bar name="Female" dataKey="female" fill="#ec4899" radius={[4, 4, 0, 0]} />
-              <Bar name="Unknown" dataKey="unknown" fill="#94a3b8" radius={[4, 4, 0, 0]} />
-            </BarChart>
+            </PieChart>
           </ResponsiveContainer>
         </div>
       </CardContent>

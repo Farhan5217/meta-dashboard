@@ -20,7 +20,7 @@ export function DashboardHeader({
   statusFilter,
 }: DashboardHeaderProps) {
   return (
-    <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl border-b border-gray-200 dark:border-gray-700 sticky top-0 z-50">
+    <div className="bg-white dark:bg-gray-800/80 backdrop-blur-xl border-b border-gray-200 dark:border-gray-700 sticky top-0 z-50 shadow-xl rounded-sm">
       <div className="container mx-auto py-6 px-4">
         <div className="flex flex-col space-y-4 md:flex-row md:items-center md:justify-between md:space-y-0">
           <div>

@@ -10,7 +10,7 @@ interface AreaChartProps {
 
 export function AreaChart({ data, title, dataKey }: AreaChartProps) {
   return (
-    <Card className="hover:shadow-lg transition-shadow bg-gradient-to-br from-green-50/50 to-teal-50/50 dark:from-green-950/50 dark:to-teal-950/50 border border-green-100/50 dark:border-green-800/50">
+    <Card className="hover:shadow-lg transition-shadow bg-white dark:from-green-950/50 dark:to-teal-950/50 border border-green-100/50 dark:border-green-800/50 shadow-xl rounded-lg">
       <CardHeader>
         <CardTitle className="text-green-900/80 dark:text-green-100/80">{title}</CardTitle>
       </CardHeader>

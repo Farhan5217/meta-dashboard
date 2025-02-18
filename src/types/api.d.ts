@@ -36,6 +36,22 @@ export interface AdSet {
   budget_remaining: string;
 }
 
+// export interface InsightData {
+//   date_start: string;
+//   date_stop: string;
+//   impressions: string;
+//   clicks: string;
+//   spend: string;
+//   reach: string;
+//   frequency: string;
+//   ctr: string;
+//   cpc: string;
+//   cpm: string;
+//   age?: string;
+//   gender?: string;
+//   campaign_name?: string;
+//   adset_name?: string;
+// }
 export interface InsightData {
   date_start: string;
   date_stop: string;
@@ -52,6 +68,7 @@ export interface InsightData {
   campaign_name?: string;
   adset_name?: string;
 }
+
 
 export interface TableMetrics {
   id: string;

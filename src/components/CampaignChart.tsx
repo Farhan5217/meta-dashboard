@@ -93,12 +93,11 @@ interface CampaignChartProps {
 }
 
 export function CampaignChart({ data, title, metric }: CampaignChartProps) {
-  // Calculate the max value for proper scaling
   const maxValue = Math.max(...data.map(item => parseFloat(item[metric]) || 0));
-  const yAxisDomain = [0, Math.ceil(maxValue * 1.1)]; // 10% padding on top
+  const yAxisDomain = [0, Math.ceil(maxValue * 1.1)];
 
   return (
-    <Card className="hover:shadow-lg transition-shadow border border-blue-100/50 dark:border-blue-800/50">
+    <Card className="hover:shadow-lg transition-shadow border border-blue-100/50 dark:border-blue-800/50 shadow-xl rounded-lg col-span-full">
       <CardHeader>
         <CardTitle className="text-blue-900/80 dark:text-blue-100/80">{title}</CardTitle>
       </CardHeader>
@@ -111,8 +110,8 @@ export function CampaignChart({ data, title, metric }: CampaignChartProps) {
             >
               <defs>
                 <linearGradient id="colorArea" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity={0.6} />
-                  <stop offset="100%" stopColor="hsl(var(--primary))" stopOpacity={0.1} />
+                  <stop offset="0%" stopColor="#80b3ff" stopOpacity={0.4} />
+                  <stop offset="100%" stopColor="#cce0ff" stopOpacity={0.1} />
                 </linearGradient>
               </defs>
 
@@ -150,14 +149,14 @@ export function CampaignChart({ data, title, metric }: CampaignChartProps) {
                 type="monotone"
                 dataKey={metric}
                 strokeWidth={2}
-                stroke="hsl(var(--primary))"
+                stroke="#80b3ff"
                 fill="url(#colorArea)"
                 fillOpacity={1}
               />
 
               <Scatter
                 dataKey={metric}
-                fill="hsl(var(--primary))"
+                fill="#80b3ff"
                 stroke="white"
                 strokeWidth={1}
                 r={3}
@@ -167,9 +166,9 @@ export function CampaignChart({ data, title, metric }: CampaignChartProps) {
                 type="monotone"
                 dataKey={metric}
                 strokeWidth={2}
-                stroke="hsl(var(--primary))"
+                stroke="#80b3ff"
                 dot={false}
-                activeDot={{ r: 6, fill: 'hsl(var(--primary))' }}
+                activeDot={{ r: 6, fill: '#80b3ff' }}
               />
             </AreaChart>
           </ResponsiveContainer>

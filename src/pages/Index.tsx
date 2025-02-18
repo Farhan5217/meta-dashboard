@@ -68,7 +68,7 @@ useEffect(() => {
           since: dateRange.from.toISOString().split('T')[0],
           until: dateRange.to.toISOString().split('T')[0],
           time_increment: 1,
-          breakdown: showDemographics,
+          breakdown: true,
         };
         
         if (selectedAccount) {
@@ -147,7 +147,7 @@ useEffect(() => {
     console.log("Campaign Objectives:", CAMPAIGN_OBJECTIVES);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-gray-950 dark:to-slate-950">
+    <div className="min-h-screen bg-white">
   <DashboardHeader
     selectedAccount={selectedAccount}
     dateRange={dateRange}
@@ -191,13 +191,13 @@ useEffect(() => {
 
 
 
-      {/* <div className="flex items-center space-x-2 disabled">
-        <Switch id="demographics" checked={showDemographics} onCheckedChange={setShowDemographics} />
-        <Label htmlFor="demographics" className="text-gray-700 dark:text-gray-300 disabled">
+      <div className="flex items-center space-x-2 disabled">
+        {/* <Switch id="demographics" checked={showDemographics} onCheckedChange={setShowDemographics} /> */}
+        {/* <Label htmlFor="demographics" className="text-gray-700 dark:text-gray-300 disabled">
           Show Demographics
-        </Label>
-      </div> */}
-      <div
+        </Label> */}
+      </div>
+      {/* <div
   className="flex items-center space-x-2 opacity-50 pointer-events-none"
   aria-disabled="true"
 >
@@ -205,7 +205,7 @@ useEffect(() => {
     id="demographics"
     checked={showDemographics}
     onCheckedChange={setShowDemographics}
-    disabled
+    // disabled
   />
   <Label
     htmlFor="demographics"
@@ -213,7 +213,7 @@ useEffect(() => {
   >
     Show Demographics
   </Label>
-</div>
+</div> */}
 
     </div>
 
@@ -221,7 +221,7 @@ useEffect(() => {
       <>
         <MetricsGrid aggregatedMetrics={aggregatedMetrics} latestReach={latestReach} latestFrequency={latestFrequency} />
 
-        <ChartsGrid timeSeriesInsights={timeSeriesInsights || []} showDemographics={showDemographics} />
+        <ChartsGrid timeSeriesInsights={timeSeriesInsights || []} />
 
         {/* Campaign Filters */}
         <div className="mt-8 space-y-6">

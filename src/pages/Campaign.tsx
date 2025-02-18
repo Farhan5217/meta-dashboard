@@ -72,7 +72,8 @@ const Campaign = () => {
         since: dateRange.from.toISOString().split("T")[0],
         until: dateRange.to.toISOString().split("T")[0],
         time_increment: 1,
-        breakdown: showDemographics,
+        // breakdown: showDemographics,
+        breakdown:true
       });
     },
     meta: {
@@ -124,15 +125,15 @@ const Campaign = () => {
               date={dateRange} 
               onRangeChange={(range) => setDateRange(range as DateRange)}
             />
-            {/* <div className="flex items-center space-x-2">
-              <Switch
+            <div className="flex items-center space-x-2">
+              {/* <Switch
                 id="demographics"
                 checked={showDemographics}
                 onCheckedChange={setShowDemographics}
                 disabled
               />
-              <Label htmlFor="demographics" className="text-gray-700 dark:text-gray-300">Show Demographics</Label>
-            </div> */}
+              <Label htmlFor="demographics" className="text-gray-700 dark:text-gray-300">Show Demographics</Label> */}
+            </div>
             <Button
       variant="aesthetic"
       size="sm"
@@ -156,7 +157,7 @@ const Campaign = () => {
             />
             <ChartsGrid 
               timeSeriesInsights={timeSeriesInsights || []}
-              showDemographics={showDemographics}
+              // showDemographics={showDemographics}
             />
 
             {/* Ad Sets Section */}

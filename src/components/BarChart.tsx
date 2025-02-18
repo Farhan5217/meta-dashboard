@@ -9,7 +9,7 @@ interface BarChartProps {
 
 export function BarChartVertical({ data, title, dataKey }: BarChartProps) {
   return (
-    <Card className="hover:shadow-lg transition-shadow bg-gradient-to-br from-purple-50/50 to-pink-50/50 dark:from-purple-900/40 dark:to-pink-900/40 border border-purple-100/50 dark:border-purple-700/50">
+    <Card className="  bg-white dark:from-purple-900/40 dark:to-pink-900/40 border border-purple-100/50 dark:border-purple-700/50 shadow-xl rounded-lg">
       <CardHeader className="pb-2">
         <CardTitle className="text-purple-900 dark:text-purple-100 text-lg font-semibold">
           {title}
