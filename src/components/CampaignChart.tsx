@@ -106,7 +106,7 @@ export function CampaignChart({ data, title, metric }: CampaignChartProps) {
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart
               data={data}
-              margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
+              margin={{ top: 20, right: 30, left: 20, bottom: 40 }}
             >
               <defs>
                 <linearGradient id="colorArea" x1="0" y1="0" x2="0" y2="1">
@@ -117,20 +117,33 @@ export function CampaignChart({ data, title, metric }: CampaignChartProps) {
 
               <CartesianGrid strokeDasharray="3 3" className="stroke-blue-200/20 dark:stroke-blue-700/20" />
               <XAxis 
-                dataKey="date_start" 
+                dataKey="custom_label" 
                 tick={{ fill: 'hsl(var(--muted-foreground))' }}
                 axisLine={{ stroke: 'hsl(var(--border))' }}
                 tickLine={{ stroke: 'hsl(var(--border))' }}
-                tickFormatter={(value) => new Date(value).toLocaleDateString()}
                 padding={{ left: 10, right: 10 }}
+                label={{
+                  value: "Time / Labels",
+                  position: "top",
+                  dy: 30,
+                  fill: 'hsl(var(--muted-foreground))',
+                  fontSize: 14
+                }}
               />
               <YAxis 
                 domain={yAxisDomain}
                 tick={{ fill: 'hsl(var(--muted-foreground))' }}
                 axisLine={{ stroke: 'hsl(var(--border))' }}
                 tickLine={{ stroke: 'hsl(var(--border))' }}
-                tickFormatter={(value) => `$${value}`}
                 padding={{ top: 20 }}
+                label={{
+                  value: metric.toUpperCase(),
+                  angle: -90,
+                  position: "insideLeft",
+                  dy: -10,
+                  fill: 'hsl(var(--muted-foreground))',
+                  fontSize: 14
+                }}
               />
               <Tooltip
                 contentStyle={{
@@ -142,7 +155,7 @@ export function CampaignChart({ data, title, metric }: CampaignChartProps) {
                   const numValue = parseFloat(value);
                   return isNaN(numValue) ? ['$0.00', 'Spend'] : [`$${numValue.toFixed(2)}`, 'Spend'];
                 }}
-                labelFormatter={(label) => new Date(label).toLocaleDateString()}
+                // labelFormatter={(label) => `Date: ${label}`} // More informative tooltip
               />
 
               <Area

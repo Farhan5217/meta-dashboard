@@ -1,5 +1,13 @@
-
-import { Activity, DollarSign, Users, TrendingUp, Signal, Radio } from "lucide-react";
+import { 
+  DollarSign, 
+  Eye, 
+  MousePointer, 
+  BarChart2, 
+  CircleDollarSign, 
+  PieChart,
+  Users,
+  Repeat
+} from "lucide-react";
 import { MetricCard } from "@/components/MetricCard";
 
 interface MetricsGridProps {
@@ -9,8 +17,8 @@ interface MetricsGridProps {
     clicks: string;
     spend: string;
     ctr: string;
-    cpc:string;
-    cpm:string
+    cpc: string;
+    cpm: string;
   };
   latestReach: number;
   latestFrequency: string;
@@ -25,62 +33,62 @@ export function MetricsGrid({
 }: MetricsGridProps) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4 gap-6 mb-8">
-      <MetricCard
-        title="Total Spend"
-        value={`$${parseFloat(aggregatedMetrics.spend || "0").toFixed(2)}`}
-        description="Total amount spent on the campaign"
-        icon={<DollarSign className="h-4 w-4" />}
-        className={className}
-      />
-      <MetricCard
-        title="Impressions"
-        value={parseInt(aggregatedMetrics.impressions || "0").toLocaleString()}
-        description="Total number of impressions"
-        icon={<Users className="h-4 w-4" />}
-        className={className}
-      />
-      <MetricCard
-        title="Clicks"
-        value={parseInt(aggregatedMetrics.clicks || "0").toLocaleString()}
-        description="Total number of clicks"
-        icon={<Activity className="h-4 w-4" />}
-        className={className}
-      />
-      <MetricCard
-        title="CTR"
-        value={`${parseFloat(aggregatedMetrics.ctr || "0").toFixed(2)}%`}
-        description="Click-through rate"
-        icon={<TrendingUp className="h-4 w-4" />}
-        className={className}
-      />
-      <MetricCard
-        title="CPC"
-        value={`${parseFloat(aggregatedMetrics.cpc || "0").toFixed(2)}%`}
-        description="Click-through rate"
-        icon={<TrendingUp className="h-4 w-4" />}
-        className={className}
-      />
-      <MetricCard
-        title="CPM"
-        value={`${parseFloat(aggregatedMetrics.cpm || "0").toFixed(2)}%`}
-        description="Click-through rate"
-        icon={<TrendingUp className="h-4 w-4" />}
-        className={className}
-      />
-      <MetricCard
-        title="Reach"
-        value={latestReach.toString().toLocaleString()}
-        description="Latest unique users reached"
-        icon={<Signal className="h-4 w-4" />}
-        className={className}
-      />
-      <MetricCard
-        title="Frequency"
-        value={latestFrequency.toString()}
-        description="Average impressions per user"
-        icon={<Radio className="h-4 w-4" />}
-        className={className}
-      />
-    </div>
+  <MetricCard
+    title="Total Spend"
+    value={`$${parseFloat(aggregatedMetrics.spend || "0").toFixed(2)}`}
+    description="Total amount spent on the campaign"
+    icon={<DollarSign className="h-4 w-4" />}
+    variant="spend"
+  />
+  <MetricCard
+    title="Impressions"
+    value={parseInt(aggregatedMetrics.impressions || "0").toLocaleString()}
+    description="Total number of impressions"
+    icon={<Eye className="h-4 w-4" />}
+    variant="impressions"
+  />
+  <MetricCard
+    title="Clicks"
+    value={parseInt(aggregatedMetrics.clicks || "0").toLocaleString()}
+    description="Total number of clicks"
+    icon={<MousePointer className="h-4 w-4" />}
+    variant="clicks"
+  />
+  <MetricCard
+    title="CTR"
+    value={`${parseFloat(aggregatedMetrics.ctr || "0").toFixed(2)}%`}
+    description="Click-through rate"
+    icon={<BarChart2 className="h-4 w-4" />}
+    variant="ctr"
+  />
+  <MetricCard
+    title="CPC"
+    value={`${parseFloat(aggregatedMetrics.cpc || "0").toFixed(2)}%`}
+    description="Cost per click"
+    icon={<CircleDollarSign className="h-4 w-4" />}
+    variant="cpc"
+  />
+  <MetricCard
+    title="CPM"
+    value={`${parseFloat(aggregatedMetrics.cpm || "0").toFixed(2)}%`}
+    description="Cost per thousand impressions"
+    icon={<PieChart className="h-4 w-4" />}
+    variant="cpm"
+  />
+  <MetricCard
+    title="Reach"
+    value={latestReach.toString().toLocaleString()}
+    description="Latest unique users reached"
+    icon={<Users className="h-4 w-4" />}
+    variant="reach"
+  />
+  <MetricCard
+    title="Frequency"
+    value={latestFrequency.toString()}
+    description="Average impressions per user"
+    icon={<Repeat className="h-4 w-4" />}
+    variant="frequency"
+  />
+</div>
   );
 }

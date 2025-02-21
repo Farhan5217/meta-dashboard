@@ -3,13 +3,18 @@ import { useState , useEffect} from "react";
 import { useQuery } from "@tanstack/react-query";
 import { getAdAccountInsights, getCampaignInsights } from "@/services/api";
 import { toast } from "sonner";
-import type { DateRange } from "@/types/api";
+import type { DateRange, InsightParams } from "@/types/api";
 import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
 import { MetricsGrid } from "@/components/dashboard/MetricsGrid";
 import { ChartsGrid } from "@/components/dashboard/ChartsGrid";
 import { useAdAccounts } from "@/hooks/useAdAccounts";
 import { useCampaigns } from "@/hooks/useCampaigns";
 import { Switch } from "@/components/ui/switch";
+import { motion } from "framer-motion"
+
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
+import { Sparkles, TrendingUp, Eye, MousePointerClick, DollarSign } from "lucide-react"
 import { Label } from "@/components/ui/label";
 import { useNavigate } from "react-router-dom";
 import {
@@ -35,21 +40,74 @@ const Index = () => {
   const [statusFilter, setStatusFilter] = useState<number>();
   const [campaignStatusFilter, setCampaignStatusFilter] = useState<string>();
   const [objectiveFilter, setObjectiveFilter] = useState<string>();
-  const [showDemographics, setShowDemographics] = useState(false);
-  // const [dateRange, setDateRange] = useState<DateRange>();
-  const [dateRange, setDateRange] = useState<DateRange>(getLast30Days());
+  // const [showDemographics, setShowDemographics] = useState(false);
+  // const [dateRange, setDateRange] = useState<DateRange>(getLast30Days());
+  // const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined); 
+  // const [dateRange, setDateRange] = useState<{ from: Date; to: Date } | undefined>();
+  const [dateRange, setDateRange] = useState<DateRange>(() => {
+    const today = new Date();
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(today.getDate() - 30);
+    return {
+      from: thirtyDaysAgo,
+      to: today
+    };
+  });
+
 
   const { accounts } = useAdAccounts(statusFilter);
   const { campaigns } = useCampaigns(selectedAccount, campaignStatusFilter, objectiveFilter);
 
-// Set default date range if account is selected
-useEffect(() => {
-  if (selectedAccount) {
-    setDateRange(getLast30Days());
-    // Store selected account in sessionStorage
-    sessionStorage.setItem("selectedAccount", selectedAccount);
+  // Auto-select first account if none selected
+  useEffect(() => {
+  if (!selectedAccount) return;
+
+  // If dateRange is undefined, we fetch all data
+  const params: InsightParams = {
+    time_increment: 1,
+    breakdown: true,
+  };
+
+  if (dateRange?.from && dateRange?.to) {
+    params.since = dateRange.from.toISOString().split('T')[0];
+    params.until = dateRange.to.toISOString().split('T')[0];
   }
-}, [selectedAccount]);
+
+  // Fetch data with or without date range
+  getAdAccountInsights(selectedAccount, params)
+    .then(data => {
+      // Process data
+    })
+    .catch(error => {
+      toast.error("Failed to fetch insights");
+    });
+}, [
+  
+  // selectedAccount, dateRange
+]);
+  // Set default date range if account is selected
+// useEffect(() => {
+//   if (selectedAccount) {
+//     setDateRange(getLast30Days());
+//     // Store selected account in sessionStorage
+//     sessionStorage.setItem("selectedAccount", selectedAccount);
+//   }
+// }, [selectedAccount]);
+
+  // Improved date range handling
+  useEffect(() => {
+    if (dateRange?.from && dateRange?.to) {
+      // Ensure dates are start and end of day
+      const from = new Date(dateRange.from);
+      from.setHours(0, 0, 0, 0);
+      const to = new Date(dateRange.to);
+      to.setHours(23, 59, 59, 999);
+      setDateRange({ from, to });
+    }
+  }, [
+    // dateRange?.from, dateRange?.to
+  ]);
+
 
 // Load selected account and filters from sessionStorage on page load
 useEffect(() => {
@@ -60,29 +118,53 @@ useEffect(() => {
 }, []);
 
   // Get insights with time increment for time series
-  const { data: timeSeriesInsights, isLoading: timeSeriesLoading } = useQuery({
-    queryKey: ["insights", selectedAccount, dateRange, "timeSeries", showDemographics],
-    queryFn: async () => {
-      if (dateRange?.from && dateRange?.to) {
-        const params = {
-          since: dateRange.from.toISOString().split('T')[0],
-          until: dateRange.to.toISOString().split('T')[0],
-          time_increment: 1,
-          breakdown: true,
-        };
+  // const { data: timeSeriesInsights, isLoading: timeSeriesLoading } = useQuery({
+  //   queryKey: ["insights", selectedAccount, dateRange, "timeSeries", showDemographics],
+  //   queryFn: async () => {
+  //     if (dateRange?.from && dateRange?.to) {
+  //       const params = {
+  //         since: dateRange.from.toISOString().split('T')[0],
+  //         until: dateRange.to.toISOString().split('T')[0],
+  //         time_increment: 1,
+  //         breakdown: true,
+  //       };
         
-        if (selectedAccount) {
-          return getAdAccountInsights(selectedAccount, params);
-        }
-      }
+  //       if (selectedAccount) {
+  //         return getAdAccountInsights(selectedAccount, params);
+  //       }
+  //     }
+  //     return [];
+  //   },
+  //   meta: {
+  //     onError: () => {
+  //       toast.error("Failed to fetch time series insights");
+  //     }
+  //   }
+  // });
+// Get insights with time increment for time series
+const { data: timeSeriesInsights, isLoading: timeSeriesLoading } = useQuery({
+  queryKey: ["insights", selectedAccount, dateRange, "timeSeries"],
+  queryFn: async () => {
+    if (!dateRange?.from || !dateRange?.to || !selectedAccount) return [];
+    
+    const params = {
+      since: dateRange.from.toISOString().split('T')[0],
+      until: dateRange.to.toISOString().split('T')[0],
+      time_increment: 1,
+      breakdown: true,
+    };
+
+    try {
+      const response = await getAdAccountInsights(selectedAccount, params);
+      return response;
+    } catch (error) {
+      console.error('Error fetching insights:', error);
       return [];
-    },
-    meta: {
-      onError: () => {
-        toast.error("Failed to fetch time series insights");
-      }
     }
-  });
+  },
+  refetchOnWindowFocus: false
+});
+
 
   // Get campaign insights for the table
   const { data: campaignInsights = {} } = useQuery({
@@ -133,6 +215,8 @@ useEffect(() => {
     clicks: "0",
     spend: "0",
     ctr: "0",
+    cpm:"0",
+cpc:"0"
   };
 
   // Calculate latest reach and frequency
@@ -144,16 +228,27 @@ useEffect(() => {
     ? (parseInt(timeSeriesInsights[timeSeriesInsights.length - 1].frequency) || 0).toFixed(2)
     : "0";
     
-    console.log("Campaign Objectives:", CAMPAIGN_OBJECTIVES);
+    // console.log("Campaign Objectives:", CAMPAIGN_OBJECTIVES);
+
+    const getStatusBadgeClass = (status: string) => {
+      switch (status) {
+        case "ACTIVE":
+          return "bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100"
+        case "PAUSED":
+          return "bg-yellow-100 text-yellow-800 dark:bg-yellow-800 dark:text-yellow-100"
+        default:
+          return "bg-red-100 text-red-800 dark:bg-red-800 dark:text-red-100"
+      }
+    }
 
   return (
     <div className="min-h-screen bg-white">
   <DashboardHeader
-    selectedAccount={selectedAccount}
-    dateRange={dateRange}
-    onAccountSelect={setSelectedAccount}
-    onDateRangeChange={setDateRange}
-    statusFilter={statusFilter}
+      selectedAccount={selectedAccount}
+      dateRange={dateRange}
+      onAccountSelect={setSelectedAccount}
+      onDateRangeChange={setDateRange}
+      statusFilter={statusFilter}
   />
 
   <div className="container mx-auto px-6 py-10">
@@ -291,82 +386,94 @@ useEffect(() => {
 
   {/* Campaigns Table Section */}
   {/* Campaigns Section */}
-<div className="mt-10 space-y-6 bg-white dark:bg-gray-800/50 rounded-xl shadow-lg p-6">
-  <div className="flex justify-between items-center">
-    <h2 className="text-2xl font-semibold text-gray-800 dark:text-gray-100">
-      Campaigns Overview
-    </h2>
-    <div className="text-sm text-gray-500 dark:text-gray-400">
-      {campaigns.length}  Campaigns
-    </div>
-  </div>
-  
-  <div className="overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700">
-    <Table>
-      <TableHeader>
-        <TableRow className=" dark:bg-gray-800/60">
-          <TableHead className="py-4 px-6 text-left text-sm font-semibold text-white dark:text-gray-100">
-            Name
-          </TableHead>
-          <TableHead className="py-4 px-6 text-left text-sm font-semibold text-white dark:text-gray-100">
-            Status
-          </TableHead>
-          <TableHead className="py-4 px-6 text-left text-sm font-semibold text-white dark:text-gray-100">
-            Objective
-          </TableHead>
-          <TableHead className="py-4 px-6 text-left text-sm font-semibold text-white dark:text-gray-100">
-            Spend
-          </TableHead>
-          <TableHead className="py-4 px-6 text-left text-sm font-semibold text-white dark:text-gray-100">
-            Impressions
-          </TableHead>
-          <TableHead className="py-4 px-6 text-left text-sm font-semibold text-white dark:text-gray-100">
-            Clicks
-          </TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {campaigns.map((campaign) => {
-          const insights = campaignInsights[campaign.id] || {};
-          return (
-            <TableRow
-              key={campaign.id}
-              className="group cursor-pointer border-t border-gray-200 dark:border-gray-700 hover:bg-gray-50/50 dark:hover:bg-gray-700/50 transition-colors duration-200"
-              onClick={() => navigate(`/campaign/${campaign.id}`)}
-            >
-              <TableCell className="py-4 px-6">
-                <div className="font-medium text-gray-900 dark:text-gray-100">
-                  {campaign.name}
-                </div>
-              </TableCell>
-              <TableCell className="py-4 px-6">
-                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-                  ${campaign.status === 'ACTIVE' 
-                    ? 'bg-green-300 text-green-800 dark:bg-green-800/20 dark:text-green-400'
-                    : 'bg-red-200 text-gray-800 dark:bg-gray-800/20 dark:text-gray-400'
-                  }`}>
-                  {campaign.status}
-                </span>
-              </TableCell>
-              <TableCell className="py-4 px-6 text-gray-700 dark:text-gray-300">
-                {campaign.objective.replace("OUTCOME_", "")}
-              </TableCell>
-              <TableCell className="py-4 px-6 text-gray-700 dark:text-gray-300">
-                <span className="font-medium">${parseFloat(insights.spend || "0").toFixed(2)}</span>
-              </TableCell>
-              <TableCell className="py-4 px-6 text-gray-700 dark:text-gray-300">
-                {parseInt(insights.impressions || "0").toLocaleString()}
-              </TableCell>
-              <TableCell className="py-4 px-6 text-gray-700 dark:text-gray-300">
-                {parseInt(insights.clicks || "0").toLocaleString()}
-              </TableCell>
-            </TableRow>
-          );
-        })}
-      </TableBody>
-    </Table>
-  </div>
-</div>
+  <Card className="mt-10 overflow-hidden bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-blue-900 dark:to-indigo-900 rounded-3xl shadow-xl">
+      <CardHeader className="bg-blue-500 dark:bg-blue-700 text-white p-6">
+        <div className="flex justify-between items-center">
+          <CardTitle className="text-2xl font-bold flex items-center gap-2">
+            <Sparkles className="w-6 h-6" />
+            Campaigns Overview
+          </CardTitle>
+          <Badge variant="secondary" className="text-sm bg-blue-600 dark:bg-blue-800">
+            {campaigns.length} Campaigns
+          </Badge>
+        </div>
+      </CardHeader>
+      <CardContent className="p-0">
+        <div className="overflow-x-auto">
+          <Table>
+            <TableHeader>
+              <TableRow className="bg-blue-100 dark:bg-blue-800/60">
+                <TableHead className="py-4 px-6 text-left text-sm font-semibold text-blue-800 dark:text-blue-100">
+                  Name
+                </TableHead>
+                <TableHead className="py-4 px-6 text-left text-sm font-semibold text-blue-800 dark:text-blue-100">
+                  Status
+                </TableHead>
+                <TableHead className="py-4 px-6 text-left text-sm font-semibold text-blue-800 dark:text-blue-100">
+                  Objective
+                </TableHead>
+                <TableHead className="py-4 px-6 text-left text-sm font-semibold text-blue-800 dark:text-blue-100">
+                  Spend
+                </TableHead>
+                <TableHead className="py-4 px-6 text-left text-sm font-semibold text-blue-800 dark:text-blue-100">
+                  Impressions
+                </TableHead>
+                <TableHead className="py-4 px-6 text-left text-sm font-semibold text-blue-800 dark:text-blue-100">
+                  Clicks
+                </TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {campaigns.map((campaign) => {
+                const insights = campaignInsights[campaign.id] || {}
+                return (
+                  <motion.tr
+                    key={campaign.id}
+                    className="group cursor-pointer border-b border-blue-200 dark:border-blue-700 hover:bg-blue-50 dark:hover:bg-blue-800/50 transition-colors duration-200"
+                    onClick={() => navigate(`/campaign/${campaign.id}`)}
+                    whileHover={{ scale: 1.02 }}
+                    transition={{ type: "spring", stiffness: 300 }}
+                  >
+                    <TableCell className="py-4 px-6">
+                      <div className="font-medium text-blue-900 dark:text-blue-100">{campaign.name}</div>
+                    </TableCell>
+                    <TableCell className="py-4 px-6">
+                      <Badge variant="outline" className={`text-xs ${getStatusBadgeClass(campaign.status)}`}>
+                        {campaign.status}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="py-4 px-6 text-blue-700 dark:text-blue-300">
+                      <div className="flex items-center gap-2">
+                        <TrendingUp className="w-4 h-4" />
+                        {campaign.objective.replace("OUTCOME_", "")}
+                      </div>
+                    </TableCell>
+                    <TableCell className="py-4 px-6 text-blue-700 dark:text-blue-300">
+                      <div className="flex items-center gap-2">
+                        <DollarSign className="w-4 h-4" />
+                        <span className="font-medium">{Number.parseFloat(insights.spend || "0").toFixed(2)}</span>
+                      </div>
+                    </TableCell>
+                    <TableCell className="py-4 px-6 text-blue-700 dark:text-blue-300">
+                      <div className="flex items-center gap-2">
+                        <Eye className="w-4 h-4" />
+                        {Number.parseInt(insights.impressions || "0").toLocaleString()}
+                      </div>
+                    </TableCell>
+                    <TableCell className="py-4 px-6 text-blue-700 dark:text-blue-300">
+                      <div className="flex items-center gap-2">
+                        <MousePointerClick className="w-4 h-4" />
+                        {Number.parseInt(insights.clicks || "0").toLocaleString()}
+                      </div>
+                    </TableCell>
+                  </motion.tr>
+                )
+              })}
+            </TableBody>
+          </Table>
+        </div>
+      </CardContent>
+    </Card>
 </div>
 
       </>
