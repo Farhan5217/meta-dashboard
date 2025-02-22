@@ -58,6 +58,18 @@ const Index = () => {
   const { accounts } = useAdAccounts(statusFilter);
   const { campaigns } = useCampaigns(selectedAccount, campaignStatusFilter, objectiveFilter);
 
+// Auto-select first account when accounts are loaded
+useEffect(() => {
+  if (!selectedAccount && accounts && accounts.length > 0) {
+    const firstAccount = accounts[0];
+    setSelectedAccount(firstAccount.id);
+    sessionStorage.setItem("selectedAccount", firstAccount.id);
+    toast.success(`Selected account: ${firstAccount.name}`, {
+      icon: "🎯",
+    });
+  }
+}, [accounts, selectedAccount])
+
   // Auto-select first account if none selected
   useEffect(() => {
   if (!selectedAccount) return;
@@ -107,6 +119,41 @@ const Index = () => {
   }, [
     // dateRange?.from, dateRange?.to
   ]);
+
+   // Load selected account from sessionStorage or auto-select first account
+   useEffect(() => {
+    const storedAccount = sessionStorage.getItem("selectedAccount");
+    if (storedAccount) {
+      setSelectedAccount(storedAccount);
+    } else if (accounts && accounts.length > 0) {
+      const firstAccount = accounts[0];
+      setSelectedAccount(firstAccount.id);
+      sessionStorage.setItem("selectedAccount", firstAccount.id);
+    }
+  }, []);
+
+  // Fetch insights when account is selected
+  useEffect(() => {
+    if (!selectedAccount) return;
+
+    const params: InsightParams = {
+      time_increment: 1,
+      breakdown: true,
+    };
+
+    if (dateRange?.from && dateRange?.to) {
+      params.since = dateRange.from.toISOString().split('T')[0];
+      params.until = dateRange.to.toISOString().split('T')[0];
+    }
+
+    getAdAccountInsights(selectedAccount, params)
+      .then(data => {
+        // Process data
+      })
+      .catch(error => {
+        toast.error("Failed to fetch insights");
+      });
+  }, [selectedAccount, dateRange]);
 
 
 // Load selected account and filters from sessionStorage on page load
@@ -316,7 +363,9 @@ cpc:"0"
       <>
         <MetricsGrid aggregatedMetrics={aggregatedMetrics} latestReach={latestReach} latestFrequency={latestFrequency} />
 
-        <ChartsGrid timeSeriesInsights={timeSeriesInsights || []} />
+        <ChartsGrid timeSeriesInsights={timeSeriesInsights || []} 
+        title="Ad Account Analytics" 
+        />
 
         {/* Campaign Filters */}
         <div className="mt-8 space-y-6">

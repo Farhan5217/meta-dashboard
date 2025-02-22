@@ -41,7 +41,7 @@ export function DemographicsChart({ data, title }: DemographicsChartProps) {
   }));
 
   const COLORS = {
-    Male: "#3b82f6",
+    Male: "#2563eb",
     Female: "#ec4899",
     Unknown: "#94a3b8"
   };
@@ -54,9 +54,9 @@ export function DemographicsChart({ data, title }: DemographicsChartProps) {
           <p className="font-medium text-gray-900 dark:text-gray-100">
             {data.name}
           </p>
-          <p className="text-gray-600 dark:text-gray-400">
+          {/* <p className="text-gray-600 dark:text-gray-400">
             ${data.value.toFixed(2)}
-          </p>
+          </p> */}
         </div>
       );
     }
@@ -66,21 +66,21 @@ export function DemographicsChart({ data, title }: DemographicsChartProps) {
   // If no data or no gender data, show empty state
   if (chartData.length === 0) {
     return (
-      <Card className="border border-blue-200/50 dark:border-blue-800/50">
+      <div className="border border-blue-200/50 dark:border-blue-800/50">
         <CardHeader>
-          <CardTitle className="text-blue-900/80 dark:text-blue-100/80">{title}</CardTitle>
+          <CardTitle className="">{title}</CardTitle>
         </CardHeader>
         <CardContent className="h-[400px] flex items-center justify-center">
           <p className="text-gray-500 dark:text-gray-400">No gender data available</p>
         </CardContent>
-      </Card>
+      </div>
     );
   }
 
   return (
-    <Card className="border border-blue-200/50 dark:border-blue-800/50 hover:shadow-lg transition-shadow">
+    <div className="">
       <CardHeader>
-        <CardTitle className="text-blue-900/80 dark:text-blue-100/80">
+        <CardTitle className="">
           {title}
         </CardTitle>
       </CardHeader>
@@ -139,6 +139,6 @@ export function DemographicsChart({ data, title }: DemographicsChartProps) {
           </ResponsiveContainer>
         </div>
       </CardContent>
-    </Card>
+    </div>
   );
 }

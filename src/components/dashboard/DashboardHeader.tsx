@@ -25,60 +25,88 @@ export function DashboardHeader({
   statusFilter,
 }: DashboardHeaderProps) {
   return (
-    <div className="sticky top-0 z-50 bg-gradient-to-br from-blue-100 via-blue-200 to-blue-300 dark:from-blue-900 dark:via-blue-800 dark:to-blue-700 overflow-hidden rounded-b-3xl shadow-lg">
-      <div className="absolute inset-0 opacity-30">
-        <Cloud className="absolute top-4 left-1/4 text-blue-300 dark:text-blue-600 w-12 h-12" />
-        <Droplets className="absolute bottom-4 right-1/4 text-blue-300 dark:text-blue-600 w-8 h-8" />
-        <Waves className="absolute top-1/2 left-3/4 text-blue-300 dark:text-blue-600 w-10 h-10" />
+    <div className="sticky top-0 z-50 bg-gradient-to-br from-blue-200 via-blue-250 to-blue-400 dark:from-blue-900 dark:via-blue-800/90 dark:to-blue-700/80 overflow-hidden shadow-xl">
+      {/* Animated background elements */}
+      <div className="absolute inset-0 opacity-40">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 1 }}
+        >
+          <Cloud className="absolute top-4 left-1/4 text-blue-400 dark:text-blue-500 w-12 h-12 opacity-60" />
+          <Droplets className="absolute bottom-4 right-1/4 text-blue-400 dark:text-blue-500 w-8 h-8 opacity-60" />
+          <Waves className="absolute top-1/2 left-3/4 text-blue-400 dark:text-blue-500 w-10 h-10 opacity-60" />
+        </motion.div>
       </div>
       
-      <div className="container mx-auto py-6 px-4 relative">
+      {/* Glass effect overlay */}
+      <div className="absolute inset-0 backdrop-blur-[2px]" />
+      
+      {/* Content */}
+      <div className="container mx-auto py-5 px-6 relative">
         <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-          <div className="flex items-center gap-4">
+          {/* Left side - Title and Logo */}
+          <div className="flex items-center gap-5">
             <motion.div
-              whileHover={{ scale: 1.1, rotate: 5 }}
-              whileTap={{ scale: 0.9 }}
+              whileHover={{ scale: 1.05, rotate: 5 }}
+              whileTap={{ scale: 0.95 }}
               className="relative"
             >
-              <div className="absolute inset-0 bg-blue-400 rounded-2xl blur opacity-50" />
-              <div className="relative bg-gradient-to-br from-blue-400 to-blue-600 p-3 rounded-2xl shadow-lg">
-                <BarChart3 className="h-8 w-8 text-white" />
+              <div className="absolute inset-0 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl blur opacity-50" />
+              <div className="relative bg-gradient-to-br from-blue-500 via-blue-600 to-blue-700 p-3.5 rounded-2xl shadow-lg">
+                <BarChart3 className="h-7 w-7 text-white" />
               </div>
             </motion.div>
+            
             <div>
-              <h1 className="text-3xl font-bold text-blue-800 dark:text-blue-100 font-comic">
+              <motion.h1 
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="text-2xl font-bold text-blue-900 dark:text-blue-50"
+              >
                 Meta Campaign Dashboard
-              </h1>
-              <div className="flex items-center gap-2 mt-1">
-                <span className="inline-block w-3 h-3 bg-green-400 rounded-full animate-bounce" />
-                <span className="text-sm text-blue-700 dark:text-blue-200">Live Analytics</span>
-              </div>
+              </motion.h1>
+              <motion.div 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.2 }}
+                className="flex items-center gap-2 mt-1"
+              >
+                <span className="relative flex h-3 w-3">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
+                </span>
+                <span className="text-sm font-medium text-blue-800 dark:text-blue-200">Live Analytics</span>
+              </motion.div>
             </div>
           </div>
 
-          <div className="flex flex-wrap items-center gap-4 bg-white/30 dark:bg-blue-800/30 backdrop-blur-md p-4 rounded-2xl shadow-inner">
-            <AdAccountSelector
-              onAccountSelect={(id) => {
-                onAccountSelect(id)
-                toast.success("Ad Account selected successfully", {
-                  icon: "🎉",
-                })
-              }}
-              selectedAccount={selectedAccount}
-              statusFilter={statusFilter}
-            />
-            <DateRangeFilter date={dateRange} onRangeChange={onDateRangeChange} />
-            {/* <Button 
-              variant="outline"
-              className="bg-blue-500 text-white hover:bg-blue-600 transition-colors duration-200"
-            >
-              Refresh Data
-            </Button> */}
-          </div>
+          {/* Right side - Controls */}
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            className="flex flex-wrap items-center gap-4 bg-white/40 dark:bg-blue-900/40 backdrop-blur-md p-4 rounded-xl shadow-inner border border-white/20 dark:border-blue-700/20"
+          >
+            <div className="flex gap-4 items-center flex-wrap">
+              <AdAccountSelector
+                onAccountSelect={(id) => {
+                  onAccountSelect(id)
+                  toast.success("Ad Account selected successfully", {
+                    icon: "🎉",
+                  })
+                }}
+                selectedAccount={selectedAccount}
+                statusFilter={statusFilter}
+              />
+              <DateRangeFilter date={dateRange} onRangeChange={onDateRangeChange} />
+            </div>
+          </motion.div>
         </div>
       </div>
       
-      <div className="h-2 bg-gradient-to-r from-blue-400 via-blue-500 to-blue-600" />
+      {/* Bottom gradient bar */}
+      <div className="h-1 bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700" />
     </div>
-  )
+  );
 }

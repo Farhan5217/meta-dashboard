@@ -155,10 +155,13 @@ const Campaign = () => {
               latestReach={Number.parseInt(latestData.reach || "0")}
               latestFrequency={latestData.frequency || "0"}
             />
-            <ChartsGrid timeSeriesInsights={timeSeriesInsights || []} />
+            <ChartsGrid timeSeriesInsights={timeSeriesInsights || []} 
+              title="Campaign Analytics" 
+
+            />
 
             {/* Enhanced Ad Sets Section */}
-            <Card className="mt-8 overflow-hidden bg-white dark:bg-gray-800 rounded-3xl shadow-lg">
+            {/* <Card className="mt-8 overflow-hidden bg-white dark:bg-gray-800 rounded-3xl shadow-lg">
               <CardHeader className="bg-blue-400 dark:bg-blue-900 p-6">
                 <CardTitle className="text-xl font-semibold text-white  flex items-center gap-2">
                   <TrendingUp className="h-5 w-5" />
@@ -217,7 +220,7 @@ const Campaign = () => {
                   </div>
                 )}
               </CardContent>
-            </Card>
+            </Card> */}
           </>
         )}
 

@@ -97,9 +97,9 @@ export function CampaignChart({ data, title, metric }: CampaignChartProps) {
   const yAxisDomain = [0, Math.ceil(maxValue * 1.1)];
 
   return (
-    <Card className="hover:shadow-lg transition-shadow border border-blue-100/50 dark:border-blue-800/50 shadow-xl rounded-lg col-span-full">
+    <div className=" ">
       <CardHeader>
-        <CardTitle className="text-blue-900/80 dark:text-blue-100/80">{title}</CardTitle>
+        <CardTitle className="">{title}</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="h-[300px]">
@@ -187,6 +187,6 @@ export function CampaignChart({ data, title, metric }: CampaignChartProps) {
           </ResponsiveContainer>
         </div>
       </CardContent>
-    </Card>
+    </div>
   );
 }

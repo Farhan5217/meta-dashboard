@@ -47,25 +47,13 @@ export function MultiMetricChart({ data, title, metrics }: MultiMetricChartProps
   const chartHeight = isExpanded ? 600 : 400;
 
   return (
-    <Card className="border border-blue-300/50 dark:border-blue-800/50 hover:shadow-xl transition-all duration-300">
-      <CardHeader className="flex flex-row items-center justify-between">
-        <CardTitle className="text-blue-900/90 dark:text-blue-100/90">
+    <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm">
+      <CardHeader className="flex flex-row items-center justify-between border-b border-slate-100 dark:border-slate-700">
+        <CardTitle className="text-slate-800 dark:text-slate-100 font-semibold">
           {title}
         </CardTitle>
-        {/* <Button
-          variant="outline"
-          size="sm"
-          onClick={() => setIsExpanded(!isExpanded)}
-          className="ml-2"
-        >
-          {isExpanded ? (
-            <Minimize2 className="h-4 w-4" />
-          ) : (
-            <Maximize2 className="h-4 w-4" />
-          )}
-        </Button> */}
       </CardHeader>
-      <CardContent>
+      <CardContent className="pt-6">
         <div style={{ height: chartHeight }} className="transition-all duration-300 ease-in-out">
           <ResponsiveContainer width="100%" height="100%">
             <LineChart 
@@ -74,32 +62,32 @@ export function MultiMetricChart({ data, title, metrics }: MultiMetricChartProps
             >
               <CartesianGrid 
                 strokeDasharray="3 3" 
-                className="stroke-blue-200/30 dark:stroke-blue-700/30" 
+                className="stroke-slate-200 dark:stroke-slate-700" 
                 vertical={false}
               />
               
               <XAxis
                 dataKey="custom_label"
-                tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }}
-                axisLine={{ stroke: 'hsl(var(--border))' }}
-                tickLine={{ stroke: 'hsl(var(--border))' }}
+                tick={{ fill: 'rgb(100, 116, 139)', fontSize: 12 }}
+                axisLine={{ stroke: 'rgb(203, 213, 225)' }}
+                tickLine={{ stroke: 'rgb(203, 213, 225)' }}
                 interval="preserveStartEnd"
                 padding={{ left: 10, right: 10 }}
               />
               
               <YAxis
-                tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }}
-                axisLine={{ stroke: 'hsl(var(--border))' }}
-                tickLine={{ stroke: 'hsl(var(--border))' }}
+                tick={{ fill: 'rgb(100, 116, 139)', fontSize: 12 }}
+                axisLine={{ stroke: 'rgb(203, 213, 225)' }}
+                tickLine={{ stroke: 'rgb(203, 213, 225)' }}
                 tickFormatter={(value) => formatValue(value, metrics[0]?.key)}
-                domain={[0, maxValue * 1.1]} // Add 10% padding to top
+                domain={[0, maxValue * 1.1]}
                 width={80}
               />
 
               <Tooltip
                 contentStyle={{
-                  backgroundColor: 'hsl(var(--card))',
-                  border: '1px solid hsl(var(--border))',
+                  backgroundColor: 'white',
+                  border: '1px solid rgb(226, 232, 240)',
                   borderRadius: '8px',
                   padding: '8px 12px',
                   boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
@@ -108,38 +96,54 @@ export function MultiMetricChart({ data, title, metrics }: MultiMetricChartProps
                   const metric = metrics.find(m => m.name === name);
                   return [formatValue(value, metric?.key || ''), name];
                 }}
-                labelStyle={{ color: 'hsl(var(--muted-foreground))' }}
+                labelStyle={{ color: 'rgb(100, 116, 139)' }}
               />
 
               <Legend 
                 verticalAlign="top"
                 height={36}
                 formatter={(value) => (
-                  <span className="text-sm font-medium">{value}</span>
+                  <span className="text-sm font-medium text-slate-700 dark:text-slate-300">{value}</span>
                 )}
               />
 
-              {metrics.map((metric) => (
-                <Line
-                  key={metric.key}
-                  type="monotone"
-                  dataKey={metric.key}
-                  name={metric.name}
-                  stroke={metric.color}
-                  strokeWidth={2.5}
-                  dot={{ r: 4, fill: metric.color }} 
-                  activeDot={{ 
-                    r: 8, 
-                    stroke: metric.color, 
-                    strokeWidth: 2, 
-                    fill: "#fff" 
-                  }}
-                />
-              ))}
+              {metrics.map((metric, index) => {
+                // Professional color palette
+                const colorPalette = [
+                  "#2563eb", // Primary blue
+                  "#0ea5e9", // Sky blue
+                  "#0d9488", // Teal
+                  "#6366f1", // Indigo
+                  "#8b5cf6", // Purple
+                  "#0891b2"  // Cyan
+                ];
+
+                return (
+                  <Line
+                    key={metric.key}
+                    type="monotone"
+                    dataKey={metric.key}
+                    name={metric.name}
+                    stroke={colorPalette[index % colorPalette.length]}
+                    strokeWidth={2}
+                    dot={{ 
+                      r: 4, 
+                      fill: colorPalette[index % colorPalette.length],
+                      strokeWidth: 0
+                    }}
+                    activeDot={{ 
+                      r: 6,
+                      stroke: colorPalette[index % colorPalette.length],
+                      strokeWidth: 2,
+                      fill: "white"
+                    }}
+                  />
+                );
+              })}
             </LineChart>
           </ResponsiveContainer>
         </div>
       </CardContent>
-    </Card>
+    </div>
   );
 }

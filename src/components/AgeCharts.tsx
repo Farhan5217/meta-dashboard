@@ -46,26 +46,34 @@ export function AgeChart({ data, title }: AgeChartProps) {
       return ageA - ageB;
     });
 
-  const COLORS = [
-    "#3b82f6", // blue
-    "#ec4899", // pink
-    "#10b981", // green
-    "#f59e0b", // yellow
-    "#6366f1", // indigo
-    "#8b5cf6", // purple
-  ];
+    const COLORS = [
+      "#2563eb", // Primary blue - professional and trustworthy
+      "#0ea5e9", // Sky blue - clean and modern
+      "#0d9488", // Teal - sophisticated and balanced
+      "#0891b2", // Cyan - tech-focused and precise
+      "#6366f1", // Indigo - professional with personality
+      "#7c3aed"  // Purple - innovative and premium
+    ];
+    
+    // For metrics-specific colors (if needed)
+    const METRIC_COLORS = {
+      revenue: "#2563eb",    // Primary blue for revenue/main metrics
+      conversion: "#0d9488", // Teal for conversion metrics
+      engagement: "#0ea5e9", // Sky blue for engagement metrics
+      cost: "#6366f1"       // Indigo for cost metrics
+    };
 
   const CustomTooltip = ({ active, payload }: any) => {
     if (active && payload && payload.length) {
       const data = payload[0];
       return (
-        <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700">
+        <div className="p-4 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700">
           <p className="font-medium text-gray-900 dark:text-gray-100">
             Age {data.name}
           </p>
-          <p className="text-gray-600 dark:text-gray-400">
+          {/* <p className="text-gray-600 dark:text-gray-400">
             ${data.value.toFixed(2)}
-          </p>
+          </p> */}
         </div>
       );
     }
@@ -75,21 +83,21 @@ export function AgeChart({ data, title }: AgeChartProps) {
   // If no data or no age data, show empty state
   if (chartData.length === 0) {
     return (
-      <Card className="border border-blue-200/50 dark:border-blue-800/50">
+      <div className="border border-blue-200/50 dark:border-blue-800/50">
         <CardHeader>
-          <CardTitle className="text-blue-900/80 dark:text-blue-100/80">{title}</CardTitle>
+          <CardTitle className="">{title}</CardTitle>
         </CardHeader>
         <CardContent className="h-[400px] flex items-center justify-center">
           <p className="text-gray-500 dark:text-gray-400">No age data available</p>
         </CardContent>
-      </Card>
+      </div>
     );
   }
 
   return (
-    <Card className="border border-blue-200/50 dark:border-blue-800/50 hover:shadow-lg transition-shadow">
+    <div className="">
       <CardHeader>
-        <CardTitle className="text-blue-900/80 dark:text-blue-100/80">
+        <CardTitle className="">
           {title}
         </CardTitle>
       </CardHeader>
@@ -148,6 +156,6 @@ export function AgeChart({ data, title }: AgeChartProps) {
           </ResponsiveContainer>
         </div>
       </CardContent>
-    </Card>
+    </div>
   );
 }
