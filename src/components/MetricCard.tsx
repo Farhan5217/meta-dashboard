@@ -126,7 +126,7 @@ export function MetricCard({
 
   return (
     <Card className={cn(
-      "group relative overflow-hidden",
+      "group relative overflow-hidden font-sans",
       "bg-gradient-to-br",
       styles.gradient,
       styles.darkGradient,
@@ -155,12 +155,15 @@ export function MetricCard({
               {icon}
             </div>
           )}
-          <CardTitle className="text-sm font-medium tracking-wide">
+          <CardTitle className={cn(
+            "text-sm font-display font-medium tracking-wide",
+            "transition-colors duration-200"
+          )}>
             {title}
           </CardTitle>
         </div>
       </CardHeader>
-
+  
       <CardContent>
         <div className="flex flex-col gap-2">
           {isLoading ? (
@@ -170,31 +173,40 @@ export function MetricCard({
             </div>
           ) : (
             <>
-              <div className="text-3xl font-bold tracking-tight">
+              <div className={cn(
+                "text-3xl font-display font-bold tracking-tight",
+                "transition-colors duration-200"
+              )}>
                 {value}
               </div>
               
               {description && (
-                <p className="text-sm text-muted-foreground">
+                <p className={cn(
+                  "text-sm font-body text-muted-foreground",
+                  "leading-relaxed"
+                )}>
                   {description}
                 </p>
               )}
-
+  
               {trend && (
                 <div className="flex items-center gap-2 mt-1">
                   <div className={cn(
-                    "flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium",
+                    "flex items-center gap-1 px-2 py-1 rounded-full",
+                    "text-xs font-body font-medium",
                     trend.isPositive 
                       ? "text-green-700 bg-green-100 dark:text-green-400 dark:bg-green-900/30"
                       : "text-red-700 bg-red-100 dark:text-red-400 dark:bg-red-900/30",
                     "transition-colors duration-200"
                   )}>
-                    <span className="text-lg">
+                    <span className="text-lg font-display">
                       {trend.isPositive ? "↑" : "↓"}
                     </span>
-                    {trend.value}%
+                    <span className="font-display">
+                      {trend.value}%
+                    </span>
                     {trend.timeFrame && (
-                      <span className="text-xs opacity-75 ml-1">
+                      <span className="text-xs font-body opacity-75 ml-1">
                         vs {trend.timeFrame}
                       </span>
                     )}
