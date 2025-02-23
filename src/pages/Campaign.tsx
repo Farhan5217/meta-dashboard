@@ -136,7 +136,7 @@ const Campaign = () => {
                 <Button
                   variant="secondary"
                   size="sm"
-                  onClick={() => navigate("/")}
+                  onClick={() => navigate("/index")}
                   className="group transition-all duration-300 ease-in-out"
                 >
                   <ArrowLeft className="h-4 w-4 mr-2 group-hover:transform group-hover:-translate-x-1 transition-transform duration-300 ease-in-out" />
