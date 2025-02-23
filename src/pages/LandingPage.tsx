@@ -44,7 +44,7 @@ const Landing = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-100 via-blue-200 to-blue-300 dark:from-blue-900 dark:via-blue-800 dark:to-blue-700 relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-blue-100 via-blue-200 to-blue-300 dark:from-blue-900 dark:via-blue-800 dark:to-blue-700 relative overflow-hidden font-sans">
       {/* Animated background elements */}
       <motion.div 
         className="absolute top-20 left-10 w-64 h-64 bg-blue-200/30 dark:bg-blue-600/30 rounded-full blur-3xl"
@@ -92,7 +92,7 @@ const Landing = () => {
           {/* Main Title */}
           <motion.h1 
             variants={itemVariants}
-            className="text-6xl font-bold text-blue-800 dark:text-blue-100 mb-6 tracking-tight"
+            className="font-display text-6xl font-bold text-blue-800 dark:text-blue-100 mb-6 tracking-tight leading-tight"
           >
             Meta Campaign Dashboard
           </motion.h1>
@@ -100,7 +100,7 @@ const Landing = () => {
           {/* Subtitle */}
           <motion.p 
             variants={itemVariants}
-            className="text-xl text-blue-700 dark:text-blue-200 mb-12 max-w-2xl"
+            className="font-body text-xl text-blue-700 dark:text-blue-200 mb-12 max-w-2xl leading-relaxed"
           >
             Transform your Meta advertising insights into actionable strategies with our powerful analytics dashboard
           </motion.p>
@@ -123,7 +123,7 @@ const Landing = () => {
                 <motion.div animate={floatingAnimation}>
                   <feature.icon className="w-10 h-10 mb-4 mx-auto text-blue-600 dark:text-blue-300" />
                 </motion.div>
-                <h3 className="text-lg font-semibold">{feature.title}</h3>
+                <h3 className="font-display text-lg font-semibold">{feature.title}</h3>
               </motion.div>
             ))}
           </motion.div>
@@ -136,7 +136,7 @@ const Landing = () => {
           >
             <Button
               onClick={handleNavigation}               
-              className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-8 py-6 rounded-full text-lg font-semibold shadow-lg flex items-center gap-2 transition-all duration-300"
+              className="font-display bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-8 py-6 rounded-full text-lg font-semibold shadow-lg flex items-center gap-2 transition-all duration-300"
             >
               <Zap className="w-5 h-5" />
               Launch Dashboard
