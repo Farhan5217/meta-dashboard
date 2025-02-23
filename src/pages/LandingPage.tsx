@@ -7,11 +7,12 @@ import { Button } from "@/components/ui/button";
 const Landing = () => {
   const navigate = useNavigate();
 
-  const handleNavigation = () => {
+  const handleNavigation = (e) => {
+    e.preventDefault(); // Prevent any default button behavior
     console.log('Navigating to /index');
     navigate('/index');
   };
-
+  
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -129,20 +130,18 @@ const Landing = () => {
           </motion.div>
 
           {/* CTA Button */}
-          <motion.div
-            variants={itemVariants}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            <Button
-              onClick={handleNavigation}               
-              className="font-display bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-8 py-6 rounded-full text-lg font-semibold shadow-lg flex items-center gap-2 transition-all duration-300"
-            >
-              <Zap className="w-5 h-5" />
-              Launch Dashboard
-              <Activity className="w-5 h-5" />
-            </Button>
-          </motion.div>
+          <Button
+  onClick={handleNavigation}
+  type="button"
+  role="button"
+  tabIndex={0}
+  aria-label="Launch Dashboard"
+  className="font-display bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-8 py-6 rounded-full text-lg font-semibold shadow-lg flex items-center gap-2 transition-all duration-300"
+>
+  <Zap className="w-5 h-5" />
+  Launch Dashboard
+  <Activity className="w-5 h-5" />
+</Button>
 
           {/* Floating Elements */}
           <motion.div className="absolute top-40 right-20" animate={floatingAnimation}>
