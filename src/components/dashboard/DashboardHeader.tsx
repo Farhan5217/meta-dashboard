@@ -25,7 +25,7 @@ export function DashboardHeader({
   statusFilter,
 }: DashboardHeaderProps) {
   return (
-    <div className="sticky top-0 z-50 bg-gradient-to-br from-blue-200 via-blue-250 to-blue-400 dark:from-blue-900 dark:via-blue-800/90 dark:to-blue-700/80 overflow-hidden shadow-xl">
+    <div className="sticky top-0 z-50 bg-teal-400 overflow-hidden shadow-xl">
       {/* Animated background elements */}
       <div className="absolute inset-0 opacity-40">
         <motion.div
@@ -52,8 +52,8 @@ export function DashboardHeader({
               whileTap={{ scale: 0.95 }}
               className="relative"
             >
-              <div className="absolute inset-0 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl blur opacity-50" />
-              <div className="relative bg-gradient-to-br from-blue-500 via-blue-600 to-blue-700 p-3.5 rounded-2xl shadow-lg">
+              <div className="absolute inset-0 bg-gradient-to-br from-teal-500 to-teal-600 rounded-2xl  opacity-50" />
+              <div className="relative bg-gradient-to-br from-teak-500 via-teal-600 to-teal-700 p-3.5 rounded-2xl shadow-lg">
                 <BarChart3 className="h-7 w-7 text-white" />
               </div>
             </motion.div>
@@ -106,7 +106,7 @@ export function DashboardHeader({
       </div>
       
       {/* Bottom gradient bar */}
-      <div className="h-1 bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700" />
+      <div className="h-1 bg-gradient-to-r from-teal-500 via-teal-600 to-teal-700" />
     </div>
   );
 }

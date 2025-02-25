@@ -119,7 +119,7 @@ export function ChartsGrid({ timeSeriesInsights,title }: ChartsGridProps) {
   
   
 <Card className=" dark:bg-gray-900 rounded-3xl shadow-xl overflow-hidden">
-      <CardHeader className="bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-700 dark:to-indigo-700 p-6">
+      <CardHeader className="bg-teal-500 p-6">
         <CardTitle className="text-2xl font-bold text-white flex items-center gap-2">
           <ChartIcon className="h-6 w-6" />
           <span>{title}</span>
@@ -130,19 +130,19 @@ export function ChartsGrid({ timeSeriesInsights,title }: ChartsGridProps) {
           <TabsList className="grid w-full grid-cols-3 rounded-xl bg-white dark:bg-gray-800 p-1 shadow-inner">
             <TabsTrigger 
               value="overview" 
-              className="rounded-lg data-[state=active]:bg-blue-600 data-[state=active]:text-white dark:data-[state=active]:bg-blue-600"
+              className="rounded-lg data-[state=active]:bg-teal-500 data-[state=active]:text-white dark:data-[state=active]:bg-blue-600"
             >
               Overview
             </TabsTrigger>
             <TabsTrigger 
               value="demographics" 
-              className="rounded-lg data-[state=active]:bg-blue-600 data-[state=active]:text-white dark:data-[state=active]:bg-blue-600"
+              className="rounded-lg data-[state=active]:bg-teal-500 data-[state=active]:text-white dark:data-[state=active]:bg-blue-600"
             >
               Demographics
             </TabsTrigger>
             <TabsTrigger 
               value="metrics" 
-              className="rounded-lg data-[state=active]:bg-blue-600 data-[state=active]:text-white dark:data-[state=active]:bg-blue-600"
+              className="rounded-lg data-[state=active]:bg-teal-500 data-[state=active]:text-white dark:data-[state=active]:bg-blue-600"
             >
               Metrics
             </TabsTrigger>

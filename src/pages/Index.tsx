@@ -436,13 +436,13 @@ cpc:"0"
   {/* Campaigns Table Section */}
   {/* Campaigns Section */}
   <Card className="mt-10 overflow-hidden bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-blue-900 dark:to-indigo-900 rounded-3xl shadow-xl">
-      <CardHeader className="bg-blue-500 dark:bg-blue-700 text-white p-6">
+      <CardHeader className="bg-teal-500 dark:bg-blue-700 text-white p-6">
         <div className="flex justify-between items-center">
           <CardTitle className="text-2xl font-bold flex items-center gap-2">
             <Sparkles className="w-6 h-6" />
             Campaigns Overview
           </CardTitle>
-          <Badge variant="secondary" className="text-sm bg-blue-600 dark:bg-blue-800">
+          <Badge variant="secondary" className="text-sm bg-teakl-800 dark:bg-blue-800 text-white rounded-xl shadow-xl border border-white">
             {campaigns.length} Campaigns
           </Badge>
         </div>

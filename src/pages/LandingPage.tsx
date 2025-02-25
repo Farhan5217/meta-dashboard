@@ -45,10 +45,10 @@ const Landing = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-100 via-blue-200 to-blue-300 dark:from-blue-900 dark:via-blue-800 dark:to-blue-700 relative overflow-hidden font-sans">
+    <div className="min-h-screen bg-gradient-to-br from-teal-100 via-teal-200 to-teal-300 dark:from-teal-900 dark:via-teal-800 dark:to-teal-700 relative overflow-hidden font-sans">
       {/* Animated background elements */}
       <motion.div 
-        className="absolute top-20 left-10 w-64 h-64 bg-blue-200/30 dark:bg-blue-600/30 rounded-full blur-3xl"
+        className="absolute top-20 left-10 w-64 h-64 bg-teal-200/30 dark:bg-teal-600/30 rounded-full blur-3xl"
         animate={{
           scale: [1, 1.2, 1],
           opacity: [0.3, 0.5, 0.3],
@@ -59,7 +59,7 @@ const Landing = () => {
         }}
       />
       <motion.div 
-        className="absolute bottom-20 right-10 w-96 h-96 bg-blue-300/30 dark:bg-blue-500/30 rounded-full blur-3xl"
+        className="absolute bottom-20 right-10 w-96 h-96 bg-teal-300/30 dark:bg-teal-500/30 rounded-full blur-3xl"
         animate={{
           scale: [1.2, 1, 1.2],
           opacity: [0.5, 0.3, 0.5],
@@ -84,16 +84,16 @@ const Landing = () => {
           >
             <motion.div
               animate={floatingAnimation}
-              className="bg-white dark:bg-blue-800 p-4 rounded-2xl shadow-xl"
+              className="bg-white dark:bg-teal-800 p-4 rounded-2xl shadow-xl"
             >
-              <Facebook className="w-12 h-12 text-blue-500 dark:text-blue-300" />
+              <Facebook className="w-12 h-12 text-teal-500 dark:text-teal-300" />
             </motion.div>
           </motion.div>
 
           {/* Main Title */}
           <motion.h1 
             variants={itemVariants}
-            className="font-display text-6xl font-bold text-blue-800 dark:text-blue-100 mb-6 tracking-tight leading-tight"
+            className="font-display text-6xl font-bold text-teal-800 dark:text-teal-100 mb-6 tracking-tight leading-tight"
           >
             Meta Campaign Dashboard
           </motion.h1>
@@ -101,7 +101,7 @@ const Landing = () => {
           {/* Subtitle */}
           <motion.p 
             variants={itemVariants}
-            className="font-body text-xl text-blue-700 dark:text-blue-200 mb-12 max-w-2xl leading-relaxed"
+            className="font-body text-xl text-teal-700 dark:text-teal-200 mb-12 max-w-2xl leading-relaxed"
           >
             Transform your Meta advertising insights into actionable strategies with our powerful analytics dashboard
           </motion.p>
@@ -119,10 +119,10 @@ const Landing = () => {
               <motion.div
                 key={index}
                 variants={itemVariants}
-                className="bg-white/30 dark:bg-blue-800/30 backdrop-blur-lg rounded-2xl p-6 text-blue-800 dark:text-blue-100 hover:bg-white/40 dark:hover:bg-blue-700/40 transition-colors"
+                className="bg-white/30 dark:bg-teal-800/30 backdrop-blur-lg rounded-2xl p-6 text-teal-800 dark:text-teal-100 hover:bg-white/40 dark:hover:bg-teal-700/40 transition-colors"
               >
                 <motion.div animate={floatingAnimation}>
-                  <feature.icon className="w-10 h-10 mb-4 mx-auto text-blue-600 dark:text-blue-300" />
+                  <feature.icon className="w-10 h-10 mb-4 mx-auto text-teal-600 dark:text-teal-300" />
                 </motion.div>
                 <h3 className="font-display text-lg font-semibold">{feature.title}</h3>
               </motion.div>
@@ -136,7 +136,7 @@ const Landing = () => {
   role="button"
   tabIndex={0}
   aria-label="Launch Dashboard"
-  className="font-display bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-8 py-6 rounded-full text-lg font-semibold shadow-lg flex items-center gap-2 transition-all duration-300"
+  className="font-display bg-gradient-to-r from-teal-500 to-teal-600 hover:from-teal-600 hover:to-teal-700 text-white px-8 py-6 rounded-full text-lg font-semibold shadow-lg flex items-center gap-2 transition-all duration-300"
 >
   <Zap className="w-5 h-5" />
   Launch Dashboard
@@ -145,13 +145,13 @@ const Landing = () => {
 
           {/* Floating Elements */}
           <motion.div className="absolute top-40 right-20" animate={floatingAnimation}>
-            <div className="w-20 h-20 bg-blue-200/40 dark:bg-blue-600/40 rounded-full blur-xl" />
+            <div className="w-20 h-20 bg-teal-200/40 dark:bg-teal-600/40 rounded-full blur-xl" />
           </motion.div>
           <motion.div className="absolute bottom-40 left-20" animate={{
             ...floatingAnimation,
             transition: { delay: 1 }
           }}>
-            <div className="w-32 h-32 bg-blue-300/40 dark:bg-blue-500/40 rounded-full blur-xl" />
+            <div className="w-32 h-32 bg-teal-300/40 dark:bg-teal-500/40 rounded-full blur-xl" />
           </motion.div>
         </motion.div>
       </div>

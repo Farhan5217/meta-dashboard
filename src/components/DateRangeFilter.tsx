@@ -73,7 +73,7 @@ export function DateRangeFilter({ date, onRangeChange }: DateRangeFilterProps) {
 
   const getButtonStyle = (filter: '7days' | '30days') => {
     return activeFilter === filter
-      ? "px-3 py-2 text-sm bg-blue-500 text-white hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700"
+      ? "px-3 py-2 text-sm bg-teal-500 text-white hover:bg-teal-600 dark:bg-teal-600 dark:hover:bg-teal-700"
       : "px-3 py-2 text-sm bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700";
   };
 
@@ -111,7 +111,7 @@ export function DateRangeFilter({ date, onRangeChange }: DateRangeFilterProps) {
             size="sm"
             className={`w-[240px] justify-start text-left font-normal ${
               activeFilter === 'custom'
-                ? "bg-blue-500 text-white hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700"
+                ? "bg-teal-500 text-white hover:bg-teal-600 dark:bg-teal-600 dark:hover:bg-teal-700"
                 : "bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700"
             }`}
           >

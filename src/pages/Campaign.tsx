@@ -114,13 +114,13 @@ const Campaign = () => {
     <div className="min-h-screen bg-white">
       <div className="container mx-auto px-6 py-8">
         {/* Enhanced Header Section */}
-        <Card className="mb-8 overflow-hidden bg-gradient-to-r from-blue-500 to-indigo-600 dark:from-blue-700 dark:to-indigo-800 rounded-3xl shadow-xl">
+        <Card className="mb-8 overflow-hidden bg-gradient-to-r from-teal-500 to-teal-600 dark:from-teal-700 dark:to-indigo-800 rounded-3xl shadow-xl">
           <CardHeader className="p-6">
             <div className="flex flex-wrap justify-between items-center">
               <div className="flex items-center gap-4">
                 <motion.div whileHover={{ scale: 1.1, rotate: 5 }} whileTap={{ scale: 0.9 }} className="relative">
-                  <div className="absolute inset-0 bg-blue-300 rounded-2xl blur opacity-50" />
-                  <div className="relative bg-gradient-to-br from-blue-400 to-indigo-500 p-3 rounded-2xl shadow-lg">
+                  <div className="absolute inset-0 bg-teal-300 rounded-2xl  opacity-50" />
+                  <div className="relative bg-gradient-to-br from-teal-400 to-teal-500 p-3 rounded-2xl shadow-lg">
                     <BarChart3 className="h-8 w-8 text-white" />
                   </div>
                 </motion.div>
@@ -162,7 +162,7 @@ const Campaign = () => {
 
             {/* Enhanced Ad Sets Section */}
             {/* <Card className="mt-8 overflow-hidden bg-white dark:bg-gray-800 rounded-3xl shadow-lg">
-              <CardHeader className="bg-blue-400 dark:bg-blue-900 p-6">
+              <CardHeader className="bg-teal-400 dark:bg-teal-900 p-6">
                 <CardTitle className="text-xl font-semibold text-white  flex items-center gap-2">
                   <TrendingUp className="h-5 w-5" />
                   Ad Sets
@@ -171,7 +171,7 @@ const Campaign = () => {
               <CardContent className="p-0">
                 {adSetsLoading ? (
                   <div className="flex items-center justify-center p-8">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-teal-500"></div>
                   </div>
                 ) : adSetsError ? (
                   <div className="text-center p-8 text-red-500">Failed to load ad sets. Please try again later.</div>
@@ -181,14 +181,14 @@ const Campaign = () => {
                   <div className="overflow-x-auto">
                     <Table>
                       <TableHeader>
-                        <TableRow className="bg-blue-50 dark:bg-blue-800/50">
-                          <TableHead className="py-4 px-6 text-left text-sm font-semibold text-blue-800 dark:text-blue-100">
+                        <TableRow className="bg-teal-50 dark:bg-teal-800/50">
+                          <TableHead className="py-4 px-6 text-left text-sm font-semibold text-teal-800 dark:text-teal-100">
                             Name
                           </TableHead>
-                          <TableHead className="py-4 px-6 text-left text-sm font-semibold text-blue-800 dark:text-blue-100">
+                          <TableHead className="py-4 px-6 text-left text-sm font-semibold text-teal-800 dark:text-teal-100">
                             Optimization Goal
                           </TableHead>
-                          <TableHead className="py-4 px-6 text-left text-sm font-semibold text-blue-800 dark:text-blue-100">
+                          <TableHead className="py-4 px-6 text-left text-sm font-semibold text-teal-800 dark:text-teal-100">
                             Budget Remaining
                           </TableHead>
                         </TableRow>
@@ -197,15 +197,15 @@ const Campaign = () => {
                         {adSets.map((adSet) => (
                           <motion.tr
                             key={adSet.id}
-                            className="border-b border-blue-100 dark:border-blue-700 hover:bg-blue-50 dark:hover:bg-blue-800/30 transition-colors duration-200"
+                            className="border-b border-teal-100 dark:border-teal-700 hover:bg-teal-50 dark:hover:bg-teal-800/30 transition-colors duration-200"
                             whileHover={{ scale: 1.01 }}
                             transition={{ type: "spring", stiffness: 300 }}
                           >
-                            <TableCell className="py-4 px-6 text-blue-700 dark:text-blue-200">{adSet.name}</TableCell>
-                            <TableCell className="py-4 px-6 text-blue-600 dark:text-blue-300">
+                            <TableCell className="py-4 px-6 text-teal-700 dark:text-teal-200">{adSet.name}</TableCell>
+                            <TableCell className="py-4 px-6 text-teal-600 dark:text-teal-300">
                               {adSet.optimization_goal}
                             </TableCell>
-                            <TableCell className="py-4 px-6 text-blue-600 dark:text-blue-300">
+                            <TableCell className="py-4 px-6 text-teal-600 dark:text-teal-300">
                               <div className="flex items-center gap-2">
                                 <DollarSign className="h-4 w-4 text-green-500" />
                                 <span className="font-medium">
@@ -227,7 +227,7 @@ const Campaign = () => {
         {/* Loading Spinner */}
         {insightsLoading && (
           <div className="flex items-center justify-center p-8">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-500"></div>
           </div>
         )}
       </div>
