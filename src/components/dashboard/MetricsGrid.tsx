@@ -63,14 +63,14 @@ export function MetricsGrid({
   />
   <MetricCard
     title="CPC"
-    value={`${parseFloat(aggregatedMetrics.cpc || "0").toFixed(2)}$`}
+    value={`$${parseFloat(aggregatedMetrics.cpc || "0").toFixed(2)}`}
     description="Cost per click"
     icon={<CircleDollarSign className="h-4 w-4" />}
     variant="cpc"
   />
   <MetricCard
     title="CPM"
-    value={`${parseFloat(aggregatedMetrics.cpm || "0").toFixed(2)}$`}
+    value={`$${parseFloat(aggregatedMetrics.cpm || "0").toFixed(2)}`}
     description="Cost per thousand impressions"
     icon={<PieChart className="h-4 w-4" />}
     variant="cpm"
