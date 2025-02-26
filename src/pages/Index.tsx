@@ -435,39 +435,39 @@ cpc:"0"
 
   {/* Campaigns Table Section */}
   {/* Campaigns Section */}
-  <Card className="mt-10 overflow-hidden bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-blue-900 dark:to-indigo-900 rounded-3xl shadow-xl">
-      <CardHeader className="bg-teal-500 dark:bg-blue-700 text-white p-6">
-        <div className="flex justify-between items-center">
-          <CardTitle className="text-2xl font-bold flex items-center gap-2">
-            <Sparkles className="w-6 h-6" />
-            Campaigns Overview
-          </CardTitle>
-          <Badge variant="secondary" className="text-sm bg-teakl-800 dark:bg-blue-800 text-white rounded-xl shadow-xl border border-white">
-            {campaigns.length} Campaigns
-          </Badge>
-        </div>
-      </CardHeader>
+  <Card className="overflow-hidden border-0 rounded-lg shadow-sm">
+                  <div className="bg-teal-500 py-3 px-4">
+                    <div className="flex justify-between items-center">
+                      <div className="flex items-center gap-2 text-white font-medium">
+                        <Sparkles className="h-5 w-5" />
+                        Campaigns Overview
+                      </div>
+                      <Badge className="bg-teal-600 text-white border-0 text-xs px-2.5">
+                        {campaigns.length} Campaigns
+                      </Badge>
+                    </div>
+                  </div>
       <CardContent className="p-0">
         <div className="overflow-x-auto">
           <Table>
             <TableHeader>
-              <TableRow className="bg-blue-100 dark:bg-blue-800/60">
-                <TableHead className="py-4 px-6 text-left text-sm font-semibold text-blue-800 dark:text-blue-100">
+              <TableRow className="bg-teal-100">
+                <TableHead className="py-3 px-4 text-xs font-medium text-teal-800 uppercase">
                   Name
                 </TableHead>
-                <TableHead className="py-4 px-6 text-left text-sm font-semibold text-blue-800 dark:text-blue-100">
+                <TableHead className="py-3 px-4 text-xs font-medium text-teal-800 uppercase">
                   Status
                 </TableHead>
-                <TableHead className="py-4 px-6 text-left text-sm font-semibold text-blue-800 dark:text-blue-100">
+                <TableHead className="py-3 px-4 text-xs font-medium text-teal-800 uppercase">
                   Objective
                 </TableHead>
-                <TableHead className="py-4 px-6 text-left text-sm font-semibold text-blue-800 dark:text-blue-100">
+                <TableHead className="py-3 px-4 text-xs font-medium text-teal-800 uppercase">
                   Spend
                 </TableHead>
-                <TableHead className="py-4 px-6 text-left text-sm font-semibold text-blue-800 dark:text-blue-100">
+                <TableHead className="py-3 px-4 text-xs font-medium text-teal-800 uppercase">
                   Impressions
                 </TableHead>
-                <TableHead className="py-4 px-6 text-left text-sm font-semibold text-blue-800 dark:text-blue-100">
+                <TableHead className="py-3 px-4 text-xs font-medium text-teal-800 uppercase">
                   Clicks
                 </TableHead>
               </TableRow>
@@ -541,3 +541,5 @@ cpc:"0"
 };
 
 export default Index;
+
+
