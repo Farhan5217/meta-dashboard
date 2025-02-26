@@ -114,18 +114,18 @@ const Campaign = () => {
     <div className="min-h-screen bg-white">
       <div className="container mx-auto px-6 py-8">
         {/* Enhanced Header Section */}
-        <Card className="mb-8 overflow-hidden bg-gradient-to-r from-teal-500 to-teal-600 dark:from-teal-700 dark:to-indigo-800 rounded-3xl shadow-xl">
-          <CardHeader className="p-6">
+        <Card className="mb-8 overflow-hidden bg-blue-100 dark:bg-blue-900 shadow-md rounded-3xl shadow-xl">
+          <CardHeader className="p-4">
             <div className="flex flex-wrap justify-between items-center">
               <div className="flex items-center gap-4">
                 <motion.div whileHover={{ scale: 1.1, rotate: 5 }} whileTap={{ scale: 0.9 }} className="relative">
-                  <div className="absolute inset-0 bg-teal-300 rounded-2xl  opacity-50" />
-                  <div className="relative bg-gradient-to-br from-teal-400 to-teal-500 p-3 rounded-2xl shadow-lg">
-                    <BarChart3 className="h-8 w-8 text-white" />
+                  <div className="absolute inset-0 bg-blue-300 rounded-2xl blur opacity-50" />
+                  <div className="relative bg-teal-500 p-3 rounded-lg shadow-md p-3 rounded-2xl shadow-lg">
+                    <BarChart3 className="h-6 w-6 text-white" />
                   </div>
                 </motion.div>
                 <div>
-                  <CardTitle className="text-3xl font-bold text-white flex items-center gap-2">
+                  <CardTitle className="text-3xl font-bold text-black flex items-center gap-2">
                     Campaign Details
                     <Sparkles className="h-6 w-6 text-yellow-300 animate-pulse" />
                   </CardTitle>
