@@ -5,6 +5,7 @@ import { getAdAccountInsights, getCampaignInsights } from "@/services/api";
 import { toast } from "sonner";
 import type { DateRange, InsightParams } from "@/types/api";
 import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
+import { Button } from "@/components/ui/button";
 import { MetricsGrid } from "@/components/dashboard/MetricsGrid";
 import { ChartsGrid } from "@/components/dashboard/ChartsGrid";
 import { useAdAccounts } from "@/hooks/useAdAccounts";
@@ -329,6 +330,17 @@ cpc:"0"
       </svg>
     </div>
   </div>
+   {/* Add Enhanced Insights Button */}
+   {selectedAccount && (
+    <Button 
+      variant="outline" 
+      className="bg-teal-500 hover:bg-teal-600 text-white border-none flex items-center gap-2 shadow-sm"
+      onClick={() => navigate(`/enhanced-insights/${selectedAccount}`)}
+    >
+      <Sparkles className="h-4 w-4" />
+      Enhanced Insights
+    </Button>
+  )}
 </div>
 
 

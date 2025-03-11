@@ -83,3 +83,31 @@ export interface TableMetrics {
   status?: string;
   objective?: string;
 }
+
+// Add these types to your api.d.ts file
+
+export interface PlacementInsight extends InsightData {
+  publisher_platform: string;
+  platform_position: string;
+  impression_device: string;
+}
+
+export interface ActionValue {
+  action_type: string;
+  value: string;
+}
+
+export interface ActionInsight extends InsightData {
+  actions?: ActionValue[];
+  cost_per_action_type?: ActionValue[];
+}
+
+// Update your InsightParams interface to include the enhanced parameters
+export interface InsightParams {
+  since?: string;
+  until?: string;
+  time_increment?: number;
+  breakdown?: boolean;
+  include_placements?: boolean;
+  include_actions?: boolean;
+}

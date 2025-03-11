@@ -45,3 +45,24 @@ export const getAdSetInsights = async (
   const response = await api.get(`/adsets/${adSetId}/insights`, { params });
   return response.data;
 };
+
+// export const getEnhancedInsights = async (adAccountId: string, params?: InsightParams) => {
+//   // Construct base URL with required parameters
+//   let url = `/adaccounts/${adAccountId}/enhanced-insights?include_placements=true&include_actions=true`;
+  
+//   // Add date parameters if provided
+//   if (params?.since && params?.until) {
+//     url += `&since=${params.since}&until=${params.until}`;
+//   }
+  
+//   const response = await api.get(url);
+//   return response.data;
+// };
+// Add this to services/api.ts
+export const getEnhancedInsights = async (
+  adAccountId: string,
+  params?: InsightParams & { include_placements?: boolean; include_actions?: boolean }
+) => {
+  const response = await api.get(`/adaccounts/${adAccountId}/enhanced-insights`, { params });
+  return response.data;
+};
