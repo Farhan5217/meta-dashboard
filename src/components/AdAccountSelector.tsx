@@ -4,6 +4,8 @@ import { useQuery } from "@tanstack/react-query";
 import { getAdAccounts } from "@/services/api";
 import { Skeleton } from "@/components/ui/skeleton";
 import { AD_ACCOUNT_STATUS } from "@/config/constants";
+import {CircleUser  } from "lucide-react";
+
 
 interface AdAccountSelectorProps {
   onAccountSelect: (accountId: string) => void;
@@ -28,6 +30,7 @@ export function AdAccountSelector({ onAccountSelect, selectedAccount, statusFilt
   return (
     <Select onValueChange={onAccountSelect} value={selectedAccount}>
       <SelectTrigger className="w-[200px]">
+      <CircleUser className="h-5 w-5 text-teal-400" />
         <SelectValue placeholder="Select Ad Account" />
       </SelectTrigger>
       <SelectContent>

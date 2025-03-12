@@ -463,7 +463,7 @@ cpc:"0"
         <div className="overflow-x-auto">
           <Table>
             <TableHeader>
-              <TableRow className="bg-teal-100">
+              <TableRow className="bg-blue-50">
                 <TableHead className="py-3 px-4 text-xs font-medium text-teal-800 uppercase">
                   Name
                 </TableHead>
