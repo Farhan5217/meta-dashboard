@@ -133,7 +133,7 @@ const EnhancedInsights = () => {
         {/* Back button */}
         <Button 
   variant="outline" 
-  className="mb-6 px-4 py-2 text-teal-700 border-teal-500 hover:text-white hover:bg-teal-600 flex items-center gap-2 transition-all duration-200"
+  className="mb-6 px-4 py-2  border-teal-500 text-white bg-teal-600 flex items-center gap-2 transition-all duration-200"
   onClick={() => navigate("/index")}
 >
   <ArrowLeft className="h-4 w-4" />
