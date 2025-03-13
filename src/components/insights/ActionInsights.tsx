@@ -325,7 +325,7 @@ const ActionInsights = ({ data, isLoading }: ActionInsightsProps) => {
       transition={{ duration: 0.5 }}
     >
       {/* Actions Summary as Cards */}
-      <div className="mb-8">
+      {/* <div className="mb-8">
         <div className="flex items-center gap-2 mb-4">
           <Zap className="h-5 w-5 text-teal-500" />
           <h3 className="text-lg font-medium text-gray-800">Actions Summary</h3>
@@ -336,7 +336,7 @@ const ActionInsights = ({ data, isLoading }: ActionInsightsProps) => {
         
         {data?.map((insight, index) => (
           <div key={index} className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-7 gap-4">
-            {/* Impressions */}
+          
             <Card className="bg-blue-50 border-blue-200 shadow-sm hover:shadow-md transition">
               <CardContent className="p-4 flex flex-col space-y-2">
                 <p className="text-xs font-medium text-blue-700 flex items-center gap-1">
@@ -348,7 +348,7 @@ const ActionInsights = ({ data, isLoading }: ActionInsightsProps) => {
               </CardContent>
             </Card>
 
-            {/* Clicks */}
+          
             <Card className="bg-green-50 border-green-200 shadow-sm hover:shadow-md transition">
               <CardContent className="p-4 flex flex-col space-y-2">
                 <p className="text-xs font-medium text-green-700 flex items-center gap-1">
@@ -360,7 +360,7 @@ const ActionInsights = ({ data, isLoading }: ActionInsightsProps) => {
               </CardContent>
             </Card>
             
-            {/* Reach */}
+          
             <Card className="bg-blue-50 border-blue-200 shadow-sm hover:shadow-md transition">
               <CardContent className="p-4 flex flex-col space-y-2">
                 <p className="text-xs font-medium text-blue-700 flex items-center gap-1">
@@ -372,7 +372,7 @@ const ActionInsights = ({ data, isLoading }: ActionInsightsProps) => {
               </CardContent>
             </Card>
 
-            {/* Spend */}
+          
             <Card className="bg-teal-50 border-teal-200 shadow-sm hover:shadow-md transition">
               <CardContent className="p-4 flex flex-col space-y-2">
                 <p className="text-xs font-medium text-teal-700 flex items-center gap-1">
@@ -384,7 +384,7 @@ const ActionInsights = ({ data, isLoading }: ActionInsightsProps) => {
               </CardContent>
             </Card>
 
-            {/* CTR */}
+          
             <Card className="bg-amber-50 border-amber-200 shadow-sm hover:shadow-md transition">
               <CardContent className="p-4 flex flex-col space-y-2">
                 <p className="text-xs font-medium text-amber-700 flex items-center gap-1">
@@ -396,7 +396,7 @@ const ActionInsights = ({ data, isLoading }: ActionInsightsProps) => {
               </CardContent>
             </Card>
 
-            {/* CPC */}
+          
             <Card className="bg-purple-50 border-purple-200 shadow-sm hover:shadow-md transition">
               <CardContent className="p-4 flex flex-col space-y-2">
                 <p className="text-xs font-medium text-purple-700 flex items-center gap-1">
@@ -408,7 +408,7 @@ const ActionInsights = ({ data, isLoading }: ActionInsightsProps) => {
               </CardContent>
             </Card>
 
-            {/* CPM */}
+          
             <Card className="bg-indigo-50 border-indigo-200 shadow-sm hover:shadow-md transition">
               <CardContent className="p-4 flex flex-col space-y-2">
                 <p className="text-xs font-medium text-indigo-700 flex items-center gap-1">
@@ -421,7 +421,7 @@ const ActionInsights = ({ data, isLoading }: ActionInsightsProps) => {
             </Card>
           </div>
         ))}
-      </div>
+      </div> */}
 
       {/* Action Details */}
       <Card className="overflow-hidden border-0 rounded-lg shadow-sm">

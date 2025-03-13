@@ -143,14 +143,14 @@ const PlacementInsights = ({ data, isLoading }: PlacementInsightsProps) => {
       transition={{ duration: 0.5 }}
     >
       <Card className="overflow-hidden border-0 rounded-xl shadow-lg bg-gradient-to-b from-white to-blue-50/30 dark:from-gray-900 dark:to-blue-900/10">
-        <div className="bg-teal-500 py-4 px-6">
+        <div className="bg-teal-500 py-3 px-4">
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
             <div className="flex items-center gap-2">
               <div className="bg-white/20 p-2 rounded-lg">
                 <Share2 className="h-5 w-5 text-white" />
               </div>
               <div>
-                <h3 className="text-xl font-bold text-white">Placement Breakdown</h3>
+                <h5 className="text-lg font-medium text-white">Placement Breakdown</h5>
                 <p className="text-xs text-white/70">Detailed analytics by platform, position and device</p>
               </div>
             </div>

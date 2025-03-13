@@ -145,15 +145,8 @@
 //   );
 // }
 
-
-import { useState, useEffect } from 'react';
-import { Button } from "@/components/ui/button";
+import { useState, useEffect, useRef } from 'react';
 import { Calendar } from "@/components/ui/calendar";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
 import {
   Select,
   SelectContent,
@@ -161,7 +154,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { CalendarIcon, ChevronDownIcon } from 'lucide-react';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Button } from "@/components/ui/button";
+import { CalendarIcon, ArrowRightIcon } from 'lucide-react';
 import type { DateRange } from "@/types/api";
 
 interface DateRangeFilterProps {
@@ -173,8 +172,20 @@ export function DateRangeFilter({ date, onRangeChange }: DateRangeFilterProps) {
   // Track active filter
   const [activeFilter, setActiveFilter] = useState<'yesterday' | '7days' | '30days' | '90days' | 'custom'>('30days');
   
-  // Track if we need to show the custom date picker
-  const [showCustomPicker, setShowCustomPicker] = useState(false);
+  // Track calendar popover open state
+  const [calendarOpen, setCalendarOpen] = useState(false);
+  
+  // Track if we're selecting start or end date
+  const [selectionPhase, setSelectionPhase] = useState<'start' | 'end'>('start');
+  
+  // Track temporary selection
+  const [tempSelection, setTempSelection] = useState<{ from?: Date, to?: Date }>({});
+  
+  // Track if select dropdown is open
+  const [selectOpen, setSelectOpen] = useState(false);
+  
+  // Ref for the trigger element
+  const triggerRef = useRef(null);
 
   // Get date range helper
   const getDateRange = (days: number): DateRange => {
@@ -262,26 +273,36 @@ export function DateRangeFilter({ date, onRangeChange }: DateRangeFilterProps) {
       case 'yesterday':
         setActiveFilter('yesterday');
         onRangeChange(getYesterdayRange());
-        setShowCustomPicker(false);
+        // Close the calendar if it was open
+        setCalendarOpen(false);
         break;
       case '7days':
         setActiveFilter('7days');
         onRangeChange(getDateRange(7));
-        setShowCustomPicker(false);
+        // Close the calendar if it was open
+        setCalendarOpen(false);
         break;
       case '30days':
         setActiveFilter('30days');
         onRangeChange(getDateRange(30));
-        setShowCustomPicker(false);
+        // Close the calendar if it was open
+        setCalendarOpen(false);
         break;
       case '90days':
         setActiveFilter('90days');
         onRangeChange(getDateRange(90));
-        setShowCustomPicker(false);
+        // Close the calendar if it was open
+        setCalendarOpen(false);
         break;
       case 'custom':
         setActiveFilter('custom');
-        setShowCustomPicker(true);
+        // Reset selection state
+        setSelectionPhase('start');
+        setTempSelection({});
+        // Open the calendar
+        setTimeout(() => {
+          setCalendarOpen(true);
+        }, 100);
         break;
       default:
         break;
@@ -324,19 +345,79 @@ export function DateRangeFilter({ date, onRangeChange }: DateRangeFilterProps) {
     }
   };
 
+  // Handle calendar date selection for start date
+  const handleStartDateSelect = (date: Date | undefined) => {
+    if (date) {
+      const startDate = new Date(date);
+      startDate.setHours(0, 0, 0, 0);
+      setTempSelection({ from: startDate });
+      setSelectionPhase('end');
+    }
+  };
+
+  // Handle calendar date selection for end date
+  const handleEndDateSelect = (date: Date | undefined) => {
+    if (date && tempSelection.from) {
+      const endDate = new Date(date);
+      endDate.setHours(23, 59, 59, 999);
+      
+      // If end date is before start date, swap them
+      if (endDate < tempSelection.from) {
+        const newRange = { from: endDate, to: tempSelection.from };
+        onRangeChange(newRange);
+      } else {
+        const newRange = { from: tempSelection.from, to: endDate };
+        onRangeChange(newRange);
+      }
+      
+      // Close calendar after selection is complete
+      setTimeout(() => {
+        setCalendarOpen(false);
+        setSelectionPhase('start');
+      }, 300);
+    }
+  };
+
+  // Handle apply button click
+  const handleApplyClick = () => {
+    if (tempSelection.from && tempSelection.to) {
+      const from = new Date(tempSelection.from);
+      from.setHours(0, 0, 0, 0);
+      const to = new Date(tempSelection.to);
+      to.setHours(23, 59, 59, 999);
+      
+      onRangeChange({ from, to });
+      setCalendarOpen(false);
+    }
+  };
+
   return (
-    <div className="flex items-center gap-3">
+    <div className="relative flex">
+      {/* Date Range Dropdown */}
       <Select 
         value={activeFilter} 
         onValueChange={handleFilterChange}
+        open={selectOpen}
+        onOpenChange={(open) => {
+          setSelectOpen(open);
+          // If dropdown is closing and custom is selected, keep calendar open
+          if (!open && activeFilter === 'custom') {
+            setTimeout(() => {
+              setCalendarOpen(true);
+            }, 100);
+          }
+        }}
       >
-        <SelectTrigger className="w-[240px] bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-gray-800 dark:to-gray-700 border-2 border-indigo-100 dark:border-gray-600 rounded-lg shadow-sm hover:shadow-md transition-all duration-300 font-medium">
-          <div className="flex items-center gap-2">
+        <SelectTrigger 
+          ref={triggerRef}
+          className="w-[320px] bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-gray-800 dark:to-gray-700 border-2 border-indigo-100 dark:border-gray-600 rounded-lg shadow-sm hover:shadow-md transition-all duration-300 font-medium"
+        >
+          <div className="flex items-center gap-2 w-full">
             <span className="text-lg">{getFilterEmoji()}</span>
-            <SelectValue className="flex-grow">{getDisplayText()}</SelectValue>
+            <SelectValue className="flex-grow truncate">{getDisplayText()}</SelectValue>
           </div>
         </SelectTrigger>
-        <SelectContent className="bg-white dark:bg-gray-800 border-2 border-indigo-100 dark:border-gray-600 rounded-lg shadow-lg animate-in fade-in-80 zoom-in-95 duration-200">
+        <SelectContent className="bg-white dark:bg-gray-800 border-2 border-indigo-100 dark:border-gray-600 rounded-lg shadow-lg animate-in fade-in-80 zoom-in-95 duration-200 w-[320px]">
           <SelectItem value="yesterday" className="hover:bg-indigo-50 dark:hover:bg-gray-700 cursor-pointer p-3 my-1 rounded-md flex items-center gap-2 transition-colors duration-200">
             <span className="text-lg mr-2">⏪</span> Yesterday
           </SelectItem>
@@ -355,40 +436,78 @@ export function DateRangeFilter({ date, onRangeChange }: DateRangeFilterProps) {
         </SelectContent>
       </Select>
 
-      <Popover open={showCustomPicker} onOpenChange={setShowCustomPicker}>
+      {/* Separate Popover for Calendar */}
+      <Popover 
+        open={activeFilter === 'custom' && calendarOpen} 
+        onOpenChange={(open) => {
+          // Only allow manually closing, not opening
+          if (!open) setCalendarOpen(false);
+        }}
+      >
         <PopoverTrigger asChild>
-          <Button 
-            variant="outline" 
-            size="sm" 
-            className={activeFilter === 'custom' ? "ml-2 bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-gray-700 dark:to-gray-600 border-2 border-indigo-100 dark:border-gray-500 rounded-lg shadow-sm hover:shadow-md transition-all duration-300 flex items-center gap-2 animate-in fade-in-80 duration-200" : "hidden"}
-            onClick={() => setShowCustomPicker(true)}
-          >
-            <CalendarIcon className="h-4 w-4 text-indigo-500 dark:text-indigo-300" />
-            <span className="text-sm font-medium">
-              {formatDate(currentSelection.from)} - {formatDate(currentSelection.to)}
-            </span>
-          </Button>
+          <div className="absolute top-0 left-0 w-1 h-1 opacity-0"></div>
         </PopoverTrigger>
-        <PopoverContent className="w-auto p-0 border border-gray-200 dark:border-gray-700 rounded-lg shadow-md" align="start">
-          <Calendar
-            mode="range"
-            selected={{
-              from: currentSelection.from,
-              to: currentSelection.to
-            }}
-            onSelect={(newDate: any) => {
-              if (newDate?.from) {
-                const from = new Date(newDate.from);
-                from.setHours(0, 0, 0, 0);
-                const to = newDate.to ? new Date(newDate.to) : new Date();
-                to.setHours(23, 59, 59, 999);
-                setActiveFilter('custom');
-                onRangeChange({ from, to });
-              }
-            }}
-            numberOfMonths={2}
-            className="rounded-lg bg-white dark:bg-gray-800 p-3"
-          />
+        <PopoverContent
+          className="w-[320px] p-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl z-50"
+          align="start" 
+          side="bottom"
+          sideOffset={5}
+          avoidCollisions={false}
+        >
+          <div className="flex flex-col">
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center">
+                <CalendarIcon className="h-4 w-4 text-indigo-500 dark:text-indigo-300 mr-2" />
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                  {selectionPhase === 'start' 
+                    ? "Select start date:" 
+                    : "Select end date:"}
+                </span>
+              </div>
+              {selectionPhase === 'end' && (
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={() => setSelectionPhase('start')}
+                  className="h-8 text-xs text-indigo-600 dark:text-indigo-400"
+                >
+                  Back
+                </Button>
+              )}
+            </div>
+            
+            {/* Show the selected range so far */}
+            {tempSelection.from && (
+              <div className="text-sm mb-2 bg-indigo-50 dark:bg-gray-700 p-2 rounded">
+                <span className="font-medium">Range: </span>
+                {formatDate(tempSelection.from)} 
+                {tempSelection.to ? ` - ${formatDate(tempSelection.to)}` : ' (selecting end date...)'}
+              </div>
+            )}
+            
+            {/* Start Date Calendar */}
+            {selectionPhase === 'start' && (
+              <Calendar
+                mode="single"
+                selected={tempSelection.from}
+                onSelect={handleStartDateSelect}
+                className="w-full bg-white dark:bg-gray-800"
+                initialFocus
+              />
+            )}
+            
+            {/* End Date Calendar */}
+            {selectionPhase === 'end' && (
+              <Calendar
+                mode="single"
+                selected={tempSelection.to}
+                onSelect={handleEndDateSelect}
+                className="w-full bg-white dark:bg-gray-800"
+                initialFocus
+                defaultMonth={tempSelection.from}
+              />
+            )}
+          </div>
         </PopoverContent>
       </Popover>
     </div>
