@@ -13,7 +13,9 @@ import {
   Tablet,
   Monitor,
   Download,
-  Filter
+  Filter ,
+  ChevronDown,
+  MoreHorizontal
 } from "lucide-react";
 import {
   Table,
@@ -27,6 +29,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import EnhancedCharts from "@/components/insights/EnhancedPlacementChartsSection";
 
 interface PlacementInsightsProps {
   data: any[];
@@ -36,6 +39,8 @@ interface PlacementInsightsProps {
 const PlacementInsights = ({ data, isLoading }: PlacementInsightsProps) => {
   const [platformFilter, setPlatformFilter] = useState<string>("all");
   const [positionFilter, setPositionFilter] = useState<string>("all");
+  const [chartTab, setChartTab] = useState<string>("platforms");
+  const [showAllRows, setShowAllRows] = useState(false);
 
   // Get unique positions from data
   const uniquePositions = useMemo(() => {
@@ -128,6 +133,10 @@ const PlacementInsights = ({ data, isLoading }: PlacementInsightsProps) => {
     document.body.removeChild(link);
   };
 
+
+  const displayData = showAllRows ? filteredData : filteredData.slice(0, 10);
+
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center p-10">
@@ -142,244 +151,299 @@ const PlacementInsights = ({ data, isLoading }: PlacementInsightsProps) => {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
     >
+      
       <Card className="overflow-hidden border-0 rounded-xl shadow-lg bg-gradient-to-b from-white to-blue-50/30 dark:from-gray-900 dark:to-blue-900/10">
-        <div className="bg-teal-500 py-3 px-4">
-          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
-            <div className="flex items-center gap-2">
-              <div className="bg-white/20 p-2 rounded-lg">
-                <Share2 className="h-5 w-5 text-white" />
-              </div>
-              <div>
-                <h5 className="text-lg font-medium text-white">Placement Breakdown</h5>
-                <p className="text-xs text-white/70">Detailed analytics by platform, position and device</p>
-              </div>
+      <div className="bg-teal-500 py-3 px-4">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
+          <div className="flex items-center gap-2">
+            <div className="bg-white/20 p-2 rounded-lg">
+              <Share2 className="h-5 w-5 text-white" />
+            </div>
+            <div>
+              <h5 className="text-lg font-medium text-white">Placement Breakdown</h5>
+              <p className="text-xs text-white/70">Detailed analytics by platform, position and device</p>
+            </div>
+          </div>
+          
+          <div className="flex flex-wrap items-center gap-3">
+            {/* Platform Filter */}
+            <div className="flex items-center gap-2 bg-white/20 px-3 py-2 rounded-lg">
+              <Filter className="h-4 w-4 text-white" />
+              <label htmlFor="platform-filter" className="text-white text-sm font-medium">Platform:</label>
+              <select
+                id="platform-filter"
+                value={platformFilter}
+                onChange={(e) => setPlatformFilter(e.target.value)}
+                className="bg-white/30 text-teal-800 text-sm rounded px-2 py-1 border-0 focus:ring-2 focus:ring-white/50"
+              >
+                <option value="all">All Platforms</option>
+                <option value="facebook">Facebook</option>
+                <option value="instagram">Instagram</option>
+              </select>
             </div>
             
-            <div className="flex flex-wrap items-center gap-3">
-              {/* Platform Filter */}
-              <div className="flex items-center gap-2 bg-white/20 px-3 py-2 rounded-lg">
-                <Filter className="h-4 w-4 text-white" />
-                <label htmlFor="platform-filter" className="text-white text-sm font-medium">Platform:</label>
-                <select
-                  id="platform-filter"
-                  value={platformFilter}
-                  onChange={(e) => setPlatformFilter(e.target.value)}
-                  className="bg-white/30 text-teal-800 text-sm rounded px-2 py-1 border-0 focus:ring-2 focus:ring-white/50"
-                >
-                  <option value="all">All Platforms</option>
-                  <option value="facebook">Facebook</option>
-                  <option value="instagram">Instagram</option>
-                </select>
-              </div>
-              
-              {/* Position Filter */}
-              <div className="flex items-center gap-2 bg-white/20 px-3 py-2 rounded-lg">
-                <Filter className="h-4 w-4 text-white" />
-                <label htmlFor="position-filter" className="text-white text-sm font-medium">Position:</label>
-                <select
-                  id="position-filter"
-                  value={positionFilter}
-                  onChange={(e) => setPositionFilter(e.target.value)}
-                  className="bg-white/30 text-teal-800 text-sm rounded px-2 py-1 border-0 focus:ring-2 focus:ring-white/50"
-                >
-                  <option value="all">All Positions</option>
-                  {uniquePositions.map(position => (
-                    <option key={position} value={position}>
-                      {position}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              
-              {/* Download Button */}
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button 
-                      variant="ghost" 
-                      size="sm" 
-                      onClick={downloadCSV}
-                      className="bg-white/20 hover:bg-white/30 text-white rounded-lg p-2"
-                      disabled={filteredData.length === 0}
-                    >
-                      <Download className="h-4 w-4" />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>Download as CSV</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-              
-              {/* Entry Badge */}
-              <Badge className="bg-teal-600/70 hover:bg-teal-600 text-white border-0 text-xs px-3 py-1 rounded-full shadow-sm">
-                {filteredData.length} Entries
-              </Badge>
+            {/* Position Filter */}
+            <div className="flex items-center gap-2 bg-white/20 px-3 py-2 rounded-lg">
+              <Filter className="h-4 w-4 text-white" />
+              <label htmlFor="position-filter" className="text-white text-sm font-medium">Position:</label>
+              <select
+                id="position-filter"
+                value={positionFilter}
+                onChange={(e) => setPositionFilter(e.target.value)}
+                className="bg-white/30 text-teal-800 text-sm rounded px-2 py-1 border-0 focus:ring-2 focus:ring-white/50"
+              >
+                <option value="all">All Positions</option>
+                {uniquePositions.map(position => (
+                  <option key={position} value={position}>
+                    {position.replace('facebook_', '')}
+                  </option>
+                ))}
+              </select>
             </div>
+            
+            {/* Download Button */}
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={downloadCSV}
+                    className="bg-white/20 hover:bg-white/30 text-white rounded-lg p-2"
+                    disabled={filteredData.length === 0}
+                  >
+                    <Download className="h-4 w-4" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Download as CSV</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+            
+            {/* Entry Badge */}
+            <Badge className="bg-teal-600/70 hover:bg-teal-600 text-white border-0 text-xs px-3 py-1 rounded-full shadow-sm">
+              {filteredData.length} Entries
+            </Badge>
           </div>
         </div>
-        
-        <CardContent className="p-0">
-          <div className="overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow className="bg-blue-50">
-                  <TableHead className="py-4 px-2 text-xs font-medium text-teal-800 uppercase">
-                    Platform
-                  </TableHead>
-                  <TableHead className="py-4 px-2 text-xs font-medium text-teal-800 uppercase">
-                    Position
-                  </TableHead>
-                  <TableHead className="py-4 px-2 text-xs font-medium text-teal-800 uppercase">
-                    <div className="flex items-center gap-2">
-                      <MonitorSmartphone className="h-4 w-4 text-amber-600" />
-                      <span>Device</span>
-                    </div>
-                  </TableHead>
-                  <TableHead className="py-4 px-2 text-xs font-medium text-teal-800 uppercase">
-                    <div className="flex items-center gap-2">
-                      <Eye className="h-4 w-4 text-blue-600" />
-                      <span>Impressions</span>
-                    </div>
-                  </TableHead>
-                  <TableHead className="py-4 px-2 text-xs font-medium text-teal-800 uppercase">
-                    <div className="flex items-center gap-2">
-                      <MousePointerClick className="h-4 w-4 text-green-600" />
-                      <span>Clicks</span>
-                    </div>
-                  </TableHead>
-                  <TableHead className="py-4 px-2 text-xs font-medium text-teal-800 uppercase">
-                    <div className="flex items-center gap-2">
-                      <DollarSign className="h-4 w-4 text-emerald-600" />
-                      <span>Spend</span>
-                    </div>
-                  </TableHead>
-                  <TableHead className="py-4 px-2 text-xs font-medium text-teal-800 uppercase">
-                    <div className="flex items-center gap-2">
-                      <BarChart className="h-4 w-4 text-indigo-600" />
-                      <span>CTR</span>
-                    </div>
-                  </TableHead>
-                  <TableHead className="py-4 px-2 text-xs font-medium text-teal-800 uppercase">
-                    <div className="flex items-center gap-2">
-                      <CircleDollarSign className="h-4 w-4 text-pink-600" />
-                      <span>CPC</span>
-                    </div>
-                  </TableHead>
-                  <TableHead className="py-4 px-2 text-xs font-medium text-teal-800 uppercase">
-                    <div className="flex items-center gap-2">
-                      <Users className="h-4 w-4 text-red-600" />
-                      <span>CPM</span>
-                    </div>
-                  </TableHead>
+      </div>
+      
+      <CardContent className="p-0">
+        <div className="overflow-x-auto">
+          <Table>
+            <TableHeader>
+              <TableRow className="bg-blue-50">
+                <TableHead className="py-4 px-2 text-xs font-medium text-teal-800 uppercase">
+                  Platform
+                </TableHead>
+                <TableHead className="py-4 px-2 text-xs font-medium text-teal-800 uppercase">
+                  Position
+                </TableHead>
+                <TableHead className="py-4 px-2 text-xs font-medium text-teal-800 uppercase">
+                  <div className="flex items-center gap-2">
+                    <MonitorSmartphone className="h-4 w-4 text-amber-600" />
+                    <span>Device</span>
+                  </div>
+                </TableHead>
+                <TableHead className="py-4 px-2 text-xs font-medium text-teal-800 uppercase">
+                  <div className="flex items-center gap-2">
+                    <Eye className="h-4 w-4 text-blue-600" />
+                    <span>Impressions</span>
+                  </div>
+                </TableHead>
+                <TableHead className="py-4 px-2 text-xs font-medium text-teal-800 uppercase">
+                  <div className="flex items-center gap-2">
+                    <MousePointerClick className="h-4 w-4 text-green-600" />
+                    <span>Clicks</span>
+                  </div>
+                </TableHead>
+                <TableHead className="py-4 px-2 text-xs font-medium text-teal-800 uppercase">
+                  <div className="flex items-center gap-2">
+                    <DollarSign className="h-4 w-4 text-emerald-600" />
+                    <span>Spend</span>
+                  </div>
+                </TableHead>
+                <TableHead className="py-4 px-2 text-xs font-medium text-teal-800 uppercase">
+                  <div className="flex items-center gap-2">
+                    <BarChart className="h-4 w-4 text-indigo-600" />
+                    <span>CTR</span>
+                  </div>
+                </TableHead>
+                <TableHead className="py-4 px-2 text-xs font-medium text-teal-800 uppercase">
+                  <div className="flex items-center gap-2">
+                    <CircleDollarSign className="h-4 w-4 text-pink-600" />
+                    <span>CPC</span>
+                  </div>
+                </TableHead>
+                <TableHead className="py-4 px-2 text-xs font-medium text-teal-800 uppercase">
+                  <div className="flex items-center gap-2">
+                    <Users className="h-4 w-4 text-red-600" />
+                    <span>CPM</span>
+                  </div>
+                </TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {displayData.length > 0 ? (
+                displayData.map((insight, index) => {
+                  // Determine device icon
+                  let DeviceIcon = MonitorSmartphone;
+                  let deviceColor = "text-gray-500";
+                  
+                  if (insight.impression_device.includes('iphone')) {
+                    DeviceIcon = Smartphone;
+                    deviceColor = "text-blue-500";
+                  } else if (insight.impression_device.includes('android')) {
+                    DeviceIcon = Smartphone;
+                    deviceColor = "text-green-500";
+                  } else if (insight.impression_device.includes('ipad')) {
+                    DeviceIcon = Tablet;
+                    deviceColor = "text-purple-500";
+                  } else if (insight.impression_device.includes('desktop')) {
+                    DeviceIcon = Monitor;
+                    deviceColor = "text-gray-600";
+                  }
+                  
+                  // For interactive rows with animation
+                  return (
+                    <motion.tr
+                      key={index}
+                      className="border-b border-blue-100 dark:border-blue-700 hover:bg-blue-50/70 dark:hover:bg-blue-800/50 transition-colors duration-200"
+                      whileHover={{ scale: 1.01 }}
+                      initial={{ opacity: 0, y: 5 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ type: "spring", stiffness: 300, delay: index * 0.03 }}
+                    >
+                      <TableCell className="py-4 px-2 font-medium text-blue-900 dark:text-blue-100">
+                        {insight.publisher_platform}
+                      </TableCell>
+                      <TableCell className="py-4 px-2 text-blue-700 dark:text-blue-300">
+                        {insight.platform_position.replace('facebook_', '')}
+                      </TableCell>
+                      <TableCell className="py-4 px-2 text-blue-700 dark:text-blue-300">
+                        <div className="flex items-center gap-2">
+                          <div className={`bg-gray-100 p-1.5 rounded-md`}>
+                            <DeviceIcon className={`w-4 h-4 ${deviceColor}`} />
+                          </div>
+                          <span>{insight.impression_device}</span>
+                        </div>
+                      </TableCell>
+                      <TableCell className="py-4 px-2">
+                        <div className="flex items-center gap-2 bg-blue-50 p-2 rounded-lg">
+                          <Eye className="w-4 h-4 text-blue-500" />
+                          <span className="font-semibold text-blue-700">
+                            {Number.parseInt(insight.impressions || "0").toLocaleString()}
+                          </span>
+                        </div>
+                      </TableCell>
+                      <TableCell className="py-4 px-2">
+                        <div className="flex items-center gap-2 bg-green-50 p-2 rounded-lg">
+                          <MousePointerClick className="w-4 h-4 text-green-500" />
+                          <span className="font-semibold text-green-700">
+                            {Number.parseInt(insight.clicks || "0").toLocaleString()}
+                          </span>
+                        </div>
+                      </TableCell>
+                      <TableCell className="py-4 px-2">
+                        <div className="flex items-center gap-2 bg-emerald-50 p-2 rounded-lg">
+                          <DollarSign className="w-4 h-4 text-emerald-500" />
+                          <span className="font-semibold text-emerald-700">
+                            ${Number.parseFloat(insight.spend || "0").toFixed(2)}
+                          </span>
+                        </div>
+                      </TableCell>
+                      <TableCell className="py-4 px-2">
+                        <div className="flex items-center gap-2 bg-indigo-50 p-2 rounded-lg">
+                          <BarChart className="w-4 h-4 text-indigo-500" />
+                          <span className="font-semibold text-indigo-700">
+                            {Number.parseFloat(insight.ctr || "0").toFixed(2)}%
+                          </span>
+                        </div>
+                      </TableCell>
+                      <TableCell className="py-4 px-2">
+                        <div className="flex items-center gap-2 bg-pink-50 p-2 rounded-lg">
+                          <CircleDollarSign className="w-4 h-4 text-pink-500" />
+                          <span className="font-semibold text-pink-700">
+                            {insight.cpc ? `$${Number.parseFloat(insight.cpc).toFixed(2)}` : "-"}
+                          </span>
+                        </div>
+                      </TableCell>
+                      <TableCell className="py-4 px-2">
+                        <div className="flex items-center gap-2 bg-red-50 p-2 rounded-lg">
+                          <Users className="w-4 h-4 text-red-500" />
+                          <span className="font-semibold text-red-700">
+                            ${Number.parseFloat(insight.cpm || "0").toFixed(2)}
+                          </span>
+                        </div>
+                      </TableCell>
+                    </motion.tr>
+                  );
+                })
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={9} className="py-6 text-center text-gray-500">
+                    No data available for the selected filters.
+                  </TableCell>
                 </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredData.length > 0 ? (
-                  filteredData.map((insight, index) => {
-                    // Determine device icon
-                    let DeviceIcon = MonitorSmartphone;
-                    let deviceColor = "text-gray-500";
-                    
-                    if (insight.impression_device.includes('iphone')) {
-                      DeviceIcon = Smartphone;
-                      deviceColor = "text-blue-500";
-                    } else if (insight.impression_device.includes('android')) {
-                      DeviceIcon = Smartphone;
-                      deviceColor = "text-green-500";
-                    } else if (insight.impression_device.includes('ipad')) {
-                      DeviceIcon = Tablet;
-                      deviceColor = "text-purple-500";
-                    } else if (insight.impression_device.includes('desktop')) {
-                      DeviceIcon = Monitor;
-                      deviceColor = "text-gray-600";
-                    }
-                    
-                    // For interactive rows with animation
-                    return (
-                      <motion.tr
-                        key={index}
-                        className="border-b border-blue-100 dark:border-blue-700 hover:bg-blue-50/70 dark:hover:bg-blue-800/50 transition-colors duration-200"
-                        whileHover={{ scale: 1.01 }}
-                        transition={{ type: "spring", stiffness: 300 }}
-                      >
-                        <TableCell className="py-4 px-2 font-medium text-blue-900 dark:text-blue-100">
-                          {insight.publisher_platform}
-                        </TableCell>
-                        <TableCell className="py-4 px-2 text-blue-700 dark:text-blue-300">
-                          {insight.platform_position.replace('facebook_', '')}
-                        </TableCell>
-                        <TableCell className="py-4 px-2 text-blue-700 dark:text-blue-300">
-                          <div className="flex items-center gap-2">
-                            <div className={`bg-gray-100 p-1.5 rounded-md`}>
-                              <DeviceIcon className={`w-4 h-4 ${deviceColor}`} />
-                            </div>
-                            <span>{insight.impression_device}</span>
-                          </div>
-                        </TableCell>
-                        <TableCell className="py-4 px-2">
-                          <div className="flex items-center gap-2 bg-blue-50 p-2 rounded-lg">
-                            <Eye className="w-4 h-4 text-blue-500" />
-                            <span className="font-semibold text-blue-700">
-                              {Number.parseInt(insight.impressions || "0").toLocaleString()}
-                            </span>
-                          </div>
-                        </TableCell>
-                        <TableCell className="py-4 px-2">
-                          <div className="flex items-center gap-2 bg-green-50 p-2 rounded-lg">
-                            <MousePointerClick className="w-4 h-4 text-green-500" />
-                            <span className="font-semibold text-green-700">
-                              {Number.parseInt(insight.clicks || "0").toLocaleString()}
-                            </span>
-                          </div>
-                        </TableCell>
-                        <TableCell className="py-4 px-2">
-                          <div className="flex items-center gap-2 bg-emerald-50 p-2 rounded-lg">
-                            <DollarSign className="w-4 h-4 text-emerald-500" />
-                            <span className="font-semibold text-emerald-700">
-                              ${Number.parseFloat(insight.spend || "0").toFixed(2)}
-                            </span>
-                          </div>
-                        </TableCell>
-                        <TableCell className="py-4 px-2">
-                          <div className="flex items-center gap-2 bg-indigo-50 p-2 rounded-lg">
-                            <BarChart className="w-4 h-4 text-indigo-500" />
-                            <span className="font-semibold text-indigo-700">
-                              {Number.parseFloat(insight.ctr || "0").toFixed(2)}%
-                            </span>
-                          </div>
-                        </TableCell>
-                        <TableCell className="py-4 px-2">
-                          <div className="flex items-center gap-2 bg-pink-50 p-2 rounded-lg">
-                            <CircleDollarSign className="w-4 h-4 text-pink-500" />
-                            <span className="font-semibold text-pink-700">
-                              {insight.cpc ? `$${Number.parseFloat(insight.cpc).toFixed(2)}` : "-"}
-                            </span>
-                          </div>
-                        </TableCell>
-                        <TableCell className="py-4 px-2">
-                          <div className="flex items-center gap-2 bg-red-50 p-2 rounded-lg">
-                            <Users className="w-4 h-4 text-red-500" />
-                            <span className="font-semibold text-red-700">
-                              ${Number.parseFloat(insight.cpm || "0").toFixed(2)}
-                            </span>
-                          </div>
-                        </TableCell>
-                      </motion.tr>
-                    );
-                  })
-                ) : (
-                  <TableRow>
-                    <TableCell colSpan={9} className="py-6 text-center text-gray-500">
-                      No data available for the selected filters.
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          </div>
-        </CardContent>
-      </Card>
+              )}
+            </TableBody>
+          </Table>
+          
+{/* Show More Button - only display if there are more rows to show */}
+{!showAllRows && filteredData.length > 10 && (
+            <motion.div 
+              initial={{ opacity: 0.8 }} 
+              animate={{ opacity: 1 }}
+              className="bg-gradient-to-b from-blue-50/80 to-blue-100/80 border-t border-blue-100"
+            >
+              <div className="flex justify-center items-center py-3">
+                <Button 
+                  onClick={() => setShowAllRows(true)}
+                  className="bg-white hover:bg-blue-50 text-teal-700 border border-teal-200 shadow-sm group flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-200 hover:shadow"
+                >
+                  <span className="font-medium">View All {filteredData.length} Entries</span>
+                  <div className="bg-teal-500 rounded-full p-1 group-hover:bg-teal-600 transition-colors duration-200">
+                    <ChevronDown className="h-3 w-3 text-white" />
+                  </div>
+                </Button>
+              </div>
+            </motion.div>
+          )}
+          
+          {/* Show Less Button - only display if showing all rows and there are more than 10 */}
+          {showAllRows && filteredData.length > 10 && (
+            <motion.div 
+              initial={{ opacity: 0.8 }} 
+              animate={{ opacity: 1 }}
+              className="bg-gradient-to-t from-blue-50/80 to-blue-100/80 border-t border-blue-100"
+            >
+              <div className="flex justify-center items-center py-3">
+                <Button 
+                  onClick={() => setShowAllRows(false)}
+                  className="bg-white hover:bg-blue-50 text-blue-700 border border-blue-200 shadow-sm group flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-200 hover:shadow"
+                >
+                  <span className="font-medium">Show Less</span>
+                  <div className="bg-blue-500 rounded-full p-1 group-hover:bg-blue-600 transition-colors duration-200">
+                    <ChevronDown className="h-3 w-3 text-white rotate-180" />
+                  </div>
+                </Button>
+              </div>
+            </motion.div>
+          )}
+  </div>
+      </CardContent>
+    </Card>
+
+{/* Charts Section */}
+<div className="w-full mt-12">
+<EnhancedCharts 
+         data={data} 
+         chartTab={chartTab}
+         setChartTab={setChartTab}
+       />
+       </div>
+
     </motion.div>
   );
 };
@@ -536,11 +600,11 @@ export default PlacementInsights;
 //       transition={{ duration: 0.5 }}
 //     >
 //       {/* Charts Section */}
-//       {/* <EnhancedCharts 
+//       <EnhancedCharts 
 //         data={data} 
 //         chartTab={chartTab}
 //         setChartTab={setChartTab}
-//       /> */}
+//       />
       
 //       {/* Table Section */}
 //       <Card className="overflow-hidden border-0 rounded-xl shadow-lg bg-gradient-to-b from-white to-blue-50/30 dark:from-gray-900 dark:to-blue-900/10">

@@ -16,7 +16,7 @@ interface ChartsGridProps {
 }
 
 export function ChartsGrid({ timeSeriesInsights,title }: ChartsGridProps) {
-  const [activeTab, setActiveTab] = useState("overview")
+  const [activeTab, setActiveTab] = useState("demographics")
 
   // Sort data chronologically
   const sortedData = [...timeSeriesInsights].sort(
@@ -128,17 +128,19 @@ export function ChartsGrid({ timeSeriesInsights,title }: ChartsGridProps) {
       <CardContent className="p-6 bg-gradient-to-b from-white to-blue-50/30 dark:from-gray-900 dark:to-blue-900/10">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
           <TabsList className="grid w-full grid-cols-3 rounded-xl bg-white dark:bg-gray-800 p-1 shadow-inner">
-            <TabsTrigger 
-              value="overview" 
-              className="rounded-lg data-[state=active]:bg-teal-500 data-[state=active]:text-white dark:data-[state=active]:bg-blue-600"
-            >
-              Overview
-            </TabsTrigger>
+            
             <TabsTrigger 
               value="demographics" 
               className="rounded-lg data-[state=active]:bg-teal-500 data-[state=active]:text-white dark:data-[state=active]:bg-blue-600"
             >
               Demographics
+            </TabsTrigger>
+
+            <TabsTrigger 
+              value="overview" 
+              className="rounded-lg data-[state=active]:bg-teal-500 data-[state=active]:text-white dark:data-[state=active]:bg-blue-600"
+            >
+              Overview
             </TabsTrigger>
             <TabsTrigger 
               value="metrics" 

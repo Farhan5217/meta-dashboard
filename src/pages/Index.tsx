@@ -15,7 +15,7 @@ import { motion } from "framer-motion"
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Sparkles, TrendingUp, Eye, MousePointerClick, DollarSign } from "lucide-react"
+import { Sparkles, TrendingUp, Eye, MousePointerClick, DollarSign,ChevronDown } from "lucide-react"
 import { Label } from "@/components/ui/label";
 import { useNavigate } from "react-router-dom";
 import {
@@ -41,6 +41,8 @@ const Index = () => {
   const [statusFilter, setStatusFilter] = useState<number>();
   const [campaignStatusFilter, setCampaignStatusFilter] = useState<string>();
   const [objectiveFilter, setObjectiveFilter] = useState<string>();
+  const [showAllRows, setShowAllRows] = useState(false);
+
   // const [showDemographics, setShowDemographics] = useState(false);
   // const [dateRange, setDateRange] = useState<DateRange>(getLast30Days());
   // const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined); 
@@ -55,6 +57,7 @@ const Index = () => {
     };
   });
 
+  
 
   const { accounts } = useAdAccounts(statusFilter);
   const { campaigns } = useCampaigns(selectedAccount, campaignStatusFilter, objectiveFilter);
@@ -289,6 +292,8 @@ cpc:"0"
       }
     }
 
+    const displayCampaigns = showAllRows ? campaigns : campaigns.slice(0, 10);
+
   return (
     <div className="min-h-screen bg-white">
   <DashboardHeader
@@ -341,8 +346,8 @@ cpc:"0"
       className="bg-teal-500 hover:bg-teal-600 text-white border-none flex items-center gap-2 shadow-sm"
       onClick={() => navigate(`/enhanced-insights/${selectedAccount}`)}
     >
-      <Sparkles className="h-4 w-4" />
-      Enhanced Insights
+      {/* <Sparkles className="h-4 w-4" /> */}
+      Placement/Actions
     </Button>
   )}
 </div>
@@ -350,29 +355,6 @@ cpc:"0"
 
 
 
-      <div className="flex items-center space-x-2 disabled">
-        {/* <Switch id="demographics" checked={showDemographics} onCheckedChange={setShowDemographics} /> */}
-        {/* <Label htmlFor="demographics" className="text-gray-700 dark:text-gray-300 disabled">
-          Show Demographics
-        </Label> */}
-      </div>
-      {/* <div
-  className="flex items-center space-x-2 opacity-50 pointer-events-none"
-  aria-disabled="true"
->
-  <Switch
-    id="demographics"
-    checked={showDemographics}
-    onCheckedChange={setShowDemographics}
-    // disabled
-  />
-  <Label
-    htmlFor="demographics"
-    className="text-gray-700 dark:text-gray-300"
-  >
-    Show Demographics
-  </Label>
-</div> */}
 
     </div>
 
@@ -380,9 +362,6 @@ cpc:"0"
       <>
         <MetricsGrid aggregatedMetrics={aggregatedMetrics} latestReach={latestReach} latestFrequency={latestFrequency} />
 
-        <ChartsGrid timeSeriesInsights={timeSeriesInsights || []} 
-        title="Ad Account Analytics" 
-        />
 
         {/* Campaign Filters */}
         <div className="mt-8 space-y-6">
@@ -452,7 +431,7 @@ cpc:"0"
 
   {/* Campaigns Table Section */}
   {/* Campaigns Section */}
-  <Card className="overflow-hidden border-0 rounded-lg shadow-sm">
+  {/* <Card className="overflow-hidden border-0 rounded-lg shadow-sm">
                   <div className="bg-teal-500 py-3 px-4">
                     <div className="flex justify-between items-center">
                       <div className="flex items-center gap-2 text-white font-medium">
@@ -539,8 +518,147 @@ cpc:"0"
           </Table>
         </div>
       </CardContent>
+    </Card> */}
+<Card className="overflow-hidden border-0 rounded-lg shadow-sm">
+      <div className="bg-teal-500 py-3 px-4">
+        <div className="flex justify-between items-center">
+          <div className="flex items-center gap-2 text-white font-medium">
+            <Sparkles className="h-5 w-5" />
+            Campaigns Overview
+          </div>
+          <Badge className="bg-teal-600 text-white border-0 text-xs px-2.5">
+            {campaigns.length} Campaigns
+          </Badge>
+        </div>
+      </div>
+      <CardContent className="p-0">
+        <div className="overflow-x-auto">
+          <Table>
+            <TableHeader>
+              <TableRow className="bg-blue-50">
+                <TableHead className="py-3 px-4 text-xs font-medium text-teal-800 uppercase">
+                  Name
+                </TableHead>
+                <TableHead className="py-3 px-4 text-xs font-medium text-teal-800 uppercase">
+                  Status
+                </TableHead>
+                <TableHead className="py-3 px-4 text-xs font-medium text-teal-800 uppercase">
+                  Objective
+                </TableHead>
+                <TableHead className="py-3 px-4 text-xs font-medium text-teal-800 uppercase">
+                  Spend
+                </TableHead>
+                <TableHead className="py-3 px-4 text-xs font-medium text-teal-800 uppercase">
+                  Impressions
+                </TableHead>
+                <TableHead className="py-3 px-4 text-xs font-medium text-teal-800 uppercase">
+                  Clicks
+                </TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {displayCampaigns.map((campaign, index) => {
+                const insights = campaignInsights[campaign.id] || {};
+                return (
+                  <motion.tr
+                    key={campaign.id}
+                    className="group cursor-pointer border-b border-blue-200 dark:border-blue-700 hover:bg-blue-50 dark:hover:bg-blue-800/50 transition-colors duration-200"
+                    onClick={() => navigate && navigate(`/campaign/${campaign.id}`)}
+                    whileHover={{ scale: 1.02 }}
+                    initial={{ opacity: 0, y: 5 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ type: "spring", stiffness: 300, delay: index * 0.03 }}
+                  >
+                    <TableCell className="py-4 px-6">
+                      <div className="font-medium text-blue-900 dark:text-blue-100">{campaign.name}</div>
+                    </TableCell>
+                    <TableCell className="py-4 px-6">
+                      <Badge variant="outline" className={`text-xs ${getStatusBadgeClass(campaign.status)}`}>
+                        {campaign.status}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="py-4 px-6 text-blue-700 dark:text-blue-300">
+                      <div className="flex items-center gap-2">
+                        <TrendingUp className="w-4 h-4" />
+                        {campaign.objective.replace("OUTCOME_", "")}
+                      </div>
+                    </TableCell>
+                    <TableCell className="py-4 px-6 text-blue-700 dark:text-blue-300">
+                      <div className="flex items-center gap-2">
+                        <DollarSign className="w-4 h-4" />
+                        <span className="font-medium">${Number.parseFloat(insights.spend || "0").toFixed(2)}</span>
+                      </div>
+                    </TableCell>
+                    <TableCell className="py-4 px-6 text-blue-700 dark:text-blue-300">
+                      <div className="flex items-center gap-2">
+                        <Eye className="w-4 h-4" />
+                        {Number.parseInt(insights.impressions || "0").toLocaleString()}
+                      </div>
+                    </TableCell>
+                    <TableCell className="py-4 px-6 text-blue-700 dark:text-blue-300">
+                      <div className="flex items-center gap-2">
+                        <MousePointerClick className="w-4 h-4" />
+                        {Number.parseInt(insights.clicks || "0").toLocaleString()}
+                      </div>
+                    </TableCell>
+                  </motion.tr>
+                );
+              })}
+            </TableBody>
+          </Table>
+          
+          {/* Show More Button - only display if there are more rows to show */}
+          {!showAllRows && campaigns.length > 10 && (
+            <motion.div 
+              initial={{ opacity: 0.8 }} 
+              animate={{ opacity: 1 }}
+              className="bg-gradient-to-b from-blue-50/80 to-blue-100/80 border-t border-blue-100"
+            >
+              <div className="flex justify-center items-center py-3">
+                <Button 
+                  onClick={() => setShowAllRows(true)}
+                  className="bg-white hover:bg-blue-50 text-teal-700 border border-teal-200 shadow-sm group flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-200 hover:shadow"
+                >
+                  <span className="font-medium">View All {campaigns.length} Campaigns</span>
+                  <div className="bg-teal-500 rounded-full p-1 group-hover:bg-teal-600 transition-colors duration-200">
+                    <ChevronDown className="h-3 w-3 text-white" />
+                  </div>
+                </Button>
+              </div>
+            </motion.div>
+          )}
+          
+          {/* Show Less Button - only display if showing all rows and there are more than 10 */}
+          {showAllRows && campaigns.length > 10 && (
+            <motion.div 
+              initial={{ opacity: 0.8 }} 
+              animate={{ opacity: 1 }}
+              className="bg-gradient-to-t from-blue-50/80 to-blue-100/80 border-t border-blue-100"
+            >
+              <div className="flex justify-center items-center py-3">
+                <Button 
+                  onClick={() => setShowAllRows(false)}
+                  className="bg-white hover:bg-blue-50 text-blue-700 border border-blue-200 shadow-sm group flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-200 hover:shadow"
+                >
+                  <span className="font-medium">Show Less</span>
+                  <div className="bg-blue-500 rounded-full p-1 group-hover:bg-blue-600 transition-colors duration-200">
+                    <ChevronDown className="h-3 w-3 text-white rotate-180" />
+                  </div>
+                </Button>
+              </div>
+            </motion.div>
+          )}
+        </div>
+      </CardContent>
     </Card>
+
 </div>
+<div className="mt-16 gap-y-12">
+<ChartsGrid timeSeriesInsights={timeSeriesInsights || []} 
+        title="Ad Account Analytics" 
+        />
+</div>
+
 
       </>
     )}

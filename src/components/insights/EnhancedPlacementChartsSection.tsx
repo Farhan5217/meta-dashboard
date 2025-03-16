@@ -10,28 +10,29 @@ import {
   YAxis,
   Tooltip,
   Legend,
-  LineChart,
-  Line,
-  AreaChart,
-  Area,
-  ComposedChart,
-  Scatter,
-  RadarChart,
-  PolarGrid,
-  PolarAngleAxis,
-  PolarRadiusAxis,
-  Radar,
-  Treemap,
-  RadialBarChart,
-  CartesianGrid,
-  RadialBar
+  Treemap
 } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Activity, PieChart, BarChart, TrendingUp, Share2, MonitorSmartphone } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { PieChart, BarChart, LayoutDashboard } from "lucide-react";
 
-// Component for the enhanced charts section
-const EnhancedCharts = ({ data, chartTab, setChartTab }) => {
+const FilteredCharts = ({ data, chartTab, setChartTab }) => {
+  // State for selected metric
+  const [selectedMetric, setSelectedMetric] = useState("impressions");
+
+  // Metrics for filter
+  const metrics = [
+    { value: "impressions", label: "Impressions" },
+    { value: "clicks", label: "Clicks" },
+    { value: "spend", label: "Spend" },
+    { value: "reach", label: "Reach" },
+    { value: "frequency", label: "Frequency" },
+    { value: "ctr", label: "CTR" },
+    { value: "cpc", label: "CPC" },
+    { value: "cpm", label: "CPM" }
+  ];
+
   // Prepare platform data
   const platformData = useMemo(() => {
     const platforms = {};
@@ -45,7 +46,11 @@ const EnhancedCharts = ({ data, chartTab, setChartTab }) => {
           impressions: 0,
           clicks: 0,
           spend: 0,
-          reach: 0
+          reach: 0,
+          frequency: 0,
+          ctr: 0,
+          cpc: 0,
+          cpm: 0
         };
       }
       
@@ -53,6 +58,21 @@ const EnhancedCharts = ({ data, chartTab, setChartTab }) => {
       platforms[platform].clicks += Number(item.clicks || 0);
       platforms[platform].spend += Number(item.spend || 0);
       platforms[platform].reach += Number(item.reach || 0);
+    });
+    
+    // Calculate derived metrics for each platform
+    Object.values(platforms).forEach(platform => {
+      // Frequency (reach must be non-zero to calculate)
+      platform.frequency = platform.reach > 0 ? platform.impressions / platform.reach : 0;
+      
+      // CTR (click-through rate) - impressions must be non-zero
+      platform.ctr = platform.impressions > 0 ? (platform.clicks / platform.impressions) * 100 : 0;
+      
+      // CPC (cost per click) - clicks must be non-zero
+      platform.cpc = platform.clicks > 0 ? platform.spend / platform.clicks : 0;
+      
+      // CPM (cost per thousand impressions) - impressions must be non-zero
+      platform.cpm = platform.impressions > 0 ? (platform.spend / platform.impressions) * 1000 : 0;
     });
     
     return Object.values(platforms);
@@ -71,18 +91,33 @@ const EnhancedCharts = ({ data, chartTab, setChartTab }) => {
           impressions: 0,
           clicks: 0,
           spend: 0,
-          ctr: 0
+          reach: 0,
+          frequency: 0,
+          ctr: 0,
+          cpc: 0,
+          cpm: 0
         };
       }
       
       positions[position].impressions += Number(item.impressions || 0);
       positions[position].clicks += Number(item.clicks || 0);
       positions[position].spend += Number(item.spend || 0);
+      positions[position].reach += Number(item.reach || 0);
     });
     
-    // Calculate CTR for each position
-    Object.values(positions).forEach(pos => {
-      pos.ctr = pos.impressions > 0 ? (pos.clicks / pos.impressions) * 100 : 0;
+    // Calculate derived metrics for each position
+    Object.values(positions).forEach(position => {
+      // Frequency (reach must be non-zero to calculate)
+      position.frequency = position.reach > 0 ? position.impressions / position.reach : 0;
+      
+      // CTR (click-through rate) - impressions must be non-zero
+      position.ctr = position.impressions > 0 ? (position.clicks / position.impressions) * 100 : 0;
+      
+      // CPC (cost per click) - clicks must be non-zero
+      position.cpc = position.clicks > 0 ? position.spend / position.clicks : 0;
+      
+      // CPM (cost per thousand impressions) - impressions must be non-zero
+      position.cpm = position.impressions > 0 ? (position.spend / position.impressions) * 1000 : 0;
     });
     
     return Object.values(positions);
@@ -101,6 +136,9 @@ const EnhancedCharts = ({ data, chartTab, setChartTab }) => {
           impressions: 0,
           clicks: 0,
           spend: 0,
+          reach: 0,
+          frequency: 0,
+          ctr: 0,
           cpc: 0,
           cpm: 0
         };
@@ -109,89 +147,195 @@ const EnhancedCharts = ({ data, chartTab, setChartTab }) => {
       devices[device].impressions += Number(item.impressions || 0);
       devices[device].clicks += Number(item.clicks || 0);
       devices[device].spend += Number(item.spend || 0);
+      devices[device].reach += Number(item.reach || 0);
     });
     
-    // Calculate CPC and CPM for each device
-    Object.values(devices).forEach(dev => {
-      dev.cpc = dev.clicks > 0 ? dev.spend / dev.clicks : 0;
-      dev.cpm = dev.impressions > 0 ? (dev.spend / dev.impressions) * 1000 : 0;
+    // Calculate derived metrics for each device
+    Object.values(devices).forEach(device => {
+      // Frequency (reach must be non-zero to calculate)
+      device.frequency = device.reach > 0 ? device.impressions / device.reach : 0;
+      
+      // CTR (click-through rate) - impressions must be non-zero
+      device.ctr = device.impressions > 0 ? (device.clicks / device.impressions) * 100 : 0;
+      
+      // CPC (cost per click) - clicks must be non-zero
+      device.cpc = device.clicks > 0 ? device.spend / device.clicks : 0;
+      
+      // CPM (cost per thousand impressions) - impressions must be non-zero
+      device.cpm = device.impressions > 0 ? (device.spend / device.impressions) * 1000 : 0;
     });
     
     return Object.values(devices);
   }, [data]);
+  
+  // Prepare platform-specific device data (for Facebook and Instagram)
+  const platformDeviceData = useMemo(() => {
+    const result = {
+      facebook: {},
+      instagram: {}
+    };
+    
+    // Group by platform and device
+    data?.forEach(item => {
+      const platform = item.publisher_platform.toLowerCase();
+      const device = item.impression_device;
+      
+      // Skip if not Facebook or Instagram
+      if (platform !== 'facebook' && platform !== 'instagram') return;
+      
+      if (!result[platform][device]) {
+        result[platform][device] = {
+          name: device,
+          impressions: 0,
+          clicks: 0,
+          spend: 0,
+          reach: 0,
+          frequency: 0,
+          ctr: 0,
+          cpc: 0,
+          cpm: 0
+        };
+      }
+      
+      result[platform][device].impressions += Number(item.impressions || 0);
+      result[platform][device].clicks += Number(item.clicks || 0);
+      result[platform][device].spend += Number(item.spend || 0);
+      result[platform][device].reach += Number(item.reach || 0);
+    });
+    
+    // Calculate derived metrics for each platform-device combo
+    ['facebook', 'instagram'].forEach(platform => {
+      Object.values(result[platform]).forEach(device => {
+        // Frequency (reach must be non-zero to calculate)
+        device.frequency = device.reach > 0 ? device.impressions / device.reach : 0;
+        
+        // CTR (click-through rate) - impressions must be non-zero
+        device.ctr = device.impressions > 0 ? (device.clicks / device.impressions) * 100 : 0;
+        
+        // CPC (cost per click) - clicks must be non-zero
+        device.cpc = device.clicks > 0 ? device.spend / device.clicks : 0;
+        
+        // CPM (cost per thousand impressions) - impressions must be non-zero
+        device.cpm = device.impressions > 0 ? (device.spend / device.impressions) * 1000 : 0;
+      });
+    });
+    
+    return {
+      facebook: Object.values(result.facebook),
+      instagram: Object.values(result.instagram)
+    };
+  }, [data]);
+
+  // Prepare platform-position data for horizontal bar chart
+  const platformPositionData = useMemo(() => {
+    const combinedData = {};
+    
+    // Group by platform and position combination
+    data?.forEach(item => {
+      const platform = item.publisher_platform;
+      const position = item.platform_position.replace('facebook_', '');
+      const key = `${platform} - ${position}`;
+      
+      if (!combinedData[key]) {
+        combinedData[key] = {
+          name: key,
+          impressions: 0,
+          clicks: 0,
+          spend: 0,
+          reach: 0,
+          frequency: 0,
+          ctr: 0,
+          cpc: 0,
+          cpm: 0
+        };
+      }
+      
+      combinedData[key].impressions += Number(item.impressions || 0);
+      combinedData[key].clicks += Number(item.clicks || 0);
+      combinedData[key].spend += Number(item.spend || 0);
+      combinedData[key].reach += Number(item.reach || 0);
+    });
+    
+    // Calculate derived metrics for each combination
+    Object.values(combinedData).forEach(combo => {
+      // Frequency (reach must be non-zero to calculate)
+      combo.frequency = combo.reach > 0 ? combo.impressions / combo.reach : 0;
+      
+      // CTR (click-through rate) - impressions must be non-zero
+      combo.ctr = combo.impressions > 0 ? (combo.clicks / combo.impressions) * 100 : 0;
+      
+      // CPC (cost per click) - clicks must be non-zero
+      combo.cpc = combo.clicks > 0 ? combo.spend / combo.clicks : 0;
+      
+      // CPM (cost per thousand impressions) - impressions must be non-zero
+      combo.cpm = combo.impressions > 0 ? (combo.spend / combo.impressions) * 1000 : 0;
+    });
+    
+    return Object.values(combinedData).sort((a, b) => b[selectedMetric] - a[selectedMetric]);
+  }, [data, selectedMetric]);
 
   // Color palette
   const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#4BC0C0', '#FF6384'];
   
-  // Prepare platform-position stacked data for heatmap
-  const platformPositionData = useMemo(() => {
-    const result = [];
-    const platformsSet = new Set();
-    const positionsSet = new Set();
-    
-    // Get unique platforms and positions
-    data?.forEach(item => {
-      platformsSet.add(item.publisher_platform);
-      positionsSet.add(item.platform_position.replace('facebook_', ''));
-    });
-    
-    const platforms = Array.from(platformsSet);
-    const positions = Array.from(positionsSet);
-    
-    // Create data structure for heatmap
-    platforms.forEach(platform => {
-      const entry = { name: platform };
-      
-      positions.forEach(position => {
-        const filteredItems = data?.filter(item => 
-          item.publisher_platform === platform && 
-          item.platform_position.replace('facebook_', '') === position
-        );
-        
-        const impressions = filteredItems.reduce((sum, item) => sum + Number(item.impressions || 0), 0);
-        entry[position] = impressions;
-      });
-      
-      result.push(entry);
-    });
-    
-    return { data: result, positions };
-  }, [data]);
+  // Format metric value for display
+  const formatMetricValue = (value, metric) => {
+    switch (metric) {
+      case "spend":
+        return `${Number(value).toFixed(2)}`;
+      case "cpc":
+        return `${Number(value).toFixed(2)}`;
+      case "cpm":
+        return `${Number(value).toFixed(2)}`;
+      case "ctr":
+        return `${Number(value).toFixed(2)}%`;
+      case "frequency":
+        return Number(value).toFixed(2);
+      default:
+        return Number(value).toLocaleString();
+    }
+  };
 
-  // Prepare date-based data for time series
-  const timeSeriesData = useMemo(() => {
-    const dateMap = {};
-    
-    // Group by date
-    data?.forEach(item => {
-      const date = item.date_start;
-      if (!dateMap[date]) {
-        dateMap[date] = {
-          date,
-          facebook: 0,
-          instagram: 0,
-          total: 0
-        };
-      }
-      
-      const platform = item.publisher_platform.toLowerCase();
-      const impressions = Number(item.impressions || 0);
-      dateMap[date][platform] += impressions;
-      dateMap[date].total += impressions;
-    });
-    
-    return Object.values(dateMap).sort((a, b) => new Date(a.date) - new Date(b.date));
-  }, [data]);
+  // Custom name for the metrics
+  const getMetricName = (metric) => {
+    const metricMap = {
+      impressions: "Impressions",
+      clicks: "Clicks",
+      spend: "Spend ($)",
+      reach: "Reach",
+      frequency: "Frequency",
+      ctr: "CTR (%)",
+      cpc: "CPC ($)",
+      cpm: "CPM ($)"
+    };
+    return metricMap[metric] || metric;
+  };
 
   return (
-    <Card className="mb-6 border-0 rounded-xl shadow-lg overflow-hidden">
-      <CardHeader className="bg-gradient-to-r from-teal-500 to-teal-600 p-6">
+    <Card className="mb-6 border rounded-xl shadow-lg overflow-hidden">
+      <CardHeader className="bg-teal-500 p-6">
         <CardTitle className="text-white flex items-center gap-2">
-          <Activity className="h-5 w-5" />
-          Advanced Placement Analytics
+          <LayoutDashboard className="h-5 w-5" />
+          Filtered Ad Placement Analytics
         </CardTitle>
       </CardHeader>
       <CardContent className="p-6">
+        {/* Metric Filter */}
+        <div className="mb-6">
+          <label className="block text-sm font-medium text-gray-700 mb-2">Select Metric</label>
+          <Select value={selectedMetric} onValueChange={setSelectedMetric}>
+            <SelectTrigger className="w-full md:w-60">
+              <SelectValue placeholder="Select metric" />
+            </SelectTrigger>
+            <SelectContent>
+              {metrics.map((metric) => (
+                <SelectItem key={metric.value} value={metric.value}>
+                  {metric.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        
         <Tabs value={chartTab} onValueChange={setChartTab} className="space-y-4">
           <TabsList className="grid w-full grid-cols-3 mb-4">
             <TabsTrigger value="platforms">Platforms</TabsTrigger>
@@ -201,91 +345,36 @@ const EnhancedCharts = ({ data, chartTab, setChartTab }) => {
           
           {/* PLATFORMS TAB */}
           <TabsContent value="platforms" className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Radial Bar Chart for Platform Metrics */}
-              <Card>
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-lg text-gray-700 flex items-center gap-2">
-                    <Share2 className="h-4 w-4 text-blue-600" />
-                    Platform Performance
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="h-[320px]">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <RadialBarChart 
-                      innerRadius="15%" 
-                      outerRadius="80%" 
-                      data={platformData} 
-                      startAngle={180} 
-                      endAngle={0}
-                    >
-                      <RadialBar
-                        label={{ fill: '#666', position: 'insideStart' }}
-                        background
-                        dataKey="impressions"
-                        nameKey="name"
-                      >
-                        {platformData.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                        ))}
-                      </RadialBar>
-                      <Legend iconSize={10} layout="vertical" verticalAlign="middle" align="right" />
-                      <Tooltip formatter={(value) => Number(value).toLocaleString()} />
-                    </RadialBarChart>
-                  </ResponsiveContainer>
-                </CardContent>
-              </Card>
-              
-              {/* Stacked Area Chart for Time Series */}
-              <Card>
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-lg text-gray-700 flex items-center gap-2">
-                    <TrendingUp className="h-4 w-4 text-green-600" />
-                    Platform Impressions Over Time
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="h-[320px]">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <AreaChart
-                      data={timeSeriesData}
-                      margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
-                    >
-                      <XAxis dataKey="date" />
-                      <YAxis />
-                      <Tooltip />
-                      <Legend />
-                      <Area type="monotone" dataKey="facebook" stackId="1" stroke="#0088FE" fill="#0088FE" />
-                      <Area type="monotone" dataKey="instagram" stackId="1" stroke="#FF8042" fill="#FF8042" />
-                    </AreaChart>
-                  </ResponsiveContainer>
-                </CardContent>
-              </Card>
-            </div>
-            
-            {/* Divergent Stacked Bar Chart for Platform Comparison */}
             <Card>
               <CardHeader className="pb-2">
                 <CardTitle className="text-lg text-gray-700 flex items-center gap-2">
-                  <BarChart className="h-4 w-4 text-purple-600" />
-                  Multi-Metric Platform Comparison
+                  <PieChart className="h-4 w-4 text-blue-600" />
+                  Platform Distribution by {getMetricName(selectedMetric)}
                 </CardTitle>
               </CardHeader>
-              <CardContent className="h-[300px]">
+              <CardContent className="h-64">
                 <ResponsiveContainer width="100%" height="100%">
-                  <ComposedChart
-                    layout="vertical"
-                    data={platformData}
-                    margin={{ top: 20, right: 20, bottom: 20, left: 80 }}
-                  >
-                    <XAxis type="number" />
-                    <YAxis dataKey="name" type="category" scale="band" />
-                    <Tooltip />
+                  <RePieChart>
+                    <Pie
+                      data={platformData}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={60}
+                      outerRadius={80}
+                      dataKey={selectedMetric}
+                      nameKey="name"
+                      label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                    >
+                      {platformData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                      ))}
+                    </Pie>
+                    <Tooltip 
+                      formatter={(value) => formatMetricValue(value, selectedMetric)} 
+                      labelFormatter={(name) => `Platform: ${name}`}
+                    />
                     <Legend />
-                    <Bar dataKey="impressions" barSize={20} fill="#0088FE" name="Impressions" />
-                    <Bar dataKey="clicks" barSize={20} fill="#00C49F" name="Clicks" />
-                    <Line dataKey="spend" stroke="#FF8042" name="Spend ($)" />
-                    <Scatter dataKey="reach" fill="#8884d8" name="Reach" />
-                  </ComposedChart>
+                  </RePieChart>
                 </ResponsiveContainer>
               </CardContent>
             </Card>
@@ -294,7 +383,7 @@ const EnhancedCharts = ({ data, chartTab, setChartTab }) => {
           {/* POSITIONS TAB */}
           <TabsContent value="positions" className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Treemap for Position Distribution */}
+              {/* Treemap for Position Distribution (always showing spend) */}
               <Card>
                 <CardHeader className="pb-2">
                   <CardTitle className="text-lg text-gray-700 flex items-center gap-2">
@@ -302,14 +391,13 @@ const EnhancedCharts = ({ data, chartTab, setChartTab }) => {
                     Position Distribution (Spend)
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="h-[320px]">
+                <CardContent className="h-64">
                   <ResponsiveContainer width="100%" height="100%">
                     <Treemap
                       data={positionData}
                       dataKey="spend"
                       aspectRatio={4/3}
                       stroke="#fff"
-                      fill="#8884d8"
                       nameKey="name"
                     >
                       {positionData.map((entry, index) => (
@@ -324,149 +412,272 @@ const EnhancedCharts = ({ data, chartTab, setChartTab }) => {
                 </CardContent>
               </Card>
               
-              {/* Stacked Column Chart */}
+              {/* Horizontal Bar Chart for Placement Combinations */}
               <Card>
                 <CardHeader className="pb-2">
                   <CardTitle className="text-lg text-gray-700 flex items-center gap-2">
                     <BarChart className="h-4 w-4 text-indigo-600" />
-                    Position Metrics Comparison
+                    Platform-Position by {getMetricName(selectedMetric)}
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="h-[320px]">
+                <CardContent className="h-64">
                   <ResponsiveContainer width="100%" height="100%">
                     <ReBarChart
-                      data={positionData}
-                      margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+                      layout="vertical"
+                      data={platformPositionData.slice(0, 5)} // Show top 5 for readability
+                      margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
                     >
-                      <XAxis dataKey="name" />
-                      <YAxis />
-                      <Tooltip />
-                      <Legend />
-                      <Bar dataKey="clicks" stackId="a" fill="#0088FE" name="Clicks" />
-                      <Bar dataKey="impressions" stackId="a" fill="#00C49F" name="Impressions" />
+                      <XAxis type="number" />
+                      <YAxis dataKey="name" type="category" width={150} />
+                      <Tooltip 
+                        formatter={(value) => formatMetricValue(value, selectedMetric)}
+                      />
+                      <Bar 
+                        dataKey={selectedMetric} 
+                        fill="#8884d8" 
+                        name={getMetricName(selectedMetric)} 
+                      />
                     </ReBarChart>
                   </ResponsiveContainer>
                 </CardContent>
               </Card>
             </div>
-            
-            {/* Heatmap-like visualization for platform-position correlation */}
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-lg text-gray-700 flex items-center gap-2">
-                  <Activity className="h-4 w-4 text-rose-600" />
-                  Platform-Position Distribution Heatmap
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="h-[300px]">
-                <ResponsiveContainer width="100%" height="100%">
-                  <ReBarChart
-                    layout="vertical"
-                    data={platformPositionData.data}
-                    margin={{ top: 20, right: 20, left: 60, bottom: 5 }}
-                  >
-                    <XAxis type="number" />
-                    <YAxis dataKey="name" type="category" />
-                    <Tooltip formatter={(value) => value ? value.toLocaleString() : '0'} />
-                    <Legend />
-                    {platformPositionData.positions.map((position, index) => (
-                      <Bar 
-                        key={position} 
-                        dataKey={position} 
-                        stackId="a" 
-                        fill={COLORS[index % COLORS.length]} 
-                      />
-                    ))}
-                  </ReBarChart>
-                </ResponsiveContainer>
-              </CardContent>
-            </Card>
           </TabsContent>
           
+          
           {/* DEVICES TAB */}
-          <TabsContent value="devices" className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Radar Chart for Device Performance */}
-              <Card>
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-lg text-gray-700 flex items-center gap-2">
-                    <MonitorSmartphone className="h-4 w-4 text-amber-600" />
-                    Device Performance Radar
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="h-[320px]">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <RadarChart outerRadius={120} data={deviceData}>
-                      <PolarGrid />
-                      <PolarAngleAxis dataKey="name" />
-                      <PolarRadiusAxis angle={30} domain={[0, 'auto']} />
-                      <Radar name="Impressions" dataKey="impressions" stroke="#0088FE" fill="#0088FE" fillOpacity={0.6} />
-                      <Radar name="Clicks" dataKey="clicks" stroke="#FF8042" fill="#FF8042" fillOpacity={0.6} />
-                      <Legend />
-                      <Tooltip />
-                    </RadarChart>
-                  </ResponsiveContainer>
-                </CardContent>
-              </Card>
-              
-              {/* Divergent Stacked Bars for Cost Metrics */}
-              <Card>
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-lg text-gray-700 flex items-center gap-2">
-                    <BarChart className="h-4 w-4 text-rose-600" />
-                    Device Cost Analysis
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="h-[320px]">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <ComposedChart
-                      data={deviceData}
-                      margin={{ top: 20, right: 20, left: 20, bottom: 5 }}
-                    >
-                      <XAxis dataKey="name" />
-                      <YAxis yAxisId="left" orientation="left" stroke="#8884d8" />
-                      <YAxis yAxisId="right" orientation="right" stroke="#FF8042" />
-                      <Tooltip formatter={(value) => `$${Number(value).toFixed(2)}`} />
-                      <Legend />
-                      <Bar yAxisId="left" dataKey="cpm" fill="#8884d8" name="CPM ($)" />
-                      <Line yAxisId="right" type="monotone" dataKey="cpc" stroke="#FF8042" name="CPC ($)" />
-                    </ComposedChart>
-                  </ResponsiveContainer>
-                </CardContent>
-              </Card>
-            </div>
-            
-            {/* Multi-metric Stacked Area Chart */}
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-lg text-gray-700 flex items-center gap-2">
-                  <Activity className="h-4 w-4 text-blue-600" />
-                  Device Engagement Metrics
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="h-[300px]">
-                <ResponsiveContainer width="100%" height="100%">
-                  <ReBarChart
-                    data={deviceData}
-                    margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
-                  >
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="name" />
-                    <YAxis />
-                    <Tooltip />
-                    <Legend />
-                    <Bar dataKey="impressions" stackId="a" fill="#0088FE" name="Impressions" />
-                    <Bar dataKey="clicks" stackId="a" fill="#00C49F" name="Clicks" />
-                    <Bar dataKey="spend" fill="#FFBB28" name="Spend ($)" />
-                  </ReBarChart>
-                </ResponsiveContainer>
-              </CardContent>
-            </Card>
-          </TabsContent>
+<TabsContent value="devices" className="space-y-4">
+  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+    {/* All Devices Chart */}
+    <Card className="shadow-md border border-gray-100 overflow-hidden">
+      <CardHeader className="pb-2 bg-gradient-to-r from-amber-500 to-amber-400 text-white">
+        <CardTitle className="text-lg flex items-center gap-2">
+          <PieChart className="h-4 w-4" />
+          All Devices by {getMetricName(selectedMetric)}
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="h-64 p-0 relative">
+        <ResponsiveContainer width="100%" height="100%">
+          <RePieChart>
+            <Pie
+              data={deviceData}
+              cx="50%"
+              cy="50%"
+              innerRadius={45}
+              outerRadius={70}
+              dataKey={selectedMetric}
+              nameKey="name"
+              paddingAngle={2}
+              label={({ name, percent }) => {
+                // Only show label if percentage is significant
+                return percent > 0.03 ? `${(percent * 100).toFixed(0)}%` : '';
+              }}
+              labelLine={{ stroke: '#666666', strokeWidth: 0.5, strokeDasharray: '2 2' }}
+            >
+              {deviceData.map((entry, index) => (
+                <Cell 
+                  key={`cell-${index}`} 
+                  fill={COLORS[index % COLORS.length]} 
+                  stroke="#ffffff"
+                  strokeWidth={1.5}
+                />
+              ))}
+            </Pie>
+            <Tooltip 
+              formatter={(value) => formatMetricValue(value, selectedMetric)} 
+              labelFormatter={(name) => `Device: ${name}`}
+              contentStyle={{ backgroundColor: '#fff', borderRadius: '8px', border: '1px solid #ddd' }}
+            />
+            <Legend 
+              layout="vertical" 
+              verticalAlign="middle" 
+              align="right"
+              iconType="circle"
+              iconSize={8}
+              formatter={(value, entry, index) => {
+                // Extract the color from the entry
+                const { color } = entry;
+                // Find the corresponding data item
+                const dataItem = deviceData[index];
+                // Calculate the percentage
+                const total = deviceData.reduce((sum, item) => sum + item[selectedMetric], 0);
+                const percentage = total > 0 ? (dataItem[selectedMetric] / total * 100).toFixed(0) : 0;
+                // Create a styled legend entry with percentage
+                return (
+                  <span style={{ color: '#555', fontSize: '10px' }}>
+                    <span style={{ color }}>{value}: </span>
+                    {percentage}%
+                  </span>
+                );
+              }}
+              wrapperStyle={{ 
+                fontSize: '11px', 
+                paddingRight: '20px',
+                width: '40%', 
+                overflowX: 'hidden', 
+                textOverflow: 'ellipsis',
+              }}
+            />
+          </RePieChart>
+        </ResponsiveContainer>
+      </CardContent>
+    </Card>
+    
+    {/* Facebook Devices Chart */}
+    <Card className="shadow-md border border-gray-100 overflow-hidden">
+      <CardHeader className="pb-2 bg-gradient-to-r from-blue-600 to-blue-500 text-white">
+        <CardTitle className="text-lg flex items-center gap-2">
+          <PieChart className="h-4 w-4" />
+          Facebook Devices by {getMetricName(selectedMetric)}
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="h-64 p-0 relative">
+        <ResponsiveContainer width="100%" height="100%">
+          <RePieChart>
+            <Pie
+              data={platformDeviceData.facebook}
+              cx="50%"
+              cy="50%"
+              innerRadius={45}
+              outerRadius={70}
+              dataKey={selectedMetric}
+              nameKey="name"
+              paddingAngle={2}
+              label={({ name, percent }) => {
+                // Only show label if percentage is significant
+                return percent > 0.03 ? `${(percent * 100).toFixed(0)}%` : '';
+              }}
+              labelLine={{ stroke: '#666666', strokeWidth: 0.5, strokeDasharray: '2 2' }}
+            >
+              {platformDeviceData.facebook.map((entry, index) => (
+                <Cell 
+                  key={`cell-${index}`} 
+                  fill={COLORS[index % COLORS.length]} 
+                  stroke="#ffffff"
+                  strokeWidth={1.5}
+                />
+              ))}
+            </Pie>
+            <Tooltip 
+              formatter={(value) => formatMetricValue(value, selectedMetric)} 
+              labelFormatter={(name) => `Device: ${name}`}
+              contentStyle={{ backgroundColor: '#fff', borderRadius: '8px', border: '1px solid #ddd' }}
+            />
+            <Legend 
+              layout="vertical" 
+              verticalAlign="middle" 
+              align="right"
+              iconType="circle"
+              iconSize={8}
+              formatter={(value, entry, index) => {
+                // Extract the color from the entry
+                const { color } = entry;
+                // Find the corresponding data item
+                const dataItem = platformDeviceData.facebook[index];
+                // Calculate the percentage
+                const total = platformDeviceData.facebook.reduce((sum, item) => sum + item[selectedMetric], 0);
+                const percentage = total > 0 ? (dataItem[selectedMetric] / total * 100).toFixed(0) : 0;
+                // Create a styled legend entry with percentage
+                return (
+                  <span style={{ color: '#555', fontSize: '10px' }}>
+                    <span style={{ color }}>{value}: </span>
+                    {percentage}%
+                  </span>
+                );
+              }}
+              wrapperStyle={{ 
+                fontSize: '11px', 
+                paddingRight: '20px',
+                width: '40%', 
+                overflowX: 'hidden', 
+                textOverflow: 'ellipsis',
+              }}
+            />
+          </RePieChart>
+        </ResponsiveContainer>
+      </CardContent>
+    </Card>
+    
+    {/* Instagram Devices Chart */}
+    <Card className="shadow-md border border-gray-100 overflow-hidden">
+      <CardHeader className="pb-2 bg-gradient-to-r from-rose-600 to-rose-500 text-white">
+        <CardTitle className="text-lg flex items-center gap-2">
+          <PieChart className="h-4 w-4" />
+          Instagram Devices by {getMetricName(selectedMetric)}
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="h-64 p-0 relative">
+        <ResponsiveContainer width="100%" height="100%">
+          <RePieChart>
+            <Pie
+              data={platformDeviceData.instagram}
+              cx="50%"
+              cy="50%"
+              innerRadius={45}
+              outerRadius={70}
+              dataKey={selectedMetric}
+              nameKey="name"
+              paddingAngle={2}
+              label={({ name, percent }) => {
+                // Only show label if percentage is significant
+                return percent > 0.03 ? `${(percent * 100).toFixed(0)}%` : '';
+              }}
+              labelLine={{ stroke: '#666666', strokeWidth: 0.5, strokeDasharray: '2 2' }}
+            >
+              {platformDeviceData.instagram.map((entry, index) => (
+                <Cell 
+                  key={`cell-${index}`} 
+                  fill={COLORS[index % COLORS.length]} 
+                  stroke="#ffffff"
+                  strokeWidth={1.5}
+                />
+              ))}
+            </Pie>
+            <Tooltip 
+              formatter={(value) => formatMetricValue(value, selectedMetric)} 
+              labelFormatter={(name) => `Device: ${name}`}
+              contentStyle={{ backgroundColor: '#fff', borderRadius: '8px', border: '1px solid #ddd' }}
+            />
+            <Legend 
+              layout="vertical" 
+              verticalAlign="middle" 
+              align="right"
+              iconType="circle"
+              iconSize={8}
+              formatter={(value, entry, index) => {
+                // Extract the color from the entry
+                const { color } = entry;
+                // Find the corresponding data item
+                const dataItem = platformDeviceData.instagram[index];
+                // Calculate the percentage
+                const total = platformDeviceData.instagram.reduce((sum, item) => sum + item[selectedMetric], 0);
+                const percentage = total > 0 ? (dataItem[selectedMetric] / total * 100).toFixed(0) : 0;
+                // Create a styled legend entry with percentage
+                return (
+                  <span style={{ color: '#555', fontSize: '10px' }}>
+                    <span style={{ color }}>{value}: </span>
+                    {percentage}%
+                  </span>
+                );
+              }}
+              wrapperStyle={{ 
+                fontSize: '11px', 
+                paddingRight: '20px',
+                width: '40%', 
+                overflowX: 'hidden', 
+                textOverflow: 'ellipsis',
+              }}
+            />
+          </RePieChart>
+        </ResponsiveContainer>
+      </CardContent>
+    </Card>
+  </div>
+</TabsContent>
         </Tabs>
       </CardContent>
     </Card>
   );
 };
 
-export default EnhancedCharts;
+export default FilteredCharts;
