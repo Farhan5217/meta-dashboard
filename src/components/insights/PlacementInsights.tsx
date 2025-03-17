@@ -240,12 +240,12 @@ const PlacementInsights = ({ data, isLoading }: PlacementInsightsProps) => {
                 <TableHead className="py-4 px-2 text-xs font-medium text-teal-800 uppercase">
                   Position
                 </TableHead>
-                <TableHead className="py-4 px-2 text-xs font-medium text-teal-800 uppercase">
+                {/* <TableHead className="py-4 px-2 text-xs font-medium text-teal-800 uppercase">
                   <div className="flex items-center gap-2">
                     <MonitorSmartphone className="h-4 w-4 text-amber-600" />
                     <span>Device</span>
                   </div>
-                </TableHead>
+                </TableHead> */}
                 <TableHead className="py-4 px-2 text-xs font-medium text-teal-800 uppercase">
                   <div className="flex items-center gap-2">
                     <Eye className="h-4 w-4 text-blue-600" />
@@ -321,14 +321,14 @@ const PlacementInsights = ({ data, isLoading }: PlacementInsightsProps) => {
                       <TableCell className="py-4 px-2 text-blue-700 dark:text-blue-300">
                         {insight.platform_position.replace('facebook_', '')}
                       </TableCell>
-                      <TableCell className="py-4 px-2 text-blue-700 dark:text-blue-300">
+                      {/* <TableCell className="py-4 px-2 text-blue-700 dark:text-blue-300">
                         <div className="flex items-center gap-2">
                           <div className={`bg-gray-100 p-1.5 rounded-md`}>
                             <DeviceIcon className={`w-4 h-4 ${deviceColor}`} />
                           </div>
                           <span>{insight.impression_device}</span>
                         </div>
-                      </TableCell>
+                      </TableCell> */}
                       <TableCell className="py-4 px-2">
                         <div className="flex items-center gap-2 bg-blue-50 p-2 rounded-lg">
                           <Eye className="w-4 h-4 text-blue-500" />
