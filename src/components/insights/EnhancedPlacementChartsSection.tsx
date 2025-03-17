@@ -14,6 +14,7 @@ import {
   Legend,
   Treemap,
 } from "recharts"
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -414,60 +415,65 @@ const FilteredCharts = ({ data, chartTab, setChartTab }: ChartProps) => {
 
           {/* PLATFORMS TAB */}
           <TabsContent value="platforms" className="space-y-4">
-            <Card className="shadow-md border border-gray-100 overflow-hidden">
-              <CardHeader className="pb-2 bg-teal-500 text-white">
-                <CardTitle className="text-lg flex items-center gap-2">
-                  <PieChart className="h-4 w-4" />
-                  Platform Distribution by {getMetricName(selectedMetric)}
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="h-72 p-4">
-                <ResponsiveContainer width="100%" height="100%">
-                  <RePieChart>
-                    <Pie
-                      data={platformData}
-                      cx="50%"
-                      cy="50%"
-                      innerRadius={60}
-                      outerRadius={90}
-                      dataKey={selectedMetric}
-                      nameKey="name"
-                      label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
-                      labelLine={{ stroke: "#666666", strokeWidth: 0.5, strokeDasharray: "2 2" }}
-                      animationDuration={800}
-                      animationBegin={0}
-                    >
-                      {platformData.map((entry, index) => (
-                        <Cell
-                          key={`cell-${index}`}
-                          fill={COLORS[index % COLORS.length]}
-                          stroke="#ffffff"
-                          strokeWidth={2}
-                        />
-                      ))}
-                    </Pie>
-                    <Tooltip
-                      formatter={(value: number) => formatMetricValue(value, selectedMetric)}
-                      labelFormatter={(name) => `Platform: ${name}`}
-                      contentStyle={{
-                        backgroundColor: "#fff",
-                        borderRadius: "8px",
-                        border: "1px solid #ddd",
-                        boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-                      }}
-                    />
-                    <Legend
-                      layout="horizontal"
-                      verticalAlign="bottom"
-                      align="center"
-                      iconType="circle"
-                      iconSize={10}
-                      wrapperStyle={{ paddingTop: "20px" }}
-                    />
-                  </RePieChart>
-                </ResponsiveContainer>
-              </CardContent>
-            </Card>
+          <Card className="shadow-md border border-gray-100 overflow-hidden">
+  <CardHeader className="pb-2 bg-teal-500 text-white">
+    <CardTitle className="text-lg flex items-center gap-2">
+      <PieChart className="h-4 w-4" />
+      Platform Distribution by {getMetricName(selectedMetric)}
+    </CardTitle>
+  </CardHeader>
+  <CardContent className="h-72 p-4 flex justify-center items-center">
+    {platformData && platformData.length > 0 ? (
+      <ResponsiveContainer width="100%" height="100%">
+        <RePieChart>
+          <Pie
+            data={platformData}
+            cx="50%"
+            cy="50%"
+            innerRadius={60}
+            outerRadius={90}
+            dataKey={selectedMetric}
+            nameKey="name"
+            label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+            labelLine={{ stroke: "#666666", strokeWidth: 0.5, strokeDasharray: "2 2" }}
+            animationDuration={800}
+            animationBegin={0}
+          >
+            {platformData.map((entry, index) => (
+              <Cell
+                key={`cell-${index}`}
+                fill={COLORS[index % COLORS.length]}
+                stroke="#ffffff"
+                strokeWidth={2}
+              />
+            ))}
+          </Pie>
+          <Tooltip
+            formatter={(value: number) => formatMetricValue(value, selectedMetric)}
+            labelFormatter={(name) => `Platform: ${name}`}
+            contentStyle={{
+              backgroundColor: "#fff",
+              borderRadius: "8px",
+              border: "1px solid #ddd",
+              boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+            }}
+          />
+          <Legend
+            layout="horizontal"
+            verticalAlign="bottom"
+            align="center"
+            iconType="circle"
+            iconSize={10}
+            wrapperStyle={{ paddingTop: "20px" }}
+          />
+        </RePieChart>
+      </ResponsiveContainer>
+    ) : (
+      <p className="text-gray-500 text-lg font-semibold">No Data Available</p>
+    )}
+  </CardContent>
+</Card>
+
           </TabsContent>
 
           {/* POSITIONS TAB */}
@@ -475,410 +481,448 @@ const FilteredCharts = ({ data, chartTab, setChartTab }: ChartProps) => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Treemap for Position Distribution (always showing spend) */}
               <Card className="shadow-md border border-gray-100 overflow-hidden">
-                <CardHeader className="pb-2 bg-teal-500 text-white">
-                  <CardTitle className="text-lg flex items-center gap-2">
-                    <PieChart className="h-4 w-4" />
-                    Position Distribution by Spend
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="h-72 p-4">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <Treemap
-                      data={positionData}
-                      dataKey="spend"
-                      aspectRatio={4 / 3}
-                      stroke="#fff"
-                      strokeWidth={2}
-                      nameKey="name"
-                      animationDuration={800}
-                      animationBegin={0}
-                    >
-                      {positionData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} fillOpacity={0.85} />
-                      ))}
-                      <Tooltip
-                        formatter={(value: number) => `$${Number(value).toFixed(2)}`}
-                        labelFormatter={(name) => `Position: ${name}`}
-                        contentStyle={{
-                          backgroundColor: "#fff",
-                          borderRadius: "8px",
-                          border: "1px solid #ddd",
-                          boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-                        }}
-                      />
-                    </Treemap>
-                  </ResponsiveContainer>
-                </CardContent>
-              </Card>
+  <CardHeader className="pb-2 bg-teal-500 text-white">
+    <CardTitle className="text-lg flex items-center gap-2">
+      <PieChart className="h-4 w-4" />
+      Position Distribution by Spend
+    </CardTitle>
+  </CardHeader>
+  <CardContent className="h-72 p-4 flex items-center justify-center">
+    {positionData && positionData.length > 0 ? (
+      <ResponsiveContainer width="100%" height="100%">
+        <Treemap
+          data={positionData}
+          dataKey="spend"
+          aspectRatio={4 / 3}
+          stroke="#f"
+          strokeWidth={2}
+          nameKey="name"
+          animationDuration={800}
+          animationBegin={0}
+        >
+          {positionData.map((entry, index) => (
+            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} fillOpacity={0.85} />
+          ))}
+          <Tooltip
+            formatter={(value: number) => `$${Number(value).toFixed(2)}`}
+            labelFormatter={(name) => `Position: ${name}`}
+            contentStyle={{
+              backgroundColor: "#d1d8e0",
+              borderRadius: "8px",
+              border: "1px solid #ddd",
+              boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+            }}
+          />
+        </Treemap>
+      </ResponsiveContainer>
+    ) : (
+      <p className="text-gray-500 text-lg font-semibold">No Data Available</p>
+    )}
+  </CardContent>
+
+  {/* Legend Below the Chart */}
+  {positionData && positionData.length > 0 && (
+    <div className="p-4 border-t border-gray-200 bg-gray-50">
+      <div className="grid grid-cols-2 gap-3">
+        {positionData.map((entry, index) => (
+          <div key={`legend-${index}`} className="flex items-center space-x-2">
+            <span
+              className="inline-block w-3 h-3 rounded-full"
+              style={{ backgroundColor: COLORS[index % COLORS.length] }}
+            ></span>
+            <span className="text-sm text-gray-700">{entry.name}:</span>
+            <span className="text-sm font-semibold text-gray-800">${entry.spend.toFixed(2)}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  )}
+</Card>
+
+
+
+
 
               {/* Horizontal Bar Chart for Placement Combinations */}
               <Card className="shadow-md border border-gray-100 overflow-hidden">
-                <CardHeader className="pb-2 bg-teal-500 text-white">
-                  <CardTitle className="text-lg flex items-center gap-2">
-                    <BarChart className="h-4 w-4" />
-                    Platform-Position by {getMetricName(selectedMetric)}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="h-72 p-4">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <ReBarChart
-                      layout="vertical"
-                      data={platformPositionData.slice(0, 5)} // Show top 5 for readability
-                      margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
-                      barSize={20}
-                      animationDuration={800}
-                      animationBegin={0}
-                    >
-<XAxis
-  type="number"
-  dataKey={selectedMetric}
-  tick={false}
-  // tickFormatter={(value) => formatMetricValue(value, selectedMetric)}
-  // axisLine={false} 
-  label={{ value: getMetricName(selectedMetric), position: "insideBottom", offset: 3 }}
-/>
+  <CardHeader className="pb-2 bg-teal-500 text-white">
+    <CardTitle className="text-lg flex items-center gap-2">
+      <BarChart className="h-4 w-4" />
+      Platform-Position by {getMetricName(selectedMetric)}
+    </CardTitle>
+  </CardHeader>
+  <CardContent className="h-72 p-4 flex items-center justify-center">
+    {platformPositionData && platformPositionData.length > 0 ? (
+      <ResponsiveContainer width="100%" height="100%">
+        <ReBarChart
+          layout="vertical"
+          data={platformPositionData.slice(0, 5)} // Show top 5 for readability
+          margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+          barSize={20}
+          animationDuration={800}
+          animationBegin={0}
+        >
+          <XAxis
+            type="number"
+            dataKey={selectedMetric}
+            tick={false}
+            label={{ value: getMetricName(selectedMetric), position: "insideBottom", offset: 3 }}
+          />
+          <YAxis
+            dataKey="name"
+            type="category"
+            width={150}
+            tick={{ fontSize: 12 }}
+            tickFormatter={(value) =>
+              value.length > 20 ? `${value.substring(0, 20)}...` : value
+            }
+          />
+          <Tooltip
+            formatter={(value: number) => formatMetricValue(value, selectedMetric)}
+            contentStyle={{
+              backgroundColor: "#fff",
+              borderRadius: "8px",
+              border: "1px solid #ddd",
+              boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+            }}
+          />
+          <Bar
+            dataKey={selectedMetric}
+            fill="#8884d8"
+            name={getMetricName(selectedMetric)}
+            radius={[0, 4, 4, 0]}
+          >
+            {platformPositionData.slice(0, 5).map((entry, index) => (
+              <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+            ))}
+          </Bar>
+        </ReBarChart>
+      </ResponsiveContainer>
+    ) : (
+      <p className="text-gray-500 text-lg font-semibold">No Data Available</p>
+    )}
+  </CardContent>
+</Card>
 
-
-
-                      <YAxis
-                        dataKey="name"
-                        type="category"
-                        width={150}
-                        tick={{ fontSize: 12 }}
-                        tickFormatter={(value) => (value.length > 20 ? `${value.substring(0, 20)}...` : value)}
-                      />
-                      <Tooltip
-                        formatter={(value: number) => formatMetricValue(value, selectedMetric)}
-                        contentStyle={{
-                          backgroundColor: "#fff",
-                          borderRadius: "8px",
-                          border: "1px solid #ddd",
-                          boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-                        }}
-                      />
-                      <Bar
-                        dataKey={selectedMetric}
-                        fill="#8884d8"
-                        name={getMetricName(selectedMetric)}
-                        radius={[0, 4, 4, 0]}
-                      >
-                        {platformPositionData.slice(0, 5).map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                        ))}
-                      </Bar>
-                    </ReBarChart>
-                  </ResponsiveContainer>
-                </CardContent>
-              </Card>
             </div>
           </TabsContent>
 
           {/* DEVICES TAB */}
-          <TabsContent value="devices" className="space-y-4">
-            {/* Toggle Button for Device View */}
-            <div className="flex justify-center mb-4">
-              <div className="bg-gray-100 p-1 rounded-full inline-flex items-center">
-                <button
-                  onClick={toggleDeviceView}
-                  className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
-                    showAllDevices ? "bg-teal-500 text-white shadow-md" : "text-gray-700 hover:bg-gray-200"
-                  }`}
-                >
-                  All Devices
-                </button>
-                <button
-                  onClick={toggleDeviceView}
-                  className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
-                    !showAllDevices ? "bg-teal-500 text-white shadow-md" : "text-gray-700 hover:bg-gray-200"
-                  }`}
-                >
-                  Facebook & Instagram
-                </button>
-              </div>
-            </div>
-
-            {showAllDevices ? (
-              // All Devices View
-              <CardContent className="p-6" style={{ height: Math.max(350, deviceData.length * 45) }}>
-  <ResponsiveContainer width="100%" height={350}>
-    <RePieChart>
-      <Pie
-        data={deviceData}
-        cx="50%"
-        cy="50%"
-        innerRadius={60}
-        outerRadius={Math.min(120, deviceData.length * 20)}
-        dataKey={selectedMetric}
-        nameKey="name"
-        paddingAngle={5}
-        label={({ name, percent }) =>
-          percent > 0.02 ? `${name}: ${(percent * 100).toFixed(0)}%` : ""
-        }
-        labelStyle={{ fontSize: "14px", fontWeight: "bold", fill: "#444" }}
-        labelLine={{ stroke: "#888", strokeWidth: 1 }}
-        animationDuration={800}
-        animationEasing="ease-out"
+          {/* DEVICES TAB */}
+<TabsContent value="devices" className="space-y-4">
+  {/* Toggle Button for Device View */}
+  <div className="flex justify-center mb-4">
+    <div className="bg-gray-100 p-1 rounded-full inline-flex items-center">
+      <button
+        onClick={toggleDeviceView}
+        className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+          showAllDevices ? "bg-teal-500 text-white shadow-md" : "text-gray-700 hover:bg-gray-200"
+        }`}
       >
-        {deviceData.map((entry, index) => (
-          <Cell
-            key={`cell-${index}`}
-            fill={COLORS[index % COLORS.length]}
-            stroke="#ffffff"
-            strokeWidth={2}
-          />
-        ))}
-      </Pie>
-
-      {/* Enhanced Tooltip */}
-      <Tooltip
-        formatter={(value: number) => formatMetricValue(value, selectedMetric)}
-        labelFormatter={(name) => `Device: ${name}`}
-        contentStyle={{
-          backgroundColor: "#fff",
-          borderRadius: "8px",
-          border: "1px solid #ddd",
-          boxShadow: "0 4px 10px rgba(0,0,0,0.1)",
-          padding: "12px",
-          fontSize: "14px",
-        }}
-        itemStyle={{ color: "#555", fontWeight: "bold" }}
-      />
-
-      {/* Legend with Better Spacing */}
-      <Legend
-        layout="horizontal"
-        verticalAlign="bottom"
-        align="center"
-        iconType="circle"
-        iconSize={12}
-        formatter={(value, entry, index) => {
-          const { color } = entry;
-          const dataItem = deviceData[index];
-          const total = deviceData.reduce(
-            (sum, item) => sum + (item[selectedMetric as keyof PlatformData] as number),
-            0
-          );
-          const percentage = total > 0
-            ? (((dataItem[selectedMetric as keyof PlatformData] as number) / total) * 100).toFixed(0)
-            : 0;
-
-          return (
-            <span style={{ color: "#444", fontSize: "14px", marginRight: "10px" }}>
-              <span style={{ color, marginRight: "4px" }}>●</span>
-              {value}: {percentage}%
-            </span>
-          );
-        }}
-        wrapperStyle={{ paddingTop: "16px", display: "flex", flexWrap: "wrap", justifyContent: "center" }}
-      />
-    </RePieChart>
-  </ResponsiveContainer>
-
-  {/* Color-wise Value Summary */}
-  <div className="mt-4 flex flex-wrap justify-center gap-4">
-    {deviceData.map((entry, index) => (
-      <div key={index} className="flex items-center gap-2 text-sm">
-        <span
-          className="w-4 h-4 rounded-full"
-          style={{ backgroundColor: COLORS[index % COLORS.length] }}
-        ></span>
-        <span className="text-gray-700 font-medium">
-          {entry.name}: {entry[selectedMetric]}
-        </span>
-      </div>
-    ))}
+        All Devices
+      </button>
+      <button
+        onClick={toggleDeviceView}
+        className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+          !showAllDevices ? "bg-teal-500 text-white shadow-md" : "text-gray-700 hover:bg-gray-200"
+        }`}
+      >
+        Facebook & Instagram
+      </button>
+    </div>
   </div>
-</CardContent>
 
+  {showAllDevices ? (
+    // All Devices View
+    <CardContent className="p-6" style={{ height: Math.max(350, deviceData.length * 45) }}>
+      {deviceData.length > 0 ? (
+        <>
+          <ResponsiveContainer width="100%" height={350}>
+            <RePieChart>
+              <Pie
+                data={deviceData}
+                cx="50%"
+                cy="50%"
+                innerRadius={60}
+                outerRadius={Math.min(120, deviceData.length * 20)}
+                dataKey={selectedMetric}
+                nameKey="name"
+                paddingAngle={5}
+                label={({ name, percent }) =>
+                  percent > 0.02 ? `${name}: ${(percent * 100).toFixed(0)}%` : ""
+                }
+                labelStyle={{ fontSize: "14px", fontWeight: "bold", fill: "#444" }}
+                labelLine={{ stroke: "#888", strokeWidth: 1 }}
+                animationDuration={800}
+                animationEasing="ease-out"
+              >
+                {deviceData.map((entry, index) => (
+                  <Cell
+                    key={`cell-${index}`}
+                    fill={COLORS[index % COLORS.length]}
+                    stroke="#ffffff"
+                    strokeWidth={2}
+                  />
+                ))}
+              </Pie>
 
-            
+              {/* Enhanced Tooltip */}
+              <Tooltip
+                formatter={(value: number) => formatMetricValue(value, selectedMetric)}
+                labelFormatter={(name) => `Device: ${name}`}
+                contentStyle={{
+                  backgroundColor: "#fff",
+                  borderRadius: "8px",
+                  border: "1px solid #ddd",
+                  boxShadow: "0 4px 10px rgba(0,0,0,0.1)",
+                  padding: "12px",
+                  fontSize: "14px",
+                }}
+                itemStyle={{ color: "#555", fontWeight: "bold" }}
+              />
 
+              {/* Legend with Better Spacing */}
+              <Legend
+                layout="horizontal"
+                verticalAlign="bottom"
+                align="center"
+                iconType="circle"
+                iconSize={12}
+                formatter={(value, entry, index) => {
+                  const { color } = entry;
+                  const dataItem = deviceData[index];
+                  const total = deviceData.reduce(
+                    (sum, item) => sum + (item[selectedMetric as keyof PlatformData] as number),
+                    0
+                  );
+                  const percentage = total > 0
+                    ? (((dataItem[selectedMetric as keyof PlatformData] as number) / total) * 100).toFixed(0)
+                    : 0;
 
-            ) : (
-              // Facebook & Instagram Devices View
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Facebook Devices Chart */}
-                <Card className="shadow-md border border-gray-100 overflow-hidden">
-                  <CardHeader className="pb-2 bg-teal-500 text-white">
-                    <CardTitle className="text-lg flex items-center gap-2">
-                      <PieChart className="h-4 w-4" />
-                      Facebook Devices by {getMetricName(selectedMetric)}
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="h-72 p-4">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <RePieChart>
-                        <Pie
-                          data={platformDeviceData.facebook}
-                          cx="50%"
-                          cy="50%"
-                          innerRadius={50}
-                          outerRadius={80}
-                          dataKey={selectedMetric}
-                          nameKey="name"
-                          paddingAngle={2}
-                          label={({ name, percent }) => {
-                            // Only show label if percentage is significant
-                            return percent > 0.03 ? `${(percent * 100).toFixed(0)}%` : ""
-                          }}
-                          labelLine={{ stroke: "#666666", strokeWidth: 0.5, strokeDasharray: "2 2" }}
-                          animationDuration={800}
-                          animationBegin={0}
-                        >
-                          {platformDeviceData.facebook.map((entry, index) => (
-                            <Cell
-                              key={`cell-${index}`}
-                              fill={COLORS[index % COLORS.length]}
-                              stroke="#ffffff"
-                              strokeWidth={2}
-                            />
-                          ))}
-                        </Pie>
-                        <Tooltip
-                          formatter={(value: number) => formatMetricValue(value, selectedMetric)}
-                          labelFormatter={(name) => `Device: ${name}`}
-                          contentStyle={{
-                            backgroundColor: "#fff",
-                            borderRadius: "8px",
-                            border: "1px solid #ddd",
-                            boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-                          }}
-                        />
-                        <Legend
-                          layout="vertical"
-                          verticalAlign="middle"
-                          align="right"
-                          iconType="circle"
-                          iconSize={8}
-                          formatter={(value, entry, index) => {
-                            // Extract the color from the entry
-                            const { color } = entry
-                            // Find the corresponding data item
-                            const dataItem = platformDeviceData.facebook[index]
-                            // Calculate the percentage
-                            const total = platformDeviceData.facebook.reduce(
-                              (sum, item) => sum + (item[selectedMetric as keyof PlatformData] as number),
-                              0,
-                            )
-                            const percentage =
-                              total > 0
-                                ? (((dataItem[selectedMetric as keyof PlatformData] as number) / total) * 100).toFixed(
-                                    0,
-                                  )
-                                : 0
-                            // Create a styled legend entry with percentage
-                            return (
-                              <span style={{ color: "#555", fontSize: "11px" }}>
-                                <span style={{ color }}>{value}: </span>
-                                {percentage}%
-                              </span>
-                            )
-                          }}
-                          wrapperStyle={{
-                            fontSize: "11px",
-                            paddingRight: "20px",
-                            width: "40%",
-                            overflowX: "hidden",
-                            textOverflow: "ellipsis",
-                          }}
-                        />
-                      </RePieChart>
-                    </ResponsiveContainer>
-                  </CardContent>
-                </Card>
+                  return (
+                    <span style={{ color: "#444", fontSize: "14px", marginRight: "10px" }}>
+                      <span style={{ color, marginRight: "4px" }}>●</span>
+                      {value}: {percentage}%
+                    </span>
+                  );
+                }}
+                wrapperStyle={{ paddingTop: "16px", display: "flex", flexWrap: "wrap", justifyContent: "center" }}
+              />
+            </RePieChart>
+          </ResponsiveContainer>
 
-                {/* Instagram Devices Chart */}
-                <Card className="shadow-md border border-gray-100 overflow-hidden">
-                  <CardHeader className="pb-2 bg-teal-500 text-white">
-                    <CardTitle className="text-lg flex items-center gap-2">
-                      <PieChart className="h-4 w-4" />
-                      Instagram Devices by {getMetricName(selectedMetric)}
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="h-72 p-4">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <RePieChart>
-                        <Pie
-                          data={platformDeviceData.instagram}
-                          cx="50%"
-                          cy="50%"
-                          innerRadius={50}
-                          outerRadius={80}
-                          dataKey={selectedMetric}
-                          nameKey="name"
-                          paddingAngle={2}
-                          label={({ name, percent }) => {
-                            // Only show label if percentage is significant
-                            return percent > 0.03 ? `${(percent * 100).toFixed(0)}%` : ""
-                          }}
-                          labelLine={{ stroke: "#666666", strokeWidth: 0.5, strokeDasharray: "2 2" }}
-                          animationDuration={800}
-                          animationBegin={0}
-                        >
-                          {platformDeviceData.instagram.map((entry, index) => (
-                            <Cell
-                              key={`cell-${index}`}
-                              fill={COLORS[index % COLORS.length]}
-                              stroke="#ffffff"
-                              strokeWidth={2}
-                            />
-                          ))}
-                        </Pie>
-                        <Tooltip
-                          formatter={(value: number) => formatMetricValue(value, selectedMetric)}
-                          labelFormatter={(name) => `Device: ${name}`}
-                          contentStyle={{
-                            backgroundColor: "#fff",
-                            borderRadius: "8px",
-                            border: "1px solid #ddd",
-                            boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-                          }}
-                        />
-                        <Legend
-                          layout="vertical"
-                          verticalAlign="middle"
-                          align="right"
-                          iconType="circle"
-                          iconSize={8}
-                          formatter={(value, entry, index) => {
-                            // Extract the color from the entry
-                            const { color } = entry
-                            // Find the corresponding data item
-                            const dataItem = platformDeviceData.instagram[index]
-                            // Calculate the percentage
-                            const total = platformDeviceData.instagram.reduce(
-                              (sum, item) => sum + (item[selectedMetric as keyof PlatformData] as number),
-                              0,
-                            )
-                            const percentage =
-                              total > 0
-                                ? (((dataItem[selectedMetric as keyof PlatformData] as number) / total) * 100).toFixed(
-                                    0,
-                                  )
-                                : 0
-                            // Create a styled legend entry with percentage
-                            return (
-                              <span style={{ color: "#555", fontSize: "11px" }}>
-                                <span style={{ color }}>{value}: </span>
-                                {percentage}%
-                              </span>
-                            )
-                          }}
-                          wrapperStyle={{
-                            fontSize: "11px",
-                            paddingRight: "20px",
-                            width: "40%",
-                            overflowX: "hidden",
-                            textOverflow: "ellipsis",
-                          }}
-                        />
-                      </RePieChart>
-                    </ResponsiveContainer>
-                  </CardContent>
-                </Card>
+          {/* Color-wise Value Summary */}
+          <div className="mt-4 flex flex-wrap justify-center gap-4">
+            {deviceData.map((entry, index) => (
+              <div key={index} className="flex items-center gap-2 text-sm">
+                <span
+                  className="w-4 h-4 rounded-full"
+                  style={{ backgroundColor: COLORS[index % COLORS.length] }}
+                ></span>
+                <span className="text-gray-700 font-medium">
+                  {entry.name}: {formatMetricValue(entry[selectedMetric as keyof PlatformData] as number, selectedMetric)}
+                </span>
               </div>
-            )}
-          </TabsContent>
+            ))}
+          </div>
+        </>
+      ) : (
+        <p className="text-gray-500 text-lg font-semibold">No Data Available</p>
+      )}
+    </CardContent>
+  ) : (
+    // Facebook & Instagram Devices View
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      {/* Facebook Devices Chart */}
+      <Card className="shadow-md border border-gray-100 overflow-hidden">
+        <CardHeader className="pb-2 bg-teal-500 text-white">
+          <CardTitle className="text-lg flex items-center gap-2">
+            <PieChart className="h-4 w-4" />
+            Facebook Devices by {getMetricName(selectedMetric)}
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="h-72 p-4">
+          {platformDeviceData.facebook && platformDeviceData.facebook.length > 0 ? (
+            <ResponsiveContainer width="100%" height="100%">
+              <RePieChart>
+                <Pie
+                  data={platformDeviceData.facebook}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={50}
+                  outerRadius={80}
+                  dataKey={selectedMetric}
+                  nameKey="name"
+                  paddingAngle={2}
+                  label={({ name, percent }) => {
+                    // Only show label if percentage is significant
+                    return percent > 0.03 ? `${(percent * 100).toFixed(0)}%` : ""
+                  }}
+                  labelLine={{ stroke: "#666666", strokeWidth: 0.5, strokeDasharray: "2 2" }}
+                  animationDuration={800}
+                  animationBegin={0}
+                >
+                  {platformDeviceData.facebook.map((entry, index) => (
+                    <Cell
+                      key={`cell-${index}`}
+                      fill={COLORS[index % COLORS.length]}
+                      stroke="#ffffff"
+                      strokeWidth={2}
+                    />
+                  ))}
+                </Pie>
+                <Tooltip
+                  formatter={(value: number) => formatMetricValue(value, selectedMetric)}
+                  labelFormatter={(name) => `Device: ${name}`}
+                  contentStyle={{
+                    backgroundColor: "#fff",
+                    borderRadius: "8px",
+                    border: "1px solid #ddd",
+                    boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+                  }}
+                />
+                <Legend
+                  layout="vertical"
+                  verticalAlign="middle"
+                  align="right"
+                  iconType="circle"
+                  iconSize={8}
+                  formatter={(value, entry, index) => {
+                    // Extract the color from the entry
+                    const { color } = entry
+                    // Find the corresponding data item
+                    const dataItem = platformDeviceData.facebook[index]
+                    // Calculate the percentage
+                    const total = platformDeviceData.facebook.reduce(
+                      (sum, item) => sum + (item[selectedMetric as keyof PlatformData] as number),
+                      0,
+                    )
+                    const percentage =
+                      total > 0
+                        ? (((dataItem[selectedMetric as keyof PlatformData] as number) / total) * 100).toFixed(
+                            0,
+                          )
+                        : 0
+                    // Create a styled legend entry with percentage
+                    return (
+                      <span style={{ color: "#555", fontSize: "11px" }}>
+                        <span style={{ color }}>{value}: </span>
+                        {percentage}%
+                      </span>
+                    )
+                  }}
+                  wrapperStyle={{
+                    fontSize: "11px",
+                    paddingRight: "20px",
+                    width: "40%",
+                    overflowX: "hidden",
+                    textOverflow: "ellipsis",
+                  }}
+                />
+              </RePieChart>
+            </ResponsiveContainer>
+          ) : (
+            <p className="text-gray-500 text-lg font-semibold">No Data Available</p>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Instagram Devices Chart */}
+      <Card className="shadow-md border border-gray-100 overflow-hidden">
+        <CardHeader className="pb-2 bg-teal-500 text-white">
+          <CardTitle className="text-lg flex items-center gap-2">
+            <PieChart className="h-4 w-4" />
+            Instagram Devices by {getMetricName(selectedMetric)}
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="h-72 p-4">
+          {platformDeviceData.instagram && platformDeviceData.instagram.length > 0 ? (
+            <ResponsiveContainer width="100%" height="100%">
+              <RePieChart>
+                <Pie
+                  data={platformDeviceData.instagram}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={50}
+                  outerRadius={80}
+                  dataKey={selectedMetric}
+                  nameKey="name"
+                  paddingAngle={2}
+                  label={({ name, percent }) => {
+                    // Only show label if percentage is significant
+                    return percent > 0.03 ? `${(percent * 100).toFixed(0)}%` : ""
+                  }}
+                  labelLine={{ stroke: "#666666", strokeWidth: 0.5, strokeDasharray: "2 2" }}
+                  animationDuration={800}
+                  animationBegin={0}
+                >
+                  {platformDeviceData.instagram.map((entry, index) => (
+                    <Cell
+                      key={`cell-${index}`}
+                      fill={COLORS[index % COLORS.length]}
+                      stroke="#ffffff"
+                      strokeWidth={2}
+                    />
+                  ))}
+                </Pie>
+                <Tooltip
+                  formatter={(value: number) => formatMetricValue(value, selectedMetric)}
+                  labelFormatter={(name) => `Device: ${name}`}
+                  contentStyle={{
+                    backgroundColor: "#fff",
+                    borderRadius: "8px",
+                    border: "1px solid #ddd",
+                    boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+                  }}
+                />
+                <Legend
+                  layout="vertical"
+                  verticalAlign="middle"
+                  align="right"
+                  iconType="circle"
+                  iconSize={8}
+                  formatter={(value, entry, index) => {
+                    // Extract the color from the entry
+                    const { color } = entry
+                    // Find the corresponding data item
+                    const dataItem = platformDeviceData.instagram[index]
+                    // Calculate the percentage
+                    const total = platformDeviceData.instagram.reduce(
+                      (sum, item) => sum + (item[selectedMetric as keyof PlatformData] as number),
+                      0,
+                    )
+                    const percentage =
+                      total > 0
+                        ? (((dataItem[selectedMetric as keyof PlatformData] as number) / total) * 100).toFixed(
+                            0,
+                          )
+                        : 0
+                    // Create a styled legend entry with percentage
+                    return (
+                      <span style={{ color: "#555", fontSize: "11px" }}>
+                        <span style={{ color }}>{value}: </span>
+                        {percentage}%
+                      </span>
+                    )
+                  }}
+                  wrapperStyle={{
+                    fontSize: "11px",
+                    paddingRight: "20px",
+                    width: "40%",
+                    overflowX: "hidden",
+                    textOverflow: "ellipsis",
+                  }}
+                />
+              </RePieChart>
+            </ResponsiveContainer>
+          ) : (
+            <p className="text-gray-500 text-lg font-semibold">No Data Available</p>
+          )}
+        </CardContent>
+      </Card>
+    </div>
+  )}
+</TabsContent>
         </Tabs>
       </CardContent>
     </Card>
