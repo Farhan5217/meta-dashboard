@@ -125,11 +125,17 @@ const Campaign = () => {
                   </div>
                 </motion.div>
                 <div>
-                  <CardTitle className="text-3xl font-bold text-black flex items-center gap-2">
-                    Campaign Details
-                    <Sparkles className="h-6 w-6 text-yellow-300 animate-pulse" />
-                  </CardTitle>
-                </div>
+              <h1 className="text-xl font-bold text-gray-900 dark:text-white">
+                Meta Campaign Dashboard
+              </h1>
+              <div className="flex items-center gap-2 mt-1">
+                <span className="relative flex h-2.5 w-2.5">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-teal-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-teal-500"></span>
+                </span>
+                <span className="text-xs font-medium text-gray-600 dark:text-blue-200">Live Analytics</span>
+              </div>
+            </div>
               </div>
               <div className="flex flex-wrap gap-4 mt-4 sm:mt-0">
                 <DateRangeFilter date={dateRange} onRangeChange={(range) => setDateRange(range as DateRange)} />
@@ -152,8 +158,8 @@ const Campaign = () => {
           <>
             <MetricsGrid
               aggregatedMetrics={aggregatedMetrics}
-              latestReach={Number.parseInt(latestData.reach || "0")}
-              latestFrequency={latestData.frequency || "0"}
+              // latestReach={Number.parseInt(latestData.reach || "0")}
+              // latestFrequency={latestData.frequency || "0"}
             />
             <ChartsGrid timeSeriesInsights={timeSeriesInsights || []} 
               title="Campaign Analytics" 
