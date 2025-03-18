@@ -7,6 +7,11 @@ const api = axios.create({
   baseURL: API_BASE_URL,
 });
 
+const url_API = axios.create({
+  baseURL: "https://meta-dashboard-backend.onrender.com/api",
+});
+
+
 export const getAdAccounts = async () => {
   const response = await api.get("/adaccounts");
   return response.data;
@@ -58,7 +63,11 @@ export const getAdSetInsights = async (
 //   const response = await api.get(url);
 //   return response.data;
 // };
+
+
+
 // Add this to services/api.ts
+
 export const getEnhancedInsights = async (
   adAccountId: string,
   params?: InsightParams & { include_placements?: boolean; include_actions?: boolean }
@@ -66,3 +75,17 @@ export const getEnhancedInsights = async (
   const response = await api.get(`/adaccounts/${adAccountId}/enhanced-insights`, { params });
   return response.data;
 };
+
+
+
+// export const getEnhancedInsights = async (
+//   adAccountId: string,
+//   params?: InsightParams & { 
+//     include_placements?: boolean; 
+//     include_actions?: boolean;
+//     include_devices?: boolean;
+//   }
+// ) => {
+//   const response = await url_API.get(`/adaccounts/${adAccountId}/enhanced-insights`, { params });
+//   return response.data;
+// };

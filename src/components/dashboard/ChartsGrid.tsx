@@ -119,8 +119,8 @@ export function ChartsGrid({ timeSeriesInsights,title }: ChartsGridProps) {
   
   
 <Card className=" dark:bg-gray-900 rounded-3xl shadow-xl overflow-hidden">
-      <CardHeader className="bg-teal-500 p-6">
-        <CardTitle className="text-2xl font-bold text-white flex items-center gap-2">
+      <CardHeader className="bg-teal-500 py-3  px-4 ">
+        <CardTitle className="text-base font-medium text-white flex items-center gap-2">
           <ChartIcon className="h-6 w-6" />
           <span>{title}</span>
         </CardTitle>

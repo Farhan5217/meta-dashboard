@@ -110,4 +110,7 @@ export interface InsightParams {
   breakdown?: boolean;
   include_placements?: boolean;
   include_actions?: boolean;
+  include_devices?: boolean;
 }
+
+ 
