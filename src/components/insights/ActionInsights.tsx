@@ -428,7 +428,9 @@ const ActionInsights = ({ data, isLoading }: ActionInsightsProps) => {
         <div className="bg-teal-500 py-3 px-4">
           <div className="flex justify-between items-center">
             <div className="flex items-center gap-2 text-white font-medium">
+            <div className="bg-white/20 p-2 rounded-lg">
               <Zap className="h-5 w-5" />
+              </div>
               Action Details
             </div>
             

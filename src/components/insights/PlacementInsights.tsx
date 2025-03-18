@@ -25,98 +25,96 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import EnhancedCharts from "@/components/insights/EnhancedPlacementChartsSection";
+import { useQuery } from "@tanstack/react-query";
+import { getEnhancedInsights } from "@/services/api";
 
 interface PlacementInsightsProps {
   data: any[];
   isLoading: boolean;
+  adAccountId?: string;
+  dateRange?: { 
+    from: Date;
+    to: Date;
+  };
 }
 
-const PlacementInsights = ({ data, isLoading }: PlacementInsightsProps) => {
+const PlacementInsights = ({ data, isLoading, adAccountId, dateRange }: PlacementInsightsProps) => {
   const [platformFilter, setPlatformFilter] = useState<string>("all");
   const [positionFilter, setPositionFilter] = useState<string>("all");
   const [chartTab, setChartTab] = useState<string>("platforms");
   const [showAllRows, setShowAllRows] = useState(false);
 
-  // Combine data across devices by platform and position
-  const combinedData = useMemo(() => {
+  // Fetch device data for the chart component - only when devices tab is activated
+  const { data: deviceData, isLoading: devicesLoading } = useQuery({
+    queryKey: ["deviceInsights", adAccountId, dateRange, chartTab],
+    queryFn: async () => {
+      if (!dateRange?.from || !dateRange?.to || !adAccountId) return [];
+      
+      const params = {
+        since: dateRange.from.toISOString().split('T')[0],
+        until: dateRange.to.toISOString().split('T')[0],
+        include_devices: true,
+      };
+
+      try {
+        const response = await getEnhancedInsights(adAccountId, params);
+        return response;
+      } catch (error) {
+        console.error('Error fetching device insights:', error);
+        return [];
+      }
+    },
+    refetchOnWindowFocus: false,
+    // Only fetch devices data when the devices tab is active in the chart
+    enabled: chartTab === "devices" && !!adAccountId && !!dateRange?.from && !!dateRange?.to
+  });
+
+  // The placement data is now directly from the API
+  const formattedData = useMemo(() => {
     if (!data || data.length === 0) return [];
     
-    // Create a map to store aggregated data
-    const aggregatedMap = new Map();
-    
-    data.forEach(item => {
-      // Create a key based on platform and position
-      const key = `${item.publisher_platform}_${item.platform_position}`;
-      
-      // Convert string values to numbers for aggregation
-      const impressions = parseInt(item.impressions || "0", 10);
-      const clicks = parseInt(item.clicks || "0", 10);
-      const spend = parseFloat(item.spend || "0");
-      
-      if (aggregatedMap.has(key)) {
-        // Update existing entry
-        const existing = aggregatedMap.get(key);
-        existing.impressions += impressions;
-        existing.clicks += clicks;
-        existing.spend += spend;
-      } else {
-        // Create new entry
-        aggregatedMap.set(key, {
-          publisher_platform: item.publisher_platform,
-          platform_position: item.platform_position,
-          impressions: impressions,
-          clicks: clicks,
-          spend: spend,
-          // These will be calculated later
-          ctr: 0,
-          cpc: 0,
-          cpm: 0
-        });
-      }
-    });
-    
-    // Calculate derived metrics and convert back to array
-    return Array.from(aggregatedMap.values()).map(item => {
-      // Calculate CTR (Click-Through Rate)
-      const ctr = item.impressions > 0 ? (item.clicks / item.impressions) * 100 : 0;
-      
-      // Calculate CPC (Cost Per Click)
-      const cpc = item.clicks > 0 ? item.spend / item.clicks : 0;
-      
-      // Calculate CPM (Cost Per Mille/Thousand)
-      const cpm = item.impressions > 0 ? (item.spend / item.impressions) * 1000 : 0;
-      
+    return data.map(item => {
+      // Parse numeric values
       return {
         ...item,
-        ctr,
-        cpc,
-        cpm
+        impressions: parseFloat(item.impressions || "0"),
+        clicks: parseFloat(item.clicks || "0"),
+        spend: parseFloat(item.spend || "0"),
+        reach: parseFloat(item.reach || "0"),
+        ctr: parseFloat(item.ctr || "0"),
+        cpc: item.cpc ? parseFloat(item.cpc) : 0,
+        cpm: parseFloat(item.cpm || "0"),
+        frequency: parseFloat(item.frequency || "0")
       };
     });
   }, [data]);
 
-  // Get unique positions from combined data
+  // Get unique positions from formatted data
   const uniquePositions = useMemo(() => {
-    if (!combinedData || combinedData.length === 0) return [];
+    if (!formattedData || formattedData.length === 0) return [];
     
     const positions = new Set<string>();
-    combinedData.forEach(item => {
-      const position = item.platform_position.replace('facebook_', '');
-      positions.add(position);
+    formattedData.forEach(item => {
+      if (item.platform_position) {
+        const position = item.platform_position.replace('facebook_', '');
+        positions.add(position);
+      }
     });
     
     return Array.from(positions).sort();
-  }, [combinedData]);
+  }, [formattedData]);
 
-  // Filter combined data based on selected platform and position
+  // Filter data based on selected platform and position
   const filteredData = useMemo(() => {
-    if (!combinedData) return [];
+    if (!formattedData) return [];
     
-    return combinedData.filter(insight => 
+    return formattedData.filter(insight => 
       (platformFilter === "all" || insight.publisher_platform === platformFilter) &&
-      (positionFilter === "all" || insight.platform_position.replace('facebook_', '') === positionFilter)
+      (positionFilter === "all" || 
+        (insight.platform_position && 
+         insight.platform_position.replace('facebook_', '') === positionFilter))
     );
-  }, [combinedData, platformFilter, positionFilter]);
+  }, [formattedData, platformFilter, positionFilter]);
 
   // Function to download data as CSV
   const downloadCSV = () => {
@@ -147,17 +145,26 @@ const PlacementInsights = ({ data, isLoading }: PlacementInsightsProps) => {
         let value = item[col];
         
         // Format specific columns
-        if (col === 'platform_position') {
+        if (col === 'platform_position' && value) {
           value = value.replace('facebook_', '');
         } else if (col === 'impressions' || col === 'clicks') {
-          value = Number(value).toLocaleString('en-US', {maximumFractionDigits: 0});
-        } else if (col === 'spend' || col === 'cpc' || col === 'cpm') {
-          value = Number(value).toFixed(2);
+          // For whole numbers, don't use decimals
+          value = Math.round(value).toString();
+        } else if (col === 'spend') {
+          // Format spend with 3 decimal places
+          value = value.toFixed(3);
         } else if (col === 'ctr') {
-          value = Number(value).toFixed(2) + '%';
+          // Format percentage with 3 decimal places
+          value = value.toFixed(3) + '%';
+        } else if (col === 'cpc') {
+          // Format CPC with 3 decimal places, handle cases with no clicks
+          value = item.clicks > 0 ? value.toFixed(3) : '-';
+        } else if (col === 'cpm') {
+          // Format CPM with 3 decimal places
+          value = value.toFixed(3);
         }
         
-        // Escape commas and double quotes
+        // Escape commas and double quotes for CSV format
         if (typeof value === 'string' && (value.includes(',') || value.includes('"'))) {
           value = `"${value.replace(/"/g, '""')}"`;
         }
@@ -210,7 +217,7 @@ const PlacementInsights = ({ data, isLoading }: PlacementInsightsProps) => {
               </div>
               <div>
                 <h5 className="text-lg font-medium text-white">Placement Breakdown</h5>
-                <p className="text-xs text-white/70">Combined metrics across all devices by platform and position</p>
+                <p className="text-xs text-white/70">Metrics by platform and position</p>
               </div>
             </div>
             
@@ -343,13 +350,13 @@ const PlacementInsights = ({ data, isLoading }: PlacementInsightsProps) => {
                           {insight.publisher_platform}
                         </TableCell>
                         <TableCell className="py-4 px-2 text-blue-700 dark:text-blue-300">
-                          {insight.platform_position.replace('facebook_', '')}
+                          {insight.platform_position ? insight.platform_position.replace('facebook_', '') : 'N/A'}
                         </TableCell>
                         <TableCell className="py-4 px-2">
                           <div className="flex items-center gap-2 bg-blue-50 p-2 rounded-lg">
                             <Eye className="w-4 h-4 text-blue-500" />
                             <span className="font-semibold text-blue-700">
-                              {Number(insight.impressions).toLocaleString()}
+                              {Math.round(insight.impressions).toLocaleString()}
                             </span>
                           </div>
                         </TableCell>
@@ -357,7 +364,7 @@ const PlacementInsights = ({ data, isLoading }: PlacementInsightsProps) => {
                           <div className="flex items-center gap-2 bg-green-50 p-2 rounded-lg">
                             <MousePointerClick className="w-4 h-4 text-green-500" />
                             <span className="font-semibold text-green-700">
-                              {Number(insight.clicks).toLocaleString()}
+                              {Math.round(insight.clicks).toLocaleString()}
                             </span>
                           </div>
                         </TableCell>
@@ -365,7 +372,7 @@ const PlacementInsights = ({ data, isLoading }: PlacementInsightsProps) => {
                           <div className="flex items-center gap-2 bg-emerald-50 p-2 rounded-lg">
                             <DollarSign className="w-4 h-4 text-emerald-500" />
                             <span className="font-semibold text-emerald-700">
-                              ${Number(insight.spend).toFixed(2)}
+                              ${parseFloat(insight.spend).toFixed(3)}
                             </span>
                           </div>
                         </TableCell>
@@ -373,7 +380,7 @@ const PlacementInsights = ({ data, isLoading }: PlacementInsightsProps) => {
                           <div className="flex items-center gap-2 bg-indigo-50 p-2 rounded-lg">
                             <BarChart className="w-4 h-4 text-indigo-500" />
                             <span className="font-semibold text-indigo-700">
-                              {Number(insight.ctr).toFixed(2)}%
+                              {parseFloat(insight.ctr).toFixed(3)}%
                             </span>
                           </div>
                         </TableCell>
@@ -381,7 +388,7 @@ const PlacementInsights = ({ data, isLoading }: PlacementInsightsProps) => {
                           <div className="flex items-center gap-2 bg-pink-50 p-2 rounded-lg">
                             <CircleDollarSign className="w-4 h-4 text-pink-500" />
                             <span className="font-semibold text-pink-700">
-                              ${Number(insight.cpc).toFixed(2)}
+                              ${insight.clicks > 0 ? parseFloat(insight.cpc).toFixed(3) : '-'}
                             </span>
                           </div>
                         </TableCell>
@@ -389,7 +396,7 @@ const PlacementInsights = ({ data, isLoading }: PlacementInsightsProps) => {
                           <div className="flex items-center gap-2 bg-red-50 p-2 rounded-lg">
                             <Users className="w-4 h-4 text-red-500" />
                             <span className="font-semibold text-red-700">
-                              ${Number(insight.cpm).toFixed(2)}
+                              ${parseFloat(insight.cpm).toFixed(3)}
                             </span>
                           </div>
                         </TableCell>
@@ -454,7 +461,8 @@ const PlacementInsights = ({ data, isLoading }: PlacementInsightsProps) => {
       {/* Charts Section */}
       <div className="w-full mt-12">
         <EnhancedCharts 
-          data={data} 
+          // Use the device data when on the devices tab, otherwise use the placement data
+          data={chartTab === "devices" && deviceData ? deviceData : data}
           chartTab={chartTab}
           setChartTab={setChartTab}
         />
@@ -464,9 +472,6 @@ const PlacementInsights = ({ data, isLoading }: PlacementInsightsProps) => {
 };
 
 export default PlacementInsights;
-
-
-
 
 // import { useState, useMemo } from "react";
 // import { motion } from "framer-motion";

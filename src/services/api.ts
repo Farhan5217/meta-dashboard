@@ -68,24 +68,41 @@ export const getAdSetInsights = async (
 
 // Add this to services/api.ts
 
+// export const getEnhancedInsights = async (
+//   adAccountId: string,
+//   params?: InsightParams & { include_placements?: boolean; include_actions?: boolean }
+// ) => {
+//   const response = await api.get(`/adaccounts/${adAccountId}/enhanced-insights`, { params });
+//   return response.data;
+// };
+
+
+
 export const getEnhancedInsights = async (
   adAccountId: string,
-  params?: InsightParams & { include_placements?: boolean; include_actions?: boolean }
+  params?: InsightParams & { 
+    include_placements?: boolean; 
+    include_actions?: boolean;
+    include_device?: boolean; // Changed from include_devices to include_device
+  }
 ) => {
-  const response = await api.get(`/adaccounts/${adAccountId}/enhanced-insights`, { params });
+  const response = await url_API.get(`/adaccounts/${adAccountId}/enhanced-insights`, { params });
   return response.data;
 };
 
-
-
-// export const getEnhancedInsights = async (
-//   adAccountId: string,
-//   params?: InsightParams & { 
-//     include_placements?: boolean; 
-//     include_actions?: boolean;
-//     include_devices?: boolean;
-//   }
-// ) => {
-//   const response = await url_API.get(`/adaccounts/${adAccountId}/enhanced-insights`, { params });
-//   return response.data;
-// };
+// If you need to maintain backward compatibility, you can create a wrapper function
+export const getDeviceInsights = async (
+  adAccountId: string,
+  dateRange: { from: Date; to: Date }
+) => {
+  const params = {
+    since: dateRange.from.toISOString().split('T')[0],
+    until: dateRange.to.toISOString().split('T')[0],
+    include_device: true, // Using the correct parameter name
+    include_placements: false,
+    include_actions: false
+  };
+  
+  const response = await url_API.get(`/adaccounts/${adAccountId}/enhanced-insights`, { params });
+  return response.data;
+};

@@ -110,7 +110,46 @@ export interface InsightParams {
   breakdown?: boolean;
   include_placements?: boolean;
   include_actions?: boolean;
-  include_devices?: boolean;
+  include_device?: boolean;
 }
 
- 
+// api.d.ts
+export interface InsightParams {
+  since?: string;
+  until?: string;
+  time_increment?: number;
+  breakdown?: boolean;
+  include_placements?: boolean;
+  include_actions?: boolean;
+  include_device?: boolean; // Changed from include_devices to include_device
+}
+
+export interface DeviceInsight {
+  impressions: string;
+  clicks: string;
+  spend: string;
+  reach: string;
+  frequency: string;
+  ctr: string;
+  cpc: string;
+  cpm: string;
+  date_start: string;
+  date_stop: string;
+  publisher_platform?: string; // Made optional since it might not always be present
+  impression_device: string;
+}
+
+export interface PlacementInsight {
+  impressions: string;
+  clicks: string;
+  spend: string;
+  reach: string;
+  frequency: string;
+  ctr: string;
+  cpc: string;
+  cpm: string;
+  date_start: string;
+  date_stop: string;
+  publisher_platform: string;
+  platform_position: string;
+}
