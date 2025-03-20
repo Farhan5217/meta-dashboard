@@ -14,7 +14,7 @@ import {
   Legend,
   Treemap,
 } from "recharts"
-
+import D3Treemap from './d3chart'; 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -322,6 +322,14 @@ const FilteredCharts = ({ data, chartTab, setChartTab }: ChartProps) => {
 
   // Color palette
   const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#8884d8", "#4BC0C0", "#FF6384"]
+const COLORS2 = [
+  "#FF6633", "#FFB399", "#FF33FF", "#FFFF99", "#00B3E6", 
+  "#E6B333", "#3366E6", "#999966", "#99FF99", "#B34D4D",
+  "#80B300", "#809900", "#E6B3B3", "#6680B3", "#66991A", 
+  "#FF99E6", "#CCFF1A", "#FF1A66", "#E6331A", "#33FFCC",
+  "#66994D", "#B366CC", "#4D8000", "#B33300", "#CC80CC", 
+  "#66664D", "#991AFF", "#E666FF", "#4DB3FF", "#1AB399"
+];
 
   // Format metric value for display
   const formatMetricValue = (value: number, metric: string) => {
@@ -474,64 +482,10 @@ const FilteredCharts = ({ data, chartTab, setChartTab }: ChartProps) => {
           <TabsContent value="positions" className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Treemap for Position Distribution (always showing spend) */}
-              <Card className="shadow-md border border-gray-100 overflow-hidden">
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-lg flex items-center gap-2">
-                    {/* <PieChart className="h-4 w-4" /> */}
-                    Position Distribution by Spend
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="h-72 p-4 flex items-center justify-center">
-                  {positionData && positionData.length > 0 ? (
-                    <ResponsiveContainer width="100%" height="100%">
-                      <Treemap
-                        data={positionData}
-                        dataKey="spend"
-                        aspectRatio={4 / 3}
-                        stroke="#f"
-                        strokeWidth={2}
-                        nameKey="name"
-                        animationDuration={800}
-                        animationBegin={0}
-                      >
-                        {positionData.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} fillOpacity={0.85} />
-                        ))}
-                        <Tooltip
-                          formatter={(value: number) => `$${Number(value).toFixed(2)}`}
-                          labelFormatter={(name) => `Position: ${name}`}
-                          contentStyle={{
-                            backgroundColor: "#d1d8e0",
-                            borderRadius: "8px",
-                            border: "1px solid #ddd",
-                            boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-                          }}
-                        />
-                      </Treemap>
-                    </ResponsiveContainer>
-                  ) : (
-                    <p className="text-gray-500 text-lg font-semibold">No Data Available</p>
-                  )}
-                </CardContent>
-
-                {/* Legend Below the Chart */}
-                {positionData && positionData.length > 0 && (
-                  <div className="p-4 border-t border-gray-200 bg-gray-50">
-                    <div className="grid grid-cols-2 gap-3">
-                      {positionData.map((entry, index) => (
-                        <div key={`legend-${index}`} className="flex items-center space-x-2">
-                          <span
-                            className="inline-block w-3 h-3 rounded-full"
-                            style={{ backgroundColor: COLORS[index % COLORS.length] }}
-                          ></span>
-                          <span className="text-sm text-gray-700">{entry.name}:</span>
-                          <span className="text-sm font-semibold text-gray-800">${entry.spend.toFixed(2)}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </Card>
+              <D3Treemap 
+  positionData={positionData} 
+  title="Position Distribution by Spend" 
+/>
 
               {/* Horizontal Bar Chart for Placement Combinations */}
               <Card className="shadow-md border border-gray-100 overflow-hidden">
@@ -594,116 +548,6 @@ const FilteredCharts = ({ data, chartTab, setChartTab }: ChartProps) => {
             </div>
           </TabsContent>
 
-          {/* DEVICES TAB */}
-          {/* <TabsContent value="devices" className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              
-              <Card className="shadow-md border border-gray-100 overflow-hidden">
-                <CardHeader className="pb-2 ">
-                  <CardTitle className="text-lg flex items-center gap-2">
-              
-                    Facebook Devices by {getMetricName(selectedMetric)}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="h-72 p-4">
-                  {platformDeviceData.facebook && platformDeviceData.facebook.length > 0 ? (
-                    <ResponsiveContainer width="100%" height="100%">
-                      <RePieChart>
-                        <Pie
-                          data={platformDeviceData.facebook}
-                          cx="50%"
-                          cy="50%"
-                          innerRadius={50}
-                          outerRadius={80}
-                          dataKey={selectedMetric}
-                          nameKey="name"
-                          paddingAngle={2}
-                          // label ko remove kar diya hai
-                          labelLine={false}
-                          animationDuration={800}
-                        >
-                          {platformDeviceData.facebook.map((entry, index) => (
-                            <Cell
-                              key={`cell-${index}`}
-                              fill={COLORS[index % COLORS.length]}
-                              stroke="#ffffff"
-                              strokeWidth={2}
-                            />
-                          ))}
-                        </Pie>
-                        <Tooltip
-                          formatter={(value: number) => formatMetricValue(value, selectedMetric)}
-                          labelFormatter={(name) => `Device: ${name}`}
-                          contentStyle={{
-                            backgroundColor: "#fff",
-                            borderRadius: "8px",
-                            border: "1px solid #ddd",
-                            boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-                          }}
-                        />
-                        <Legend layout="vertical" verticalAlign="middle" align="right" iconType="circle" iconSize={8} />
-                      </RePieChart>
-                    </ResponsiveContainer>
-                  ) : (
-                    <p className="text-gray-500 text-lg font-semibold">No Data Available</p>
-                  )}
-                </CardContent>
-              </Card>
-
-              
-              <Card className="shadow-md border border-gray-100 overflow-hidden">
-                <CardHeader className="pb-2 ">
-                  <CardTitle className="text-lg flex items-center gap-2">
-              
-                    Instagram Devices by {getMetricName(selectedMetric)}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="h-72 p-4">
-                  {platformDeviceData.instagram && platformDeviceData.instagram.length > 0 ? (
-                    <ResponsiveContainer width="100%" height="100%">
-                      <RePieChart>
-                        <Pie
-                          data={platformDeviceData.instagram}
-                          cx="50%"
-                          cy="50%"
-                          innerRadius={50}
-                          outerRadius={80}
-                          dataKey={selectedMetric}
-                          nameKey="name"
-                          paddingAngle={2}
-              
-                          labelLine={false}
-                          animationDuration={800}
-                        >
-                          {platformDeviceData.instagram.map((entry, index) => (
-                            <Cell
-                              key={`cell-${index}`}
-                              fill={COLORS[index % COLORS.length]}
-                              stroke="#ffffff"
-                              strokeWidth={2}
-                            />
-                          ))}
-                        </Pie>
-                        <Tooltip
-                          formatter={(value: number) => formatMetricValue(value, selectedMetric)}
-                          labelFormatter={(name) => `Device: ${name}`}
-                          contentStyle={{
-                            backgroundColor: "#fff",
-                            borderRadius: "8px",
-                            border: "1px solid #ddd",
-                            boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-                          }}
-                        />
-                        <Legend layout="vertical" verticalAlign="middle" align="right" iconType="circle" iconSize={8} />
-                      </RePieChart>
-                    </ResponsiveContainer>
-                  ) : (
-                    <p className="text-gray-500 text-lg font-semibold">No Data Available</p>
-                  )}
-                </CardContent>
-              </Card>
-            </div>
-          </TabsContent> */}
         </Tabs>
       </CardContent>
     </Card>

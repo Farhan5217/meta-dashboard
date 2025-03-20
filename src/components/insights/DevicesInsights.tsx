@@ -76,9 +76,10 @@ const DeviceInsights = ({ data = [], isLoading = false }) => {
   }, [data, selectedMetric]);
 
   // Colors for the chart
-  const COLORS = ["#0077B6", "#00A6FB", "#0096C7", "#00B4D8", "#48CAE4", "#90E0EF", "#00CED1"];
+  // const COLORS = ["#0077B6", "#00A6FB", "#0096C7", "#00B4D8", "#48CAE4", "#90E0EF", "#00CED1"];
+  const COLORS = ["#0077B6","#FF6B6B", "#FF8E72", "#FFA94D", "#FFD43B", "#74C69D", "#4D96FF", "#6A4C93"];
 
-
+ 
 
   // Calculate totals for summary cards
   const totals = useMemo(() => {
@@ -109,9 +110,9 @@ const DeviceInsights = ({ data = [], isLoading = false }) => {
           <p className="font-medium text-gray-900">{data.name}</p>
           <div className="text-sm text-gray-600 mt-1">
             <p>{getMetricName(selectedMetric)}: {formatMetricValue(data[selectedMetric], selectedMetric)}</p>
-            <p>Impressions: {formatMetricValue(data.impressions, "impressions")}</p>
+            {/* <p>Impressions: {formatMetricValue(data.impressions, "impressions")}</p>
             <p>Clicks: {formatMetricValue(data.clicks, "clicks")}</p>
-            <p>CTR: {formatMetricValue(data.ctr, "ctr")}</p>
+            <p>CTR: {formatMetricValue(data.ctr, "ctr")}</p> */}
           </div>
         </div>
       );
@@ -145,37 +146,33 @@ const DeviceInsights = ({ data = [], isLoading = false }) => {
                 <p className="text-xs text-white/70">Analytics by device type</p>
               </div>
             </div>
-            
-            <div className="flex items-center gap-3">
-              <div className="flex items-center gap-1 bg-white/20 px-3 py-2 rounded-lg">
-              <Filter className="h-6 w-6 text-white" />
-                <span className="text-white text-sm font-medium">Metric:</span>
-                <Select 
-                  value={selectedMetric} 
-                  onValueChange={setSelectedMetric}
-                >
-                  <SelectTrigger className="bg-white/30 text-teal-800 text-sm h-8 rounded border-0 focus:ring-2 focus:ring-white/50 min-w-[120px]">
-                    <SelectValue placeholder="Select metric" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="impressions">Impressions</SelectItem>
-                    <SelectItem value="clicks">Clicks</SelectItem>
-                    <SelectItem value="spend">Spend</SelectItem>
-                    <SelectItem value="ctr">CTR</SelectItem>
-                    <SelectItem value="cpc">CPC</SelectItem>
-                    <SelectItem value="cpm">CPM</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              
-              <Badge className="bg-teal-600/70 hover:bg-teal-600 text-white border-0 text-xs px-3 py-1 rounded-full shadow-sm">
+            <Badge className="bg-teal-600/70 hover:bg-teal-600 text-white border-0 text-xs px-3 py-1 rounded-full shadow-sm">
                 {data.length} Devices
               </Badge>
-            </div>
+            
           </div>
         </CardHeader>
         
+
         <CardContent className="p-6">
+        <div className=" gap-4 mb-4">
+        <label className="block text-sm font-medium text-gray-700 mb-2">Select Metric for Analysis</label>
+            <div className="w-full md:w-60 bg-white border-gray-300 hover:border-teal-500 transition-colors">
+              <Select value={selectedMetric} onValueChange={setSelectedMetric}>
+                <SelectTrigger className="w-full md:w-60 bg-white border-gray-300 hover:border-teal-500 transition-colors">
+                  <SelectValue placeholder="Select metric" />
+                </SelectTrigger>
+                <SelectContent className="bg-white shadow-md rounded-lg">
+                  <SelectItem value="impressions">Impressions</SelectItem>
+                  <SelectItem value="clicks">Clicks</SelectItem>
+                  <SelectItem value="spend">Spend</SelectItem>
+                  <SelectItem value="ctr">CTR</SelectItem>
+                  <SelectItem value="cpc">CPC</SelectItem>
+                  <SelectItem value="cpm">CPM</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
           {/* Device Distribution Chart */}
           <Card className="shadow-md border border-gray-100 overflow-hidden mb-6">
             <CardHeader className="pb-2">
@@ -233,58 +230,6 @@ const DeviceInsights = ({ data = [], isLoading = false }) => {
               )}
             </CardContent>
           </Card>
-
-          
-
-          {/* Device Metrics Table */}
-          {/* <Card className="mt-6 border border-gray-100 shadow-sm">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-lg">Device Performance Details</CardTitle>
-            </CardHeader>
-            <CardContent className="p-0">
-              <div className="overflow-x-auto">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="bg-gray-50 border-y border-gray-200">
-                      <th className="text-left py-3 px-4 font-medium text-gray-600">Device</th>
-                      <th className="text-right py-3 px-4 font-medium text-gray-600">Impressions</th>
-                      <th className="text-right py-3 px-4 font-medium text-gray-600">Clicks</th>
-                      <th className="text-right py-3 px-4 font-medium text-gray-600">CTR</th>
-                      <th className="text-right py-3 px-4 font-medium text-gray-600">CPC</th>
-                      <th className="text-right py-3 px-4 font-medium text-gray-600">Spend</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {chartData.map((device, index) => (
-                      <tr 
-                        key={index} 
-                        className="border-b border-gray-100 hover:bg-gray-50 transition-colors"
-                      >
-                        <td className="py-3 px-4 text-gray-800 font-medium">
-                          {device.name}
-                        </td>
-                        <td className="py-3 px-4 text-right text-gray-700">
-                          {formatMetricValue(device.impressions, "impressions")}
-                        </td>
-                        <td className="py-3 px-4 text-right text-gray-700">
-                          {formatMetricValue(device.clicks, "clicks")}
-                        </td>
-                        <td className="py-3 px-4 text-right text-gray-700">
-                          {formatMetricValue(device.ctr, "ctr")}
-                        </td>
-                        <td className="py-3 px-4 text-right text-gray-700">
-                          {formatMetricValue(device.cpc, "cpc")}
-                        </td>
-                        <td className="py-3 px-4 text-right text-gray-700">
-                          {formatMetricValue(device.spend, "spend")}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </CardContent>
-          </Card> */}
         </CardContent>
       </Card>
     </motion.div>

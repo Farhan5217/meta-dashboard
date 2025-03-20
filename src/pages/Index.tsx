@@ -43,10 +43,7 @@ const Index = () => {
   const [objectiveFilter, setObjectiveFilter] = useState<string>();
   const [showAllRows, setShowAllRows] = useState(false);
 
-  // const [showDemographics, setShowDemographics] = useState(false);
-  // const [dateRange, setDateRange] = useState<DateRange>(getLast30Days());
-  // const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined); 
-  // const [dateRange, setDateRange] = useState<{ from: Date; to: Date } | undefined>();
+  
   const [dateRange, setDateRange] = useState<DateRange>(() => {
     const today = new Date();
     const thirtyDaysAgo = new Date();
@@ -101,15 +98,7 @@ useEffect(() => {
   
   // selectedAccount, dateRange
 ]);
-  // Set default date range if account is selected
-// useEffect(() => {
-//   if (selectedAccount) {
-//     setDateRange(getLast30Days());
-//     // Store selected account in sessionStorage
-//     sessionStorage.setItem("selectedAccount", selectedAccount);
-//   }
-// }, [selectedAccount]);
-
+  
   // Improved date range handling
   useEffect(() => {
     if (dateRange?.from && dateRange?.to) {
@@ -168,30 +157,7 @@ useEffect(() => {
   }
 }, []);
 
-  // Get insights with time increment for time series
-  // const { data: timeSeriesInsights, isLoading: timeSeriesLoading } = useQuery({
-  //   queryKey: ["insights", selectedAccount, dateRange, "timeSeries", showDemographics],
-  //   queryFn: async () => {
-  //     if (dateRange?.from && dateRange?.to) {
-  //       const params = {
-  //         since: dateRange.from.toISOString().split('T')[0],
-  //         until: dateRange.to.toISOString().split('T')[0],
-  //         time_increment: 1,
-  //         breakdown: true,
-  //       };
-        
-  //       if (selectedAccount) {
-  //         return getAdAccountInsights(selectedAccount, params);
-  //       }
-  //     }
-  //     return [];
-  //   },
-  //   meta: {
-  //     onError: () => {
-  //       toast.error("Failed to fetch time series insights");
-  //     }
-  //   }
-  // });
+  
 // Get insights with time increment for time series
 const { data: timeSeriesInsights, isLoading: timeSeriesLoading } = useQuery({
   queryKey: ["insights", selectedAccount, dateRange, "timeSeries"],
@@ -352,10 +318,6 @@ cpc:"0"
   )}
 </div>
 
-
-
-
-
     </div>
 
     {selectedAccount && (
@@ -430,95 +392,7 @@ cpc:"0"
   </div>
 
   {/* Campaigns Table Section */}
-  {/* Campaigns Section */}
-  {/* <Card className="overflow-hidden border-0 rounded-lg shadow-sm">
-                  <div className="bg-teal-500 py-3 px-4">
-                    <div className="flex justify-between items-center">
-                      <div className="flex items-center gap-2 text-white font-medium">
-                        <Sparkles className="h-5 w-5" />
-                        Campaigns Overview
-                      </div>
-                      <Badge className="bg-teal-600 text-white border-0 text-xs px-2.5">
-                        {campaigns.length} Campaigns
-                      </Badge>
-                    </div>
-                  </div>
-      <CardContent className="p-0">
-        <div className="overflow-x-auto">
-          <Table>
-            <TableHeader>
-              <TableRow className="bg-blue-50">
-                <TableHead className="py-3 px-4 text-xs font-medium text-teal-800 uppercase">
-                  Name
-                </TableHead>
-                <TableHead className="py-3 px-4 text-xs font-medium text-teal-800 uppercase">
-                  Status
-                </TableHead>
-                <TableHead className="py-3 px-4 text-xs font-medium text-teal-800 uppercase">
-                  Objective
-                </TableHead>
-                <TableHead className="py-3 px-4 text-xs font-medium text-teal-800 uppercase">
-                  Spend
-                </TableHead>
-                <TableHead className="py-3 px-4 text-xs font-medium text-teal-800 uppercase">
-                  Impressions
-                </TableHead>
-                <TableHead className="py-3 px-4 text-xs font-medium text-teal-800 uppercase">
-                  Clicks
-                </TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {campaigns.map((campaign) => {
-                const insights = campaignInsights[campaign.id] || {}
-                return (
-                  <motion.tr
-                    key={campaign.id}
-                    className="group cursor-pointer border-b border-blue-200 dark:border-blue-700 hover:bg-blue-50 dark:hover:bg-blue-800/50 transition-colors duration-200"
-                    onClick={() => navigate(`/campaign/${campaign.id}`)}
-                    whileHover={{ scale: 1.02 }}
-                    transition={{ type: "spring", stiffness: 300 }}
-                  >
-                    <TableCell className="py-4 px-6">
-                      <div className="font-medium text-blue-900 dark:text-blue-100">{campaign.name}</div>
-                    </TableCell>
-                    <TableCell className="py-4 px-6">
-                      <Badge variant="outline" className={`text-xs ${getStatusBadgeClass(campaign.status)}`}>
-                        {campaign.status}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="py-4 px-6 text-blue-700 dark:text-blue-300">
-                      <div className="flex items-center gap-2">
-                        <TrendingUp className="w-4 h-4" />
-                        {campaign.objective.replace("OUTCOME_", "")}
-                      </div>
-                    </TableCell>
-                    <TableCell className="py-4 px-6 text-blue-700 dark:text-blue-300">
-                      <div className="flex items-center gap-2">
-                        <DollarSign className="w-4 h-4" />
-                        <span className="font-medium">{Number.parseFloat(insights.spend || "0").toFixed(2)}</span>
-                      </div>
-                    </TableCell>
-                    <TableCell className="py-4 px-6 text-blue-700 dark:text-blue-300">
-                      <div className="flex items-center gap-2">
-                        <Eye className="w-4 h-4" />
-                        {Number.parseInt(insights.impressions || "0").toLocaleString()}
-                      </div>
-                    </TableCell>
-                    <TableCell className="py-4 px-6 text-blue-700 dark:text-blue-300">
-                      <div className="flex items-center gap-2">
-                        <MousePointerClick className="w-4 h-4" />
-                        {Number.parseInt(insights.clicks || "0").toLocaleString()}
-                      </div>
-                    </TableCell>
-                  </motion.tr>
-                )
-              })}
-            </TableBody>
-          </Table>
-        </div>
-      </CardContent>
-    </Card> */}
+  
 <Card className="overflow-hidden border-0 rounded-lg shadow-sm">
       <div className="bg-teal-500 py-3 px-4">
         <div className="flex justify-between items-center">
@@ -658,9 +532,7 @@ cpc:"0"
         title="Ad Account Analytics" 
         />
 </div>
-
-
-      </>
+    </>
     )}
 
     {/* Loading State */}
@@ -674,7 +546,4 @@ cpc:"0"
 
   );
 };
-
 export default Index;
-
-
