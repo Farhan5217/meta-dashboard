@@ -7,9 +7,9 @@ const api = axios.create({
   baseURL: API_BASE_URL,
 });
 
-const url_API = axios.create({
-  baseURL: "https://meta-dashboard-backend.onrender.com/api",
-});
+// const url_API = axios.create({
+//   baseURL: "https://meta-dashboard-backend.onrender.com/api",
+// });
 
 
 export const getAdAccounts = async () => {
@@ -86,7 +86,7 @@ export const getEnhancedInsights = async (
     include_device?: boolean; // Changed from include_devices to include_device
   }
 ) => {
-  const response = await url_API.get(`/adaccounts/${adAccountId}/enhanced-insights`, { params });
+  const response = await api.get(`/adaccounts/${adAccountId}/enhanced-insights`, { params });
   return response.data;
 };
 
@@ -103,6 +103,6 @@ export const getDeviceInsights = async (
     include_actions: false
   };
   
-  const response = await url_API.get(`/adaccounts/${adAccountId}/enhanced-insights`, { params });
+  const response = await api.get(`/adaccounts/${adAccountId}/enhanced-insights`, { params });
   return response.data;
 };
