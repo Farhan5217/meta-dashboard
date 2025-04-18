@@ -7,9 +7,9 @@ const api = axios.create({
   baseURL: API_BASE_URL,
 });
 
-// const url_API = axios.create({
-//   baseURL: "https://meta-dashboard-backend.onrender.com/api",
-// });
+const url_API = axios.create({
+  baseURL: "https://meta-dashboard-backend.onrender.com/api",
+});
 
 
 export const getAdAccounts = async () => {
@@ -104,5 +104,22 @@ export const getDeviceInsights = async (
   };
   
   const response = await api.get(`/adaccounts/${adAccountId}/enhanced-insights`, { params });
+  return response.data;
+};
+
+
+// Add this to services/api.ts
+
+export const getCampaignsWithCreatives = async (
+  adAccountId: string,
+  params?: { active_only?: boolean }
+) => {
+  const response = await url_API.get(`/adaccounts/${adAccountId}/campaigns-with-creatives`, { params });
+  return response.data;
+};
+
+
+export const getCampaignCreatives = async (campaignId: string) => {
+  const response = await url_API.get(`/campaigns/${campaignId}/creatives`);
   return response.data;
 };

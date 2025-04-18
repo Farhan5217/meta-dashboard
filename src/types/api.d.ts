@@ -67,6 +67,16 @@ export interface InsightData {
   gender?: string;
   campaign_name?: string;
   adset_name?: string;
+
+  // Add percentage change fields
+  impressions_pct_change?: number;
+  clicks_pct_change?: number;
+  spend_pct_change?: number;
+  reach_pct_change?: number;
+  frequency_pct_change?: number;
+  ctr_pct_change?: number;
+  cpc_pct_change?: number;
+  cpm_pct_change?: number;
 }
 
 
@@ -111,6 +121,8 @@ export interface InsightParams {
   include_placements?: boolean;
   include_actions?: boolean;
   include_device?: boolean;
+  include_percent_change?: boolean;
+
 }
 
 // api.d.ts
@@ -122,6 +134,8 @@ export interface InsightParams {
   include_placements?: boolean;
   include_actions?: boolean;
   include_device?: boolean; // Changed from include_devices to include_device
+  include_percent_change?: boolean;
+
 }
 
 export interface DeviceInsight {
@@ -152,4 +166,20 @@ export interface PlacementInsight {
   date_stop: string;
   publisher_platform: string;
   platform_position: string;
+}
+
+export interface CreativeItem {
+  ad_id: string;
+  ad_name: string;
+  creative_id: string;
+  creative_name: string;
+  creative_type: string; // "video", "image", etc.
+  preview_url: string;   // thumbnail URL
+  page_id: string;
+  instagram_user_id?: string;
+  video_url?: string;    // video URL if creative_type is "video"
+}
+
+export interface CampaignWithCreatives extends Campaign {
+  creatives: CreativeItem[];
 }
