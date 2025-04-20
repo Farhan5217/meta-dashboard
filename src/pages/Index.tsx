@@ -239,8 +239,11 @@ const Index = () => {
 
         {selectedAccount && (
           <>
-            <MetricsGrid aggregatedMetrics={aggregatedMetrics} latestReach={latestReach} latestFrequency={latestFrequency} />
-
+            {/* <MetricsGrid aggregatedMetrics={aggregatedMetrics} latestReach={latestReach} latestFrequency={latestFrequency} /> */}
+            <MetricsGrid 
+      aggregatedMetrics={aggregatedMetrics} 
+      timeSeriesInsights={timeSeriesInsights}
+    />
             {/* Campaign Filters */}
             <div className="mt-8 space-y-6">
               {/* Filter Section */}

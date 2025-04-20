@@ -405,12 +405,14 @@ const Campaign = () => {
           <>
             <MetricsGrid
               aggregatedMetrics={aggregatedMetrics}
+              timeSeriesInsights={timeSeriesInsights}
+
             />
 
             {/* Campaign Creatives Section */}
         <Card className="mb-8 overflow-hidden bg-white dark:bg-gray-800 rounded-xl shadow-lg">
           <CardHeader className="bg-teal-500 dark:bg-teal-800 p-4">
-            <CardTitle className="text-lg font-semibold text-white flex items-center gap-2">
+            <CardTitle className="text-md font-semibold text-white flex items-center gap-2">
               <Film className="h-5 w-5" />
               Campaign Creatives
             </CardTitle>
