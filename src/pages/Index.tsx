@@ -319,152 +319,148 @@ const Index = () => {
                   </div>
                 </div>
                 <CardContent className="p-0">
-                  <div className="overflow-x-auto">
-                    <Table>
-                      <TableHeader>
-                        <TableRow className="bg-blue-50">
-                          <TableHead className="py-3 px-4 text-xs font-medium text-teal-800 uppercase">
-                            Name
-                          </TableHead>
-                          <TableHead className="py-3 px-4 text-xs font-medium text-teal-800 uppercase">
-                            Status
-                          </TableHead>
-                          <TableHead className="py-3 px-4 text-xs font-medium text-teal-800 uppercase">
-                            Objective
-                          </TableHead>
-                          
-                          <TableHead className="py-3 px-4 text-xs font-medium text-teal-800 uppercase">
-                            Spend
-                          </TableHead>
-                          <TableHead className="py-3 px-4 text-xs font-medium text-teal-800 uppercase">
-                            Impressions
-                          </TableHead>
-                          <TableHead className="py-3 px-4 text-xs font-medium text-teal-800 uppercase">
-                            Clicks
-                          </TableHead>
-                          {/* Add new column for Creatives */}
-                          <TableHead className="py-3 px-4 text-xs font-medium text-teal-800 uppercase">
-                            Creatives
-                          </TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {displayCampaigns.map((campaign, index) => {
-                          const insights = campaignInsights[campaign.id] || {};
-                          const creatives = campaignCreativesMap[campaign.id] || [];
-                          
-                          return (
-                            <motion.tr
-                              key={campaign.id}
-                              className="group cursor-pointer border-b border-blue-200 dark:border-blue-700 hover:bg-blue-50 dark:hover:bg-blue-800/50 transition-colors duration-200"
-                              onClick={() => navigate && navigate(`/campaign/${campaign.id}`)}
-                              whileHover={{ scale: 1.02 }}
-                              initial={{ opacity: 0, y: 5 }}
-                              animate={{ opacity: 1, y: 0 }}
-                              transition={{ type: "spring", stiffness: 300, delay: index * 0.03 }}
-                            >
-                              <TableCell className="py-4 px-6">
-                                <div className="font-medium text-blue-900 dark:text-blue-100">{campaign.name}</div>
-                              </TableCell>
-                              <TableCell className="py-4 px-6">
-                                <Badge variant="outline" className={`text-xs ${getStatusBadgeClass(campaign.status)}`}>
-                                  {campaign.status}
-                                </Badge>
-                              </TableCell>
-                              <TableCell className="py-4 px-6 text-blue-700 dark:text-blue-300">
-                                <div className="flex items-center gap-2">
-                                  <TrendingUp className="w-4 h-4" />
-                                  {campaign.objective.replace("OUTCOME_", "")}
-                                </div>
-                              </TableCell>
-                              
-                              <TableCell className="py-4 px-6 text-blue-700 dark:text-blue-300">
-                                <div className="flex items-center gap-2">
-                                  <DollarSign className="w-4 h-4" />
-                                  <span className="font-medium">${Number.parseFloat(insights.spend || "0").toFixed(2)}</span>
-                                </div>
-                              </TableCell>
-                              <TableCell className="py-4 px-6 text-blue-700 dark:text-blue-300">
-                                <div className="flex items-center gap-2">
-                                  <Eye className="w-4 h-4" />
-                                  {Number.parseInt(insights.impressions || "0").toLocaleString()}
-                                </div>
-                              </TableCell>
-                              <TableCell className="py-4 px-6 text-blue-700 dark:text-blue-300">
-                                <div className="flex items-center gap-2">
-                                  <MousePointerClick className="w-4 h-4" />
-                                  {Number.parseInt(insights.clicks || "0").toLocaleString()}
-                                </div>
-                              </TableCell>
-                              {/* Add Creatives Cell */}
-                              <TableCell 
-                                className="py-4 px-6 text-blue-700 dark:text-blue-300"
-                                onClick={(e) => {
-                                  // Prevent navigation when clicking on creatives
-                                  e.stopPropagation();
-                                }}
-                              >
-                                {creativesLoading ? (
-                                  <div className="flex items-center justify-center">
-                                    <div className="w-5 h-5 border-2 border-blue-300 border-t-blue-600 rounded-full animate-spin"></div>
-                                  </div>
-                                ) : creatives.length > 0 ? (
-                                  <CreativeThumbnails creatives={creatives} />
-                                ) : (
-                                  <div className="flex items-center gap-2 text-gray-400">
-                                    <Film className="w-4 h-4" />
-                                    <span>No creatives</span>
-                                  </div>
-                                )}
-                              </TableCell>
-                            </motion.tr>
-                          );
-                        })}
-                      </TableBody>
-                    </Table>
-                    
-                    {/* Show More Button - only display if there are more rows to show */}
-                    {!showAllRows && campaigns.length > 10 && (
-                      <motion.div 
-                        initial={{ opacity: 0.8 }} 
-                        animate={{ opacity: 1 }}
-                        className="bg-gradient-to-b from-blue-50/80 to-blue-100/80 border-t border-blue-100"
-                      >
-                        <div className="flex justify-center items-center py-3">
-                          <Button 
-                            onClick={() => setShowAllRows(true)}
-                            className="bg-white hover:bg-blue-50 text-teal-700 border border-teal-200 shadow-sm group flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-200 hover:shadow"
-                          >
-                            <span className="font-medium">View All {campaigns.length} Campaigns</span>
-                            <div className="bg-teal-500 rounded-full p-1 group-hover:bg-teal-600 transition-colors duration-200">
-                              <ChevronDown className="h-3 w-3 text-white" />
-                            </div>
-                          </Button>
-                        </div>
-                      </motion.div>
-                    )}
-                    
-                    {/* Show Less Button - only display if showing all rows and there are more than 10 */}
-                    {showAllRows && campaigns.length > 10 && (
-                      <motion.div 
-                        initial={{ opacity: 0.8 }} 
-                        animate={{ opacity: 1 }}
-                        className="bg-gradient-to-t from-blue-50/80 to-blue-100/80 border-t border-blue-100"
-                      >
-                        <div className="flex justify-center items-center py-3">
-                          <Button 
-                            onClick={() => setShowAllRows(false)}
-                            className="bg-white hover:bg-blue-50 text-blue-700 border border-blue-200 shadow-sm group flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-200 hover:shadow"
-                          >
-                            <span className="font-medium">Show Less</span>
-                            <div className="bg-blue-500 rounded-full p-1 group-hover:bg-blue-600 transition-colors duration-200">
-                              <ChevronDown className="h-3 w-3 text-white rotate-180" />
-                            </div>
-                          </Button>
-                        </div>
-                      </motion.div>
-                    )}
-                  </div>
+                <div className="overflow-x-auto">
+  <Table className="w-full border-collapse">
+    <TableHeader>
+      <TableRow className="bg-blue-50 border-b border-blue-200">
+        <TableHead className="py-3 px-4 text-xs font-medium text-teal-800 uppercase sticky top-0">
+          Name
+        </TableHead>
+        <TableHead className="py-3 px-4 text-xs font-medium text-teal-800 uppercase sticky top-0">
+          Status
+        </TableHead>
+        <TableHead className="py-3 px-4 text-xs font-medium text-teal-800 uppercase sticky top-0">
+          Objective
+        </TableHead>
+        <TableHead className="py-3 px-4 text-xs font-medium text-teal-800 uppercase sticky top-0">
+          Spend
+        </TableHead>
+        <TableHead className="py-3 px-4 text-xs font-medium text-teal-800 uppercase sticky top-0">
+          Impressions
+        </TableHead>
+        <TableHead className="py-3 px-4 text-xs font-medium text-teal-800 uppercase sticky top-0">
+          Clicks
+        </TableHead>
+        <TableHead className="py-3 px-4 text-xs font-medium text-teal-800 uppercase sticky top-0">
+          Creatives
+        </TableHead>
+      </TableRow>
+    </TableHeader>
+    <TableBody>
+      {displayCampaigns.map((campaign, index) => {
+        const insights = campaignInsights[campaign.id] || {};
+        const creatives = campaignCreativesMap[campaign.id] || [];
+        
+        return (
+          <motion.tr
+            key={campaign.id}
+            className="group cursor-pointer border-b border-blue-200 dark:border-blue-700 hover:bg-blue-50 dark:hover:bg-blue-800/50 transition-colors duration-200"
+            onClick={() => navigate && navigate(`/campaign/${campaign.id}`)}
+            whileHover={{ scale: 1.01 }}
+            initial={{ opacity: 0, y: 5 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ type: "spring", stiffness: 300, delay: index * 0.03 }}
+          >
+            <TableCell className="py-3 px-4">
+              <div className="font-medium text-blue-900 dark:text-blue-100">{campaign.name}</div>
+            </TableCell>
+            <TableCell className="py-3 px-4">
+              <Badge variant="outline" className={`text-xs ${getStatusBadgeClass(campaign.status)}`}>
+                {campaign.status}
+              </Badge>
+            </TableCell>
+            <TableCell className="py-3 px-4 text-blue-700 dark:text-blue-300">
+              <div className="flex items-center gap-2">
+                <TrendingUp className="w-4 h-4" />
+                {campaign.objective.replace("OUTCOME_", "")}
+              </div>
+            </TableCell>
+            <TableCell className="py-3 px-4 text-blue-700 dark:text-blue-300">
+              <div className="flex items-center gap-2">
+                <DollarSign className="w-4 h-4" />
+                <span className="font-medium">${Number.parseFloat(insights.spend || "0").toFixed(2)}</span>
+              </div>
+            </TableCell>
+            <TableCell className="py-3 px-4 text-blue-700 dark:text-blue-300">
+              <div className="flex items-center gap-2">
+                <Eye className="w-4 h-4" />
+                {Number.parseInt(insights.impressions || "0").toLocaleString()}
+              </div>
+            </TableCell>
+            <TableCell className="py-3 px-4 text-blue-700 dark:text-blue-300">
+              <div className="flex items-center gap-2">
+                <MousePointerClick className="w-4 h-4" />
+                {Number.parseInt(insights.clicks || "0").toLocaleString()}
+              </div>
+            </TableCell>
+            <TableCell 
+              className="py-3 px-4 text-blue-700 dark:text-blue-300"
+              onClick={(e) => {
+                // Prevent navigation when clicking on creatives
+                e.stopPropagation();
+              }}
+            >
+              {creativesLoading ? (
+                <div className="flex items-center justify-center">
+                  <div className="w-5 h-5 border-2 border-blue-300 border-t-blue-600 rounded-full animate-spin"></div>
+                </div>
+              ) : creatives.length > 0 ? (
+                <CreativeThumbnails creatives={creatives} />
+              ) : (
+                <div className="flex items-center gap-2 text-gray-400">
+                  <Film className="w-4 h-4" />
+                  <span>No creatives</span>
+                </div>
+              )}
+            </TableCell>
+          </motion.tr>
+        );
+      })}
+    </TableBody>
+  </Table>
+  
+  {/* Show More Button - only display if there are more rows to show */}
+  {!showAllRows && campaigns.length > 10 && (
+    <motion.div 
+      initial={{ opacity: 0.8 }} 
+      animate={{ opacity: 1 }}
+      className="bg-gradient-to-b from-blue-50/80 to-blue-100/80 border-t border-blue-100"
+    >
+      <div className="flex justify-center items-center py-3">
+        <Button 
+          onClick={() => setShowAllRows(true)}
+          className="bg-white hover:bg-blue-50 text-teal-700 border border-teal-200 shadow-sm group flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-200 hover:shadow"
+        >
+          <span className="font-medium">View All {campaigns.length} Campaigns</span>
+          <div className="bg-teal-500 rounded-full p-1 group-hover:bg-teal-600 transition-colors duration-200">
+            <ChevronDown className="h-3 w-3 text-white" />
+          </div>
+        </Button>
+      </div>
+    </motion.div>
+  )}
+  
+  {/* Show Less Button - only display if showing all rows and there are more than 10 */}
+  {showAllRows && campaigns.length > 10 && (
+    <motion.div 
+      initial={{ opacity: 0.8 }} 
+      animate={{ opacity: 1 }}
+      className="bg-gradient-to-t from-blue-50/80 to-blue-100/80 border-t border-blue-100"
+    >
+      <div className="flex justify-center items-center py-3">
+        <Button 
+          onClick={() => setShowAllRows(false)}
+          className="bg-white hover:bg-blue-50 text-blue-700 border border-blue-200 shadow-sm group flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-200 hover:shadow"
+        >
+          <span className="font-medium">Show Less</span>
+          <div className="bg-blue-500 rounded-full p-1 group-hover:bg-blue-600 transition-colors duration-200">
+            <ChevronDown className="h-3 w-3 text-white rotate-180" />
+          </div>
+        </Button>
+      </div>
+    </motion.div>
+  )}
+</div>
                 </CardContent>
               </Card>
             </div>
