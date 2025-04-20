@@ -75,7 +75,7 @@ export const VideoPlayerModal: React.FC<VideoPlayerModalProps> = ({
             onClick={onClose}
             className="rounded-full p-1 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
           >
-            <X className="h-5 w-5" />
+            
           </button>
         </DialogHeader>
         <div className="relative w-full">

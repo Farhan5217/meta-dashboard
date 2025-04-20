@@ -25,11 +25,81 @@ export const getAdAccountInsights = async (
   return response.data;
 };
 
+export const getCombinedAdAccountInsights = async (
+  adAccountId: string,
+  dateRange: { from: Date; to: Date }
+) => {
+  // Prepare date parameters
+  const dateParams = {
+    since: dateRange.from.toISOString().split('T')[0],
+    until: dateRange.to.toISOString().split('T')[0],
+  };
+
+  // Make two separate API calls
+  const [breakdownInsights, percentChangeInsights] = await Promise.all([
+    // Get time series data with breakdown=true
+    getAdAccountInsights(adAccountId, {
+      ...dateParams,
+      time_increment: 1,
+      breakdown: true,
+      include_percent_change: false
+    }),
+    
+    // Get aggregated data with percentage changes
+    getAdAccountInsights(adAccountId, {
+      ...dateParams,
+      breakdown: false,
+      include_percent_change: true
+    })
+  ]);
+
+  // Return both datasets
+  return {
+    timeSeriesData: breakdownInsights || [],
+    percentChangeData: percentChangeInsights?.[0] || {}
+  };
+};
+
+
+
 export const getCampaigns = async (adAccountId: string) => {
   const response = await api.get(`/adaccounts/${adAccountId}/campaigns`);
   return response.data;
 };
+export const getCombinedCampaignInsights = async (
+  campaignId: string,
+  dateRange: { from: Date; to: Date }
+) => {
+  // Prepare date parameters
+  const dateParams = {
+    since: dateRange.from.toISOString().split('T')[0],
+    until: dateRange.to.toISOString().split('T')[0],
+  };
 
+  // Make two separate API calls
+  const [breakdownInsights, percentChangeInsights] = await Promise.all([
+    // Get time series data with breakdown=true
+    getCampaignInsights(campaignId, {
+      ...dateParams,
+      time_increment: 1,
+      breakdown: true,
+      include_percent_change: false
+    }),
+    
+    // Get aggregated data with percentage changes
+    getCampaignInsights(campaignId, {
+      ...dateParams,
+      breakdown: false,
+      include_percent_change: true
+    })
+  ]);
+
+  // Return both datasets
+  return {
+    timeSeriesData: breakdownInsights || [],
+    percentChangeData: percentChangeInsights?.[0] || {}
+  };
+};
 export const getCampaignInsights = async (
   campaignId: string,
   params?: InsightParams

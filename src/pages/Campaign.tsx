@@ -245,18 +245,17 @@
 
 
 
-
 "use client"
 
 import { useState, useEffect } from "react"
 import { useParams, useNavigate } from "react-router-dom"
 import { useQuery } from "@tanstack/react-query"
-import { getCampaignInsights, getAdSets, getCampaignCreatives } from "@/services/api"
+import { getAdSets, getCampaignCreatives, getCombinedCampaignInsights } from "@/services/api"
 import { toast } from "sonner"
 import { MetricsGrid } from "@/components/dashboard/MetricsGrid"
 import { ChartsGrid } from "@/components/dashboard/ChartsGrid"
-import { CreativeThumbnails } from "../components/dashboard/CreativeThumbnails" // Import CreativeThumbnails
-import { VideoPlayerModal } from "../components/creatives/VideoPlayerModal" // Import VideoPlayerModal
+import { CreativeThumbnails } from "@/components/dashboard/CreativeThumbnails"
+import { VideoPlayerModal } from "../components/creatives/VideoPlayerModal"
 import type { DateRange, CreativeItem } from "@/types/api"
 import { DateRangeFilter } from "@/components/DateRangeFilter"
 import { Button } from "@/components/ui/button"
@@ -312,37 +311,27 @@ const Campaign = () => {
     sessionStorage.setItem("campaignShowDemographics", JSON.stringify(showDemographics))
   }, [showDemographics])
 
-  // Get campaign insights (time series)
-  const { data: timeSeriesInsights, isLoading: insightsLoading } = useQuery({
-    queryKey: ["campaignInsights", id, dateRange, "timeSeries", showDemographics],
+  // Get combined campaign insights (time series and percentage changes)
+  const { 
+    data: combinedInsights, 
+    isLoading: insightsLoading 
+  } = useQuery({
+    queryKey: ["combinedCampaignInsights", id, dateRange],
     queryFn: async () => {
-      if (!id || !dateRange?.from || !dateRange?.to) return []
-      return getCampaignInsights(id, {
-        since: dateRange.from.toISOString().split("T")[0],
-        until: dateRange.to.toISOString().split("T")[0],
-        time_increment: 1,
-        // breakdown: showDemographics,
-        breakdown: true,
-      })
+      if (!id || !dateRange?.from || !dateRange?.to) return { timeSeriesData: [], percentChangeData: {} };
+      
+      return getCombinedCampaignInsights(
+        id,
+        { from: dateRange.from, to: dateRange.to }
+      );
     },
+    enabled: !!id && !!dateRange?.from && !!dateRange?.to,
     meta: {
       onError: () => {
         toast.error("Failed to fetch campaign insights")
       },
-    },
-  })
-
-  // Get aggregated insights
-  const { data: aggregatedInsights } = useQuery({
-    queryKey: ["campaignInsights", id, dateRange, "aggregated"],
-    queryFn: async () => {
-      if (!id || !dateRange?.from || !dateRange?.to) return []
-      return getCampaignInsights(id, {
-        since: dateRange.from.toISOString().split("T")[0],
-        until: dateRange.to.toISOString().split("T")[0],
-      })
-    },
-  })
+    }
+  });
 
   // Get campaign creatives
   const { 
@@ -359,27 +348,12 @@ const Campaign = () => {
         toast.error("Failed to fetch campaign creatives")
       },
     },
-  })
+  });
 
-  // Get ad sets
-  const {
-    data: adSets = [],
-    isLoading: adSetsLoading,
-    isError: adSetsError,
-  } = useQuery({
-    queryKey: ["adSets", id],
-    queryFn: () => getAdSets(id!),
-    enabled: !!id,
-    meta: {
-      onError: (error: any) => {
-        console.error("Ad Sets Error:", error)
-        toast.error("Failed to fetch ad sets")
-      },
-    },
-  })
+  
 
-  const aggregatedMetrics = aggregatedInsights?.[0] || {}
-  const latestData = timeSeriesInsights?.[timeSeriesInsights.length - 1] || {}
+  const timeSeriesInsights = combinedInsights?.timeSeriesData || [];
+  const aggregatedMetrics = combinedInsights?.percentChangeData || {};
 
   return (
     <div className="min-h-screen bg-white">
@@ -424,23 +398,17 @@ const Campaign = () => {
           </CardHeader>
         </Card>
 
+        
 
         {/* Metrics and Insights Section */}
         {dateRange && (
           <>
             <MetricsGrid
               aggregatedMetrics={aggregatedMetrics}
-              // latestReach={Number.parseInt(latestData.reach || "0")}
-              // latestFrequency={latestData.frequency || "0"}
             />
-            <ChartsGrid 
-              timeSeriesInsights={timeSeriesInsights || []} 
-              title="Campaign Analytics" 
-            />
-          </>
-        )}
-{/* Campaign Creatives Section */}
-<Card className="mb-8 overflow-hidden bg-white dark:bg-gray-800 rounded-xl shadow-lg">
+
+            {/* Campaign Creatives Section */}
+        <Card className="mb-8 overflow-hidden bg-white dark:bg-gray-800 rounded-xl shadow-lg">
           <CardHeader className="bg-teal-500 dark:bg-teal-800 p-4">
             <CardTitle className="text-lg font-semibold text-white flex items-center gap-2">
               <Film className="h-5 w-5" />
@@ -504,8 +472,15 @@ const Campaign = () => {
             )}
           </CardContent>
         </Card>
+            <ChartsGrid 
+              timeSeriesInsights={timeSeriesInsights || []} 
+              title="Campaign Analytics" 
+            />
+          </>
+        )}
+
         {/* Loading Spinner */}
-        {insightsLoading && (
+        {(insightsLoading || creativesLoading) && (
           <div className="flex items-center justify-center p-8">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-500"></div>
           </div>

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { getAdAccountInsights, getCampaignInsights } from "@/services/api";
+import { getCampaignInsights, getCombinedAdAccountInsights } from "@/services/api";
 import { toast } from "sonner";
 import type { DateRange, InsightParams } from "@/types/api";
 import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
@@ -9,17 +9,15 @@ import { MetricsGrid } from "@/components/dashboard/MetricsGrid";
 import { ChartsGrid } from "@/components/dashboard/ChartsGrid";
 import { useAdAccounts } from "@/hooks/useAdAccounts";
 import { useCampaigns } from "@/hooks/useCampaigns";
-import { useCampaignCreatives } from "@/hooks/useCampaignCreatives"; // Import the new hook
+import { useCampaignCreatives } from "@/hooks/useCampaignCreatives";
 import { Switch } from "@/components/ui/switch";
-import { motion } from "framer-motion"
-import { getCombinedAdAccountInsights } from "@/services/api";
-
+import { motion } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Sparkles, TrendingUp, Eye, MousePointerClick, DollarSign, ChevronDown, Film } from "lucide-react"
 import { Label } from "@/components/ui/label";
 import { useNavigate } from "react-router-dom";
-import { CreativeThumbnails } from "../components/dashboard/CreativeThumbnails"; // Import the new component
+import { CreativeThumbnails } from "@/components/dashboard/CreativeThumbnails";
 import {
   Table,
   TableBody,
@@ -75,32 +73,7 @@ const Index = () => {
         icon: "🎯",
       });
     }
-  }, [accounts, selectedAccount])
-
-  // Auto-select first account if none selected
-  useEffect(() => {
-    if (!selectedAccount) return;
-
-    // If dateRange is undefined, we fetch all data
-    const params: InsightParams = {
-      time_increment: 1,
-      breakdown: true,
-    };
-
-    if (dateRange?.from && dateRange?.to) {
-      params.since = dateRange.from.toISOString().split('T')[0];
-      params.until = dateRange.to.toISOString().split('T')[0];
-    }
-
-    // Fetch data with or without date range
-    getAdAccountInsights(selectedAccount, params)
-      .then(data => {
-        // Process data
-      })
-      .catch(error => {
-        toast.error("Failed to fetch insights");
-      });
-  }, [selectedAccount, dateRange]);
+  }, [accounts, selectedAccount]);
   
   // Improved date range handling
   useEffect(() => {
@@ -126,58 +99,23 @@ const Index = () => {
     }
   }, []);
 
-  // Fetch insights when account is selected
-  useEffect(() => {
-    if (!selectedAccount) return;
-
-    const params: InsightParams = {
-      time_increment: 1,
-      breakdown: true,
-    };
-
-    if (dateRange?.from && dateRange?.to) {
-      params.since = dateRange.from.toISOString().split('T')[0];
-      params.until = dateRange.to.toISOString().split('T')[0];
-    }
-
-    getAdAccountInsights(selectedAccount, params)
-      .then(data => {
-        // Process data
-      })
-      .catch(error => {
-        toast.error("Failed to fetch insights");
-      });
-  }, [selectedAccount, dateRange]);
-
-  // Load selected account and filters from sessionStorage on page load
-  useEffect(() => {
-    const storedAccount = sessionStorage.getItem("selectedAccount");
-    if (storedAccount) {
-      setSelectedAccount(storedAccount);
-    }
-  }, []);
-
-  // Get insights with time increment for time series
-  const { data: timeSeriesInsights, isLoading: timeSeriesLoading } = useQuery({
-    queryKey: ["insights", selectedAccount, dateRange, "timeSeries"],
+  // Get combined insights (time series and percentage changes)
+  const { 
+    data: combinedInsights, 
+    isLoading: insightsLoading 
+  } = useQuery({
+    queryKey: ["combinedInsights", selectedAccount, dateRange],
     queryFn: async () => {
-      if (!dateRange?.from || !dateRange?.to || !selectedAccount) return [];
-      
-      const params = {
-        since: dateRange.from.toISOString().split('T')[0],
-        until: dateRange.to.toISOString().split('T')[0],
-        time_increment: 1,
-        breakdown: true,
-      };
-
-      try {
-        const response = await getAdAccountInsights(selectedAccount, params);
-        return response;
-      } catch (error) {
-        console.error('Error fetching insights:', error);
-        return [];
+      if (!selectedAccount || !dateRange?.from || !dateRange?.to) {
+        return { timeSeriesData: [], percentChangeData: {} };
       }
+      
+      return getCombinedAdAccountInsights(
+        selectedAccount,
+        { from: dateRange.from, to: dateRange.to }
+      );
     },
+    enabled: !!selectedAccount && !!dateRange?.from && !!dateRange?.to,
     refetchOnWindowFocus: false
   });
 
@@ -200,38 +138,17 @@ const Index = () => {
     enabled: !!campaigns.length && !!dateRange?.from && !!dateRange?.to
   });
 
-  // Get aggregated insights for metrics
-  const { data: aggregatedInsights, isLoading: aggregatedLoading } = useQuery({
-    queryKey: ["insights", selectedAccount, dateRange, "aggregated"],
-    queryFn: async () => {
-      if (dateRange?.from && dateRange?.to) {
-        const params = {
-          since: dateRange.from.toISOString().split('T')[0],
-          until: dateRange.to.toISOString().split('T')[0],
-          breakdown: false,
-        };
-        
-        if (selectedAccount) {
-          return getAdAccountInsights(selectedAccount, params);
-        }
-      }
-      return [];
-    },
-    meta: {
-      onError: () => {
-        toast.error("Failed to fetch aggregated insights");
-      }
-    }
-  });
-
-  const aggregatedMetrics = aggregatedInsights?.[0] || {
+  // Extract data from combined insights
+  const timeSeriesInsights = combinedInsights?.timeSeriesData || [];
+  const aggregatedMetrics = combinedInsights?.percentChangeData || {
     impressions: "0",
     reach: "0",
     clicks: "0",
     spend: "0",
     ctr: "0",
-    cpm:"0",
-    cpc:"0"
+    cpm: "0",
+    cpc: "0",
+    frequency: "0"
   };
 
   // Calculate latest reach and frequency
@@ -240,7 +157,7 @@ const Index = () => {
     : 0;
 
   const latestFrequency = timeSeriesInsights?.length 
-    ? (parseInt(timeSeriesInsights[timeSeriesInsights.length - 1].frequency) || 0).toFixed(2)
+    ? (parseFloat(timeSeriesInsights[timeSeriesInsights.length - 1].frequency) || 0).toFixed(2)
     : "0";
 
   const getStatusBadgeClass = (status: string) => {
@@ -558,7 +475,7 @@ const Index = () => {
         )}
 
         {/* Loading State */}
-        {(timeSeriesLoading || aggregatedLoading || creativesLoading) && (
+        {(insightsLoading || creativesLoading) && (
           <div className="flex items-center justify-center p-10">
             <div className="animate-spin rounded-full h-10 w-10 border-4 border-primary"></div>
           </div>
