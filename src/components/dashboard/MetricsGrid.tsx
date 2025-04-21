@@ -169,6 +169,10 @@ export function MetricsGrid({
   )
 }
 
+
+
+// with charts
+
 // import { DollarSign, Eye, MousePointer, BarChart2, CircleDollarSign, PieChart, Users, Repeat } from "lucide-react"
 // import { MetricCard } from "../MetricCard"
 
