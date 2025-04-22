@@ -39,7 +39,7 @@ const Index = () => {
   const navigate = useNavigate();
   const [selectedAccount, setSelectedAccount] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState<number>();
-  const [campaignStatusFilter, setCampaignStatusFilter] = useState<string>();
+  const [campaignStatusFilter, setCampaignStatusFilter] = useState<string>(CAMPAIGN_STATUS.ACTIVE);
   const [objectiveFilter, setObjectiveFilter] = useState<string>();
   const [showAllRows, setShowAllRows] = useState(false);
 
