@@ -184,12 +184,12 @@ export const getCampaignsWithCreatives = async (
   adAccountId: string,
   params?: { active_only?: boolean }
 ) => {
-  const response = await url_API.get(`/adaccounts/${adAccountId}/campaigns-with-creatives`, { params });
+  const response = await api.get(`/adaccounts/${adAccountId}/campaigns-with-creatives`, { params });
   return response.data;
 };
 
 
 export const getCampaignCreatives = async (campaignId: string) => {
-  const response = await url_API.get(`/campaigns/${campaignId}/creatives`);
+  const response = await api.get(`/campaigns/${campaignId}/creatives`);
   return response.data;
 };
