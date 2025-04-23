@@ -406,6 +406,7 @@ const Campaign = () => {
             <MetricsGrid
               aggregatedMetrics={aggregatedMetrics}
               timeSeriesInsights={timeSeriesInsights}
+              showCharts={false}
 
             />
 

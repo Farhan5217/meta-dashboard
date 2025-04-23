@@ -71,12 +71,11 @@ export const VideoPlayerModal: React.FC<VideoPlayerModalProps> = ({
       <DialogContent className="sm:max-w-2xl">
         <DialogHeader className="flex flex-row items-center justify-between">
           <DialogTitle className="text-lg font-medium">{title || "Creative Preview"}</DialogTitle>
-          <button
+          {/* <button
             onClick={onClose}
             className="rounded-full p-1 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
           >
-            
-          </button>
+          </button> */}
         </DialogHeader>
         <div className="relative w-full">
           {videoUrl ? (
@@ -91,7 +90,7 @@ export const VideoPlayerModal: React.FC<VideoPlayerModalProps> = ({
             </div>
           ) : imageUrl ? (
             // If only image URL is available, show the image
-            <div className="flex justify-center">
+            <div className="flex justify-center h-[20vh]">
               <img
                 src={imageUrl}
                 alt={title || "Creative Preview"}
