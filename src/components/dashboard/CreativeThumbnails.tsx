@@ -134,7 +134,7 @@ interface CreativeThumbnailsProps {
 
 export const CreativeThumbnails: React.FC<CreativeThumbnailsProps> = ({
   creatives,
-  itemsPerPage = 2,
+  itemsPerPage = 1,
 }) => {
   const [currentPage, setCurrentPage] = useState(0);
   const [selectedCreative, setSelectedCreative] = useState<CreativeItem | null>(null);
@@ -177,7 +177,7 @@ export const CreativeThumbnails: React.FC<CreativeThumbnailsProps> = ({
             className="relative group cursor-pointer"
             onClick={() => handleThumbnailClick(creative)}
           >
-            <div className="w-14 h-14 md:w-16 md:h-16 rounded-md bg-gray-100 overflow-hidden border border-gray-200">
+            <div className="w-14 h-14 md:w-14 md:h-14 rounded-md bg-gray-100 overflow-hidden border border-gray-200">
               {creative.preview_url ? (
                 <img
                   src={creative.preview_url}
