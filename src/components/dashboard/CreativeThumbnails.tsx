@@ -170,14 +170,14 @@ export const CreativeThumbnails: React.FC<CreativeThumbnailsProps> = ({
 
   return (
     <div className="flex flex-col items-center">
-      <div className="flex items-center space-x-2 my-1">
+      <div className="flex items-center space-x-2 my-1 mt-2">
         {visibleCreatives.map((creative, index) => (
           <div
             key={creative.creative_id}
             className="relative group cursor-pointer"
             onClick={() => handleThumbnailClick(creative)}
           >
-            <div className="w-14 h-14 md:w-14 md:h-14 rounded-md bg-gray-100 overflow-hidden border border-gray-200">
+            <div className="w-14 h-14 md:w-14 md:h-14 rounded-md bg-gray-100 overflow-hidden border border-gray-200 ">
               {creative.preview_url ? (
                 <img
                   src={creative.preview_url}
@@ -215,7 +215,7 @@ export const CreativeThumbnails: React.FC<CreativeThumbnailsProps> = ({
                 : "text-gray-600 hover:bg-gray-100"
             }`}
           >
-            <ChevronLeft className="h-4 w-4" />
+            <ChevronLeft className="h-3 w-3" />
           </button>
           <span className="text-xs text-gray-500">
             {currentPage + 1} / {totalPages}
@@ -229,7 +229,7 @@ export const CreativeThumbnails: React.FC<CreativeThumbnailsProps> = ({
                 : "text-gray-600 hover:bg-gray-100"
             }`}
           >
-            <ChevronRight className="h-4 w-4" />
+            <ChevronRight className="h-3 w-3" />
           </button>
         </div>
       )}
