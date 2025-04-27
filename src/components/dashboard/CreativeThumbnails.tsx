@@ -170,7 +170,7 @@ export const CreativeThumbnails: React.FC<CreativeThumbnailsProps> = ({
 
   return (
     <div className="flex flex-col items-center">
-      <div className="flex items-center space-x-2 my-1 mt-2">
+      <div className="flex items-center space-x-2  mt-2">
         {visibleCreatives.map((creative, index) => (
           <div
             key={creative.creative_id}
