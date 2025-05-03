@@ -2,9 +2,10 @@ import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { getCampaignInsights, getCombinedAdAccountInsights } from "@/services/api";
 import { toast } from "sonner";
-import type { DateRange, InsightParams } from "@/types/api";
+import type { ActionValue, DateRange, InsightParams } from "@/types/api";
 import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
 import { Button } from "@/components/ui/button";
+import { LeadMetric } from "../components/LeadMetric"; 
 import { MetricsGrid } from "@/components/dashboard/MetricsGrid";
 import { ChartsGrid } from "@/components/dashboard/ChartsGrid";
 import { useAdAccounts } from "@/hooks/useAdAccounts";
@@ -42,6 +43,9 @@ const Index = () => {
   const [campaignStatusFilter, setCampaignStatusFilter] = useState<string>(CAMPAIGN_STATUS.ACTIVE);
   const [objectiveFilter, setObjectiveFilter] = useState<string>();
   const [showAllRows, setShowAllRows] = useState(false);
+  const [leadCount, setLeadCount] = useState(0);
+
+
 
   const [dateRange, setDateRange] = useState<DateRange>(() => {
     const today = new Date();
@@ -99,6 +103,8 @@ const Index = () => {
     }
   }, []);
 
+
+
   // Get combined insights (time series and percentage changes)
   const { 
     data: combinedInsights, 
@@ -118,6 +124,22 @@ const Index = () => {
     enabled: !!selectedAccount && !!dateRange?.from && !!dateRange?.to,
     refetchOnWindowFocus: false
   });
+
+  useEffect(() => {
+    if (combinedInsights?.percentChangeData?.actions) {
+      const leadAction = combinedInsights.percentChangeData.actions.find(
+        (action: ActionValue) => action.action_type === 'lead'
+      );
+      
+      if (leadAction) {
+        setLeadCount(parseInt(leadAction.value));
+      } else {
+        setLeadCount(0);
+      }
+    } else {
+      setLeadCount(0);
+    }
+  }, [combinedInsights]);
 
   // Get campaign insights for the table
   const { data: campaignInsights = {} } = useQuery({
@@ -192,53 +214,64 @@ const Index = () => {
       <div className="container mx-auto px-6 py-10">
         {/* Filters Section */}
         <div className="flex flex-wrap items-center gap-6 mb-8">
-          <div className="flex flex-col sm:flex-row items-center justify-between w-full">
-            {/* Left Section: Account Status + Dropdown */}
-            <div className="flex items-center gap-2 sm:gap-4">
-              <Label
-                htmlFor="account-filter"
-                className="text-sm font-medium text-gray-700 dark:text-gray-300"
-              >
-                Account Status:
-              </Label>
-              <div className="relative w-full sm:w-auto">
-                <select
-                  id="account-filter"
-                  className="w-full sm:w-[200px] border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2 text-sm bg-white dark:bg-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-primary focus:border-primary outline-none appearance-none pr-8"
-                  value={statusFilter?.toString() || ""}
-                  onChange={(e) => {
-                    setStatusFilter(e.target.value ? Number(e.target.value) : undefined);
-                    setSelectedAccount(undefined);
-                  }}
-                >
-                  <option value="">All</option>
-                  <option value={AD_ACCOUNT_STATUS.ACTIVE}>Active</option>
-                  <option value={AD_ACCOUNT_STATUS.INACTIVE}>Inactive</option>
-                </select>
-                {/* Custom arrow styling */}
-                <div className="absolute top-1/2 right-4 transform -translate-y-1/2 pointer-events-none">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="text-gray-400 dark:text-gray-200" viewBox="0 0 16 16">
-                    <path d="M4.293 5.293a1 1 0 0 1 1.414 0L8 7.586l2.293-2.293a1 1 0 1 1 1.414 1.414l-3 3a1 1 0 0 1-1.414 0l-3-3a1 1 0 0 1 0-1.414z"/>
-                  </svg>
-                </div>
-              </div>
-            </div>
-
-            {/* Right Section: Enhanced Insights Button */}
-            {selectedAccount && (
-              <Button 
-                variant="outline" 
-                className="bg-teal-500 hover:bg-teal-600 text-white border-none flex items-center gap-2 shadow-sm"
-                onClick={() => navigate(`/enhanced-insights/${selectedAccount}`)}
-              >
-                Placement/Actions
-              </Button>
-            )}
+  <div className="flex flex-col sm:flex-row justify-between w-full items-start sm:items-center">
+    
+    {/* Left Section: Dropdown + Lead Metric */}
+    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+      {/* Dropdown */}
+      <div className="flex items-center gap-2 sm:gap-4">
+        <Label
+          htmlFor="account-filter"
+          className="text-sm font-medium text-gray-700 dark:text-gray-300"
+        >
+          Account Status:
+        </Label>
+        <div className="relative w-full sm:w-auto">
+          <select
+            id="account-filter"
+            className="w-full sm:w-[200px] border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2 text-sm bg-white dark:bg-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-primary focus:border-primary outline-none appearance-none pr-8"
+            value={statusFilter?.toString() || ""}
+            onChange={(e) => {
+              setStatusFilter(e.target.value ? Number(e.target.value) : undefined);
+              setSelectedAccount(undefined);
+            }}
+          >
+            <option value="">All</option>
+            <option value={AD_ACCOUNT_STATUS.ACTIVE}>Active</option>
+            <option value={AD_ACCOUNT_STATUS.INACTIVE}>Inactive</option>
+          </select>
+          <div className="absolute top-1/2 right-4 transform -translate-y-1/2 pointer-events-none">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="text-gray-400 dark:text-gray-200" viewBox="0 0 16 16">
+              <path d="M4.293 5.293a1 1 0 0 1 1.414 0L8 7.586l2.293-2.293a1 1 0 1 1 1.414 1.414l-3 3a1 1 0 0 1-1.414 0l-3-3a1 1 0 0 1 0-1.414z"/>
+            </svg>
           </div>
         </div>
+      </div>
+
+      {/* Lead Metric (next to dropdown) */}
+      <LeadMetric 
+        leadCount={leadCount}
+        isLoading={insightsLoading}
+      />
+    </div>
+
+    {/* Right Section: Enhanced Insights Button */}
+    {selectedAccount && (
+      <Button 
+        variant="outline" 
+        className="bg-teal-500 hover:bg-teal-600 text-white border-none flex items-center gap-2 shadow-sm mt-4 sm:mt-0"
+        onClick={() => navigate(`/enhanced-insights/${selectedAccount}`)}
+      >
+        Placement/Actions
+      </Button>
+    )}
+  </div>
+</div>
+
 
         {selectedAccount && (
           <>
+          
             {/* <MetricsGrid aggregatedMetrics={aggregatedMetrics} latestReach={latestReach} latestFrequency={latestFrequency} /> */}
             <MetricsGrid 
       aggregatedMetrics={aggregatedMetrics} 
@@ -530,57 +563,6 @@ const Index = () => {
       </motion.div>
     )}
     
-    {/* Summary cards for mobile and better visibility */}
-    {/* <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-4 bg-white border-t border-blue-200">
-      <div className="bg-teal-50 rounded-lg p-4 shadow-sm">
-        <div className="text-xs text-teal-700 font-medium mb-1 uppercase flex items-center">
-          <DollarSign className="h-3 w-3 mr-1" /> Total Spend
-        </div>
-        <div className="text-xl font-bold text-teal-900">
-          ${displayCampaigns.reduce((sum, campaign) => {
-            const insights = campaignInsights[campaign.id] || {};
-            return sum + Number.parseFloat(insights.spend || "0");
-          }, 0).toFixed(2)}
-        </div>
-      </div>
-      
-      <div className="bg-blue-50 rounded-lg p-4 shadow-sm">
-        <div className="text-xs text-blue-700 font-medium mb-1 uppercase flex items-center">
-          <Eye className="h-3 w-3 mr-1" /> Total Impressions
-        </div>
-        <div className="text-xl font-bold text-blue-900">
-          {displayCampaigns.reduce((sum, campaign) => {
-            const insights = campaignInsights[campaign.id] || {};
-            return sum + Number.parseInt(insights.impressions || "0");
-          }, 0).toLocaleString()}
-        </div>
-      </div>
-      
-      <div className="bg-indigo-50 rounded-lg p-4 shadow-sm">
-        <div className="text-xs text-indigo-700 font-medium mb-1 uppercase flex items-center">
-          <MousePointerClick className="h-3 w-3 mr-1" /> Total Clicks
-        </div>
-        <div className="text-xl font-bold text-indigo-900">
-          {displayCampaigns.reduce((sum, campaign) => {
-            const insights = campaignInsights[campaign.id] || {};
-            return sum + Number.parseInt(insights.clicks || "0");
-          }, 0).toLocaleString()}
-        </div>
-      </div>
-      
-      <div className="bg-cyan-50 rounded-lg p-4 shadow-sm">
-        <div className="text-xs text-cyan-700 font-medium mb-1 uppercase flex items-center">
-          <Repeat className="h-3 w-3 mr-1" /> Avg Frequency
-        </div>
-        <div className="text-xl font-bold text-cyan-900">
-          {displayCampaigns.length > 0 ? 
-            (displayCampaigns.reduce((sum, campaign) => {
-              const insights = campaignInsights[campaign.id] || {};
-              return sum + Number.parseFloat(insights.frequency || "0");
-            }, 0) / (displayCampaigns.length || 1)).toFixed(2) : "0"}
-        </div>
-      </div>
-    </div> */}
   </div>
 </CardContent>
               </Card>

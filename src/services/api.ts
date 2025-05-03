@@ -240,15 +240,18 @@ export const getAdAccountInsights = async (
 
 export const getCombinedAdAccountInsights = async (
   adAccountId: string,
-  dateRange: { from: Date; to: Date }
+  dateRange: { from: Date; to: Date  
+    include_actions?: boolean;
+  }
 ) => {
   // Prepare date parameters
   const dateParams = {
     since: dateRange.from.toISOString().split('T')[0],
     until: dateRange.to.toISOString().split('T')[0],
+    include_actions: dateRange.include_actions || false
   };
 
-  const cacheKey = `combined_${adAccountId}_${dateParams.since}_${dateParams.until}`;
+  const cacheKey = `combined_${adAccountId}_${dateParams.since}_${dateParams.until}_${dateParams.include_actions}`;
   
   return withCache('INSIGHT', cacheKey, async () => {
     // Make two separate API calls
@@ -258,14 +261,18 @@ export const getCombinedAdAccountInsights = async (
         ...dateParams,
         time_increment: 1,
         breakdown: true,
-        include_percent_change: false
+        include_percent_change: false,
+        include_actions: dateParams.include_actions
+
       }),
       
       // Get aggregated data with percentage changes
       getAdAccountInsights(adAccountId, {
         ...dateParams,
         breakdown: false,
-        include_percent_change: true
+        include_percent_change: true,
+        include_actions: dateParams.include_actions
+
       })
     ]);
 

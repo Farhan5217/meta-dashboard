@@ -67,6 +67,8 @@ export interface InsightData {
   gender?: string;
   campaign_name?: string;
   adset_name?: string;
+  actions?: ActionValue[];
+  cost_per_action_type?: ActionValue[];
 
   // Add percentage change fields
   impressions_pct_change?: number;
@@ -137,6 +139,14 @@ export interface InsightParams {
   include_percent_change?: boolean;
 
 }
+
+
+// Make sure ActionValue is defined
+export interface ActionValue {
+  action_type: string;
+  value: string;
+}
+
 
 export interface DeviceInsight {
   impressions: string;
