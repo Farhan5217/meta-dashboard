@@ -105,12 +105,12 @@ export function LeadMetric({
   return (
     <div
       className={cn(
-        "group inline-flex items-center space-x-4 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-6 py-3 rounded-full shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer",
+        "group inline-flex items-center space-x-4 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-6 py-3 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer",
         className
       )}
     >
       {/* Icon button */}
-      <div className="flex items-center justify-center bg-primary text-white rounded-full p-2 group-hover:scale-105 transition-transform">
+      <div className="flex items-center justify-center bg-teal-500 text-white rounded-full p-2 group-hover:scale-105 transition-transform">
         <UserPlus className="h-4 w-4" />
       </div>
 
