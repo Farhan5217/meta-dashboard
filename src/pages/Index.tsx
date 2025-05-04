@@ -213,13 +213,13 @@ const Index = () => {
 
       <div className="container mx-auto px-6 py-10">
         {/* Filters Section */}
-        <div className="flex flex-wrap items-center gap-6 mb-8">
+        <div className="flex flex-wrap items-center gap-6 mb-6">
   <div className="flex flex-col sm:flex-row justify-between w-full items-start sm:items-center">
     
     {/* Left Section: Dropdown + Lead Metric */}
     <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
       {/* Dropdown */}
-      <div className="flex items-center gap-2 sm:gap-4">
+      {/* <div className="flex items-center gap-2 sm:gap-4">
         <Label
           htmlFor="account-filter"
           className="text-sm font-medium text-gray-700 dark:text-gray-300"
@@ -246,7 +246,7 @@ const Index = () => {
             </svg>
           </div>
         </div>
-      </div>
+      </div> */}
 
       {/* Lead Metric (next to dropdown) */}
       <LeadMetric 

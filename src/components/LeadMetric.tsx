@@ -88,44 +88,108 @@ interface LeadMetricProps {
 //   )
 // }
 
-export function LeadMetric({ leadCount, previousLeadCount, isLoading = false, className }: LeadMetricProps) {
-    const percentChange =
-      previousLeadCount && previousLeadCount > 0 ? ((leadCount - previousLeadCount) / previousLeadCount) * 100 : null
-  
-    const isPositive = percentChange ? percentChange >= 0 : true
-  
-    return (
-      <div className={cn("flex items-center space-x-4", className)}>
-        <div className="bg-violet-50 text-violet-600 dark:bg-violet-900/20 dark:text-violet-400 p-3 rounded-full">
-          <UserPlus className="h-5 w-5" />
-        </div>
-  
-        <div>
-          <div className="flex items-center">
-            <h3 className="font-medium text-slate-800 dark:text-slate-200">Total Leads:</h3>
-            <span className="ml-2 text-lg font-medium ">
-              {isLoading ? (
-                <div className="h-6 w-12  animate-pulse rounded ml-1"></div>
-              ) : (
-                leadCount
-              )}
-            </span>
-  
-            {percentChange !== null && (
-              <div
-                className={cn(
-                  "flex items-center ml-3 px-2 py-1 rounded-md text-xs font-medium",
-                  isPositive
-                    ? "text-green-600 bg-green-50 dark:text-green-400 dark:bg-green-900/20"
-                    : "text-red-600 bg-red-50 dark:text-red-400 dark:bg-red-900/20",
-                )}
-              >
-                {isPositive ? <TrendingUp className="h-3 w-3 mr-1" /> : <TrendingDown className="h-3 w-3 mr-1" />}
-                <span>{Math.abs(Math.round(percentChange))}%</span>
-              </div>
-            )}
-          </div>
-        </div>
+
+export function LeadMetric({
+  leadCount,
+  previousLeadCount,
+  isLoading = false,
+  className,
+}: LeadMetricProps) {
+  const percentChange =
+    previousLeadCount && previousLeadCount > 0
+      ? ((leadCount - previousLeadCount) / previousLeadCount) * 100
+      : null;
+
+  const isPositive = percentChange ? percentChange >= 0 : true;
+
+  return (
+    <div
+      className={cn(
+        "group inline-flex items-center space-x-4 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-6 py-3 rounded-full shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer",
+        className
+      )}
+    >
+      {/* Icon button */}
+      <div className="flex items-center justify-center bg-primary text-white rounded-full p-2 group-hover:scale-105 transition-transform">
+        <UserPlus className="h-4 w-4" />
       </div>
-    )
-  }
+
+      {/* Label */}
+      <span className="text-sm font-medium text-slate-600 dark:text-slate-300">Total Leads</span>
+
+      {/* Lead Count */}
+      <span className="text-lg font-bold text-slate-900 dark:text-white">
+        {isLoading ? (
+          <div className="h-5 w-10 bg-slate-200 dark:bg-slate-700 rounded animate-pulse" />
+        ) : (
+          leadCount
+        )}
+      </span>
+
+      {/* Percentage Change */}
+      {percentChange !== null && (
+        <span
+          className={cn(
+            "inline-flex items-center text-xs font-semibold px-2 py-0.5 rounded-full",
+            isPositive
+              ? "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300"
+              : "bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300"
+          )}
+        >
+          {isPositive ? (
+            <TrendingUp className="h-3 w-3 mr-1" />
+          ) : (
+            <TrendingDown className="h-3 w-3 mr-1" />
+          )}
+          {Math.abs(Math.round(percentChange))}%
+        </span>
+      )}
+    </div>
+  );
+}
+
+
+
+
+
+// export function LeadMetric({ leadCount, previousLeadCount, isLoading = false, className }: LeadMetricProps) {
+//     const percentChange =
+//       previousLeadCount && previousLeadCount > 0 ? ((leadCount - previousLeadCount) / previousLeadCount) * 100 : null
+  
+//     const isPositive = percentChange ? percentChange >= 0 : true
+  
+//     return (
+//       <div className={cn("flex items-center space-x-4", className)}>
+//         <div className="bg-violet-50 text-violet-600 dark:bg-violet-900/20 dark:text-violet-400 p-3 rounded-full">
+//           <UserPlus className="h-5 w-5" />
+//         </div>
+  
+//         <div>
+//           <div className="flex items-center">
+//             <h3 className="font-medium text-slate-800 dark:text-slate-200">Total Leads:</h3>
+//             <span className="ml-2 text-lg font-medium ">
+//               {isLoading ? (
+//                 <div className="h-6 w-12  animate-pulse rounded ml-1"></div>
+//               ) : (
+//                 leadCount
+//               )}
+//             </span>
+  
+//             {percentChange !== null && (
+//               <div
+//                 className={cn(
+//                   "flex items-center ml-3 px-2 py-1 rounded-md text-xs font-medium",
+//                   isPositive
+//                     ? "text-green-600 bg-green-50 dark:text-green-400 dark:bg-green-900/20"
+//                     : "text-red-600 bg-red-50 dark:text-red-400 dark:bg-red-900/20",
+//                 )}
+//               >
+//                 {isPositive ? <TrendingUp className="h-3 w-3 mr-1" /> : <TrendingDown className="h-3 w-3 mr-1" />}
+//                 <span>{Math.abs(Math.round(percentChange))}%</span>
+//               </div>
+//             )}
+//           </div>
+//         </div>
+//       </div>
+//     )
+//   }
