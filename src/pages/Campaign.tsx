@@ -250,7 +250,7 @@
 import { useState, useEffect } from "react"
 import { useParams, useNavigate } from "react-router-dom"
 import { useQuery } from "@tanstack/react-query"
-import { getAdSets, getCampaignCreatives, getCombinedCampaignInsights } from "@/services/api"
+import {  getCampaignCreatives, getCombinedCampaignInsights } from "@/services/api"
 import { toast } from "sonner"
 import { MetricsGrid } from "@/components/dashboard/MetricsGrid"
 import { ChartsGrid } from "@/components/dashboard/ChartsGrid"

@@ -292,6 +292,18 @@ export const getCampaigns = async (adAccountId: string) => {
   });
 };
 
+export const getCampaignInsights = async (
+  campaignId: string,
+  params?: InsightParams
+) => {
+  const paramsKey = params ? JSON.stringify(params) : 'default';
+  return withCache('INSIGHT', `campaign_${campaignId}_${paramsKey}`, async () => {
+    const response = await api.get(`/campaigns/${campaignId}/insights`, { params });
+    return response.data;
+  });
+};
+
+
 export const getCombinedCampaignInsights = async (
   campaignId: string,
   dateRange: { from: Date; to: Date }
@@ -331,35 +343,25 @@ export const getCombinedCampaignInsights = async (
   });
 };
 
-export const getCampaignInsights = async (
-  campaignId: string,
-  params?: InsightParams
-) => {
-  const paramsKey = params ? JSON.stringify(params) : 'default';
-  return withCache('INSIGHT', `campaign_${campaignId}_${paramsKey}`, async () => {
-    const response = await api.get(`/campaigns/${campaignId}/insights`, { params });
-    return response.data;
-  });
-};
 
 // Ad Sets
-export const getAdSets = async (campaignId: string) => {
-  return withCache('ADSET', `list_${campaignId}`, async () => {
-    const response = await api.get(`/campaigns/${campaignId}/adsets`);
-    return response.data;
-  });
-};
+// export const getAdSets = async (campaignId: string) => {
+//   return withCache('ADSET', `list_${campaignId}`, async () => {
+//     const response = await api.get(`/campaigns/${campaignId}/adsets`);
+//     return response.data;
+//   });
+// };
 
-export const getAdSetInsights = async (
-  adSetId: string,
-  params?: InsightParams
-) => {
-  const paramsKey = params ? JSON.stringify(params) : 'default';
-  return withCache('INSIGHT', `adset_${adSetId}_${paramsKey}`, async () => {
-    const response = await api.get(`/adsets/${adSetId}/insights`, { params });
-    return response.data;
-  });
-};
+// export const getAdSetInsights = async (
+//   adSetId: string,
+//   params?: InsightParams
+// ) => {
+//   const paramsKey = params ? JSON.stringify(params) : 'default';
+//   return withCache('INSIGHT', `adset_${adSetId}_${paramsKey}`, async () => {
+//     const response = await api.get(`/adsets/${adSetId}/insights`, { params });
+//     return response.data;
+//   });
+// };
 
 // Enhanced Insights
 export const getEnhancedInsights = async (

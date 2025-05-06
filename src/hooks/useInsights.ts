@@ -4,7 +4,8 @@ import { getAdAccountInsights, getCampaignInsights, getAdSetInsights } from "@/s
 import type { InsightParams } from "@/types/api";
 
 export function useInsights(
-  type: "adAccount" | "campaign" | "adSet",
+  type: "adAccount" | "campaign" ,
+  // | "adSet",
   id?: string,
   params?: InsightParams
 ) {
@@ -16,8 +17,8 @@ export function useInsights(
         return getAdAccountInsights(id, params);
       case "campaign":
         return getCampaignInsights(id, params);
-      case "adSet":
-        return getAdSetInsights(id, params);
+      // case "adSet":
+      //   return getAdSetInsights(id, params);
       default:
         return null;
     }
