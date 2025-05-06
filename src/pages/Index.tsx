@@ -703,7 +703,7 @@ const Index = () => {
     }
   }, [])
 
- 
+  
 
   // Get combined insights (time series and percentage changes)
   const { data: combinedInsights, isLoading: insightsLoading } = useQuery({
@@ -718,8 +718,9 @@ const Index = () => {
     enabled: !!selectedAccount && !!dateRange?.from && !!dateRange?.to,
     refetchOnWindowFocus: false,
   })
- // Modify the useEffect that handles the page loading state to consider initial load
- useEffect(() => {
+
+// Modify the useEffect that handles the page loading state to consider initial load
+useEffect(() => {
   if (!initialLoadComplete) {
     if (insightsLoading || !selectedAccount || creativesLoading) {
       setIsPageLoading(true)
@@ -736,7 +737,7 @@ const Index = () => {
     setIsPageLoading(false)
   }
 }, [insightsLoading, selectedAccount, creativesLoading, initialLoadComplete])
- 
+
   useEffect(() => {
     if (combinedInsights?.percentChangeData?.actions) {
       const leadAction = combinedInsights.percentChangeData.actions.find(
