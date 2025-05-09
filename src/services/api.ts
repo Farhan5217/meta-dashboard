@@ -189,16 +189,33 @@ const CACHE_DURATION = {
   ACCOUNT: 4 * 60 * 60 * 1000,  // 4 hours for account data
   CAMPAIGN: 2 * 60 * 60 * 1000, // 2 hours for campaign data
   ADSET: 2 * 60 * 60 * 1000,    // 2 hours for ad set data
-  CREATIVE: 24 * 60 * 60 * 1000, // 24 hours for creative data
-  INSIGHT: 30 * 60 * 1000       // 30 minutes for insight data (changes more frequently)
+  CREATIVE: 2 * 60 * 60 * 1000, // 2 hours for creative data (reduced from 24 hours)
+  INSIGHT: 30 * 60 * 1000       // 30 minutes for insight data
 };
 
-// Generic caching wrapper function
+// Separate shorter cache duration for empty creative results
+const EMPTY_CREATIVE_CACHE_DURATION = 5 * 60 * 1000; // 5 minutes for empty creative results
+
+// Generic caching wrapper function with improved empty result handling
 const withCache = async (cacheType, cacheKey, fetchFn) => {
   const fullCacheKey = `${cacheType}_${cacheKey}`;
   const cachedItem = apiCache.get(fullCacheKey);
   
-  if (cachedItem && (Date.now() - cachedItem.timestamp) < CACHE_DURATION[cacheType]) {
+  // For creatives, check if we have an empty result and use shorter cache duration
+  if (cachedItem && cacheType === 'CREATIVE') {
+    const isEmptyCreativeResult = Array.isArray(cachedItem.data) && 
+                                 cachedItem.data.length === 0 || 
+                                 (cachedItem.data && Object.keys(cachedItem.data).length === 0);
+    
+    const cacheDuration = isEmptyCreativeResult ? 
+                         EMPTY_CREATIVE_CACHE_DURATION : 
+                         CACHE_DURATION[cacheType];
+                         
+    if ((Date.now() - cachedItem.timestamp) < cacheDuration) {
+      console.log(`Using cached ${cacheType} data for ${cacheKey}${isEmptyCreativeResult ? ' (empty result)' : ''}`);
+      return cachedItem.data;
+    }
+  } else if (cachedItem && (Date.now() - cachedItem.timestamp) < CACHE_DURATION[cacheType]) {
     console.log(`Using cached ${cacheType} data for ${cacheKey}`);
     return cachedItem.data;
   }
@@ -207,15 +224,38 @@ const withCache = async (cacheType, cacheKey, fetchFn) => {
     console.log(`Fetching ${cacheType} data for ${cacheKey}`);
     const data = await fetchFn();
     
-    apiCache.set(fullCacheKey, {
-      data,
-      timestamp: Date.now()
-    });
+    // For creatives, add a flag to indicate if the result was empty
+    if (cacheType === 'CREATIVE') {
+      const isEmptyCreativeResult = Array.isArray(data) && 
+                                    data.length === 0 || 
+                                    (data && Object.keys(data).length === 0);
+      apiCache.set(fullCacheKey, {
+        data,
+        timestamp: Date.now(),
+        isEmptyCreativeResult
+      });
+    } else {
+      apiCache.set(fullCacheKey, {
+        data,
+        timestamp: Date.now()
+      });
+    }
     
     return data;
   } catch (error) {
     console.error(`Error fetching ${cacheType} data for ${cacheKey}:`, error);
-    return cacheType === 'CREATIVE' ? [] : null; // Return empty array for creatives, null for others
+    
+    // For errors with creatives, use a very short cache time
+    if (cacheType === 'CREATIVE') {
+      apiCache.set(fullCacheKey, {
+        data: [],
+        timestamp: Date.now(),
+        isEmptyCreativeResult: true,
+        isError: true
+      });
+    }
+    
+    return cacheType === 'CREATIVE' ? [] : null; 
   }
 };
 
@@ -402,14 +442,59 @@ export const getDeviceInsights = async (
 // Campaigns with Creatives
 export const getCampaignsWithCreatives = async (
   adAccountId: string,
-  params?: { active_only?: boolean }
+  params: { active_only?: boolean } = { active_only: true },
+  options?: { retries?: number; timeout?: number }
 ) => {
   const paramsKey = params ? JSON.stringify(params) : 'default';
-  return withCache('CREATIVE', `campaigns_with_creatives_${adAccountId}_${paramsKey}`, async () => {
-    const response = await api.get(`/adaccounts/${adAccountId}/campaigns-with-creatives`, { params });
-    return response.data;
-  });
+
+  return withCache(
+    'CREATIVE',
+    `campaigns_with_creatives_${adAccountId}_${paramsKey}`,
+    async () => {
+      const MAX_RETRIES = options?.retries ?? 2;
+      const TIMEOUT = options?.timeout ?? 15000;
+
+      let attempts = 0;
+      let lastError;
+
+      while (attempts <= MAX_RETRIES) {
+        try {
+          const response = await api.get(
+            `/adaccounts/${adAccountId}/campaigns-with-creatives`,
+            {
+              params,
+              timeout: TIMEOUT,
+            }
+          );
+
+          const campaigns = response.data;
+
+          return campaigns.map((campaign: any) => ({
+            ...campaign,
+            creatives: Array.isArray(campaign.creatives) ? campaign.creatives : [],
+          }));
+        } catch (error) {
+          console.error(
+            `Error fetching creatives (attempt ${attempts + 1}/${MAX_RETRIES + 1}):`,
+            error
+          );
+          lastError = error;
+          attempts++;
+
+          if (attempts <= MAX_RETRIES) {
+            await new Promise((resolve) =>
+              setTimeout(resolve, 1000 * Math.pow(2, attempts - 1))
+            );
+          }
+        }
+      }
+
+      throw lastError;
+    }
+  );
 };
+
+
 
 // Campaign Creatives
 export const getCampaignCreatives = async (campaignId: string) => {
