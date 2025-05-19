@@ -1,6 +1,6 @@
 
 import { useQuery } from "@tanstack/react-query";
-import { getAdAccountInsights, getCampaignInsights, getAdSetInsights } from "@/services/api";
+import { getAdAccountInsights, getCampaignInsights } from "@/services/api";
 import type { InsightParams } from "@/types/api";
 
 export function useInsights(

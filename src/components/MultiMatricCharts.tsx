@@ -210,181 +210,78 @@ export function MultiMetricChart({ data, title, description, metrics }: MultiMet
         </div>
         
         {/* Chart - Now with properly working combo mode */}
-        <div className="h-[350px]">
-          <ResponsiveContainer width="100%" height="100%">
-            <ComposedChart
-              data={filteredData}
-              margin={{ top: 10, right: 30, left: 10, bottom: 10 }}
-            >
-              {showGrid && (
-                <CartesianGrid
-                  strokeDasharray="3 3"
-                  className="stroke-gray-200 dark:stroke-gray-700"
-                  vertical={false}
-                  opacity={0.5}
-                />
-              )}
+       <div className="h-[350px] flex items-center justify-center">
+  {filteredData.length > 0 ? (
+    <ResponsiveContainer width="100%" height="100%">
+      <ComposedChart
+        data={filteredData}
+        margin={{ top: 10, right: 30, left: 10, bottom: 10 }}
+      >
+        {showGrid && (
+          <CartesianGrid
+            strokeDasharray="3 3"
+            className="stroke-gray-200 dark:stroke-gray-700"
+            vertical={false}
+            opacity={0.5}
+          />
+        )}
+        <XAxis
+          dataKey="custom_label"
+          tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 12 }}
+          axisLine={{ stroke: "hsl(var(--border))" }}
+          tickLine={{ stroke: "hsl(var(--border))" }}
+          interval="preserveStartEnd"
+          padding={{ left: 10, right: 10 }}
+        />
+        <YAxis
+          tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 12 }}
+          axisLine={{ stroke: "hsl(var(--border))" }}
+          tickLine={{ stroke: "hsl(var(--border))" }}
+          tickFormatter={(value) => {
+            const activeKey = activeMetrics.length > 0
+              ? metrics.find(m => m.key === activeMetrics[0])?.key
+              : metrics[0]?.key;
+            return formatValue(value, activeKey || '');
+          }}
+          domain={[0, maxValue]}
+          width={60}
+        />
+        <Tooltip
+          contentStyle={{
+            backgroundColor: "white",
+            border: "1px solid hsl(var(--border))",
+            borderRadius: "8px",
+            padding: "10px",
+            boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)"
+          }}
+        />
+        {metrics.map((metric, index) => {
+          if (!activeMetrics.includes(metric.key)) return null;
+          const color = metric.color || colorPalette[index % colorPalette.length];
+          const type = getChartElementType(metric.key);
+          const sharedProps = {
+            key: metric.key,
+            dataKey: metric.key,
+            stroke: color,
+            fill: color,
+            strokeWidth: hoveredMetric === metric.key ? 3 : 2,
+            dot: showPoints,
+            isAnimationActive: true,
+          };
+          if (type === "line") return <Line {...sharedProps} type="monotone" />;
+          if (type === "area") return <Area {...sharedProps} type="monotone" fillOpacity={0.3} />;
+          if (type === "bar") return <Bar {...sharedProps} barSize={20} />;
+          return null;
+        })}
+      </ComposedChart>
+    </ResponsiveContainer>
+  ) : (
+    <p className="text-center text-gray-500 dark:text-gray-400 text-sm">
+      No data available
+    </p>
+  )}
+</div>
 
-              <XAxis
-                dataKey="custom_label"
-                tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 12 }}
-                axisLine={{ stroke: "hsl(var(--border))" }}
-                tickLine={{ stroke: "hsl(var(--border))" }}
-                interval="preserveStartEnd"
-                padding={{ left: 10, right: 10 }}
-              />
-
-              <YAxis
-                tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 12 }}
-                axisLine={{ stroke: "hsl(var(--border))" }}
-                tickLine={{ stroke: "hsl(var(--border))" }}
-                tickFormatter={(value) => {
-                  const activeKey = activeMetrics.length > 0 ? 
-                    metrics.find(m => m.key === activeMetrics[0])?.key : 
-                    metrics[0]?.key;
-                  return formatValue(value, activeKey || '');
-                }}
-                domain={[0, maxValue]}
-                width={60}
-              />
-
-              <Tooltip
-                contentStyle={{
-                  backgroundColor: "white",
-                  border: "1px solid hsl(var(--border))",
-                  borderRadius: "8px",
-                  padding: "10px",
-                  boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)"
-                }}
-                formatter={(value: any, name: string) => {
-                  const metric = metrics.find((m) => m.name === name);
-                  return [formatValue(value, metric?.key || ""), name];
-                }}
-              />
-
-              {/* Logic to determine chart element order for proper rendering in combo mode */}
-              {/* First render all bars to ensure they appear in the background */}
-              {chartType === "combo" && activeMetrics
-                .filter(key => getChartElementType(key) === "bar")
-                .map(key => {
-                  const metric = metrics.find(m => m.key === key)!;
-                  const index = metrics.findIndex(m => m.key === key);
-                  const color = metric.color || colorPalette[index % colorPalette.length];
-                  const isHighlighted = hoveredMetric === key;
-                  
-                  return (
-                    <Bar
-                      key={`bar-${key}`}
-                      dataKey={key}
-                      name={metric.name}
-                      fill={color}
-                      stroke={color}
-                      opacity={hoveredMetric && !isHighlighted ? 0.5 : 1}
-                      barSize={20}
-                      fillOpacity={0.7}
-                    />
-                  );
-                })
-              }
-              
-              {/* Then render all areas */}
-              {chartType === "combo" && activeMetrics
-                .filter(key => getChartElementType(key) === "area")
-                .map(key => {
-                  const metric = metrics.find(m => m.key === key)!;
-                  const index = metrics.findIndex(m => m.key === key);
-                  const color = metric.color || colorPalette[index % colorPalette.length];
-                  const isHighlighted = hoveredMetric === key;
-                  
-                  return (
-                    <Area
-                      key={`area-${key}`}
-                      dataKey={key}
-                      name={metric.name}
-                      fill={color}
-                      stroke={color}
-                      opacity={hoveredMetric && !isHighlighted ? 0.5 : 1}
-                      type="monotone"
-                      fillOpacity={0.4}
-                      strokeWidth={2}
-                      dot={showPoints ? { r: 3 } : false}
-                      activeDot={{ r: 5 }}
-                    />
-                  );
-                })
-              }
-              
-              {/* Finally render all lines to ensure they appear on top */}
-              {chartType === "combo" && activeMetrics
-                .filter(key => getChartElementType(key) === "line")
-                .map(key => {
-                  const metric = metrics.find(m => m.key === key)!;
-                  const index = metrics.findIndex(m => m.key === key);
-                  const color = metric.color || colorPalette[index % colorPalette.length];
-                  const isHighlighted = hoveredMetric === key;
-                  
-                  return (
-                    <Line
-                      key={`line-${key}`}
-                      dataKey={key}
-                      name={metric.name}
-                      stroke={color}
-                      fill="none"
-                      opacity={hoveredMetric && !isHighlighted ? 0.5 : 1}
-                      type="monotone"
-                      strokeWidth={isHighlighted ? 3 : 2}
-                      dot={showPoints ? { r: 3 } : false}
-                      activeDot={{ r: 5 }}
-                      connectNulls={true}
-                    />
-                  );
-                })
-              }
-              
-              {/* For non-combo charts, use a simpler rendering approach */}
-              {chartType !== "combo" && metrics.map((metric, index) => {
-                // Skip if not active
-                if (!activeMetrics.includes(metric.key)) return null;
-                
-                const color = metric.color || colorPalette[index % colorPalette.length];
-                const isHighlighted = hoveredMetric === metric.key;
-                
-                const commonProps = {
-                  key: metric.key,
-                  dataKey: metric.key,
-                  name: metric.name,
-                  fill: color,
-                  stroke: color,
-                  opacity: hoveredMetric && !isHighlighted ? 0.5 : 1,
-                };
-                
-                if (chartType === "area") {
-                  return (
-                    <Area
-                      {...commonProps}
-                      type="monotone"
-                      fillOpacity={0.4}
-                      strokeWidth={2}
-                      dot={showPoints ? { r: 3 } : false}
-                      activeDot={{ r: 5 }}
-                    />
-                  );
-                } else {
-                  return (
-                    <Line
-                      {...commonProps}
-                      type="monotone"
-                      strokeWidth={isHighlighted ? 3 : 2}
-                      dot={showPoints ? { r: 3 } : false}
-                      activeDot={{ r: 5 }}
-                      connectNulls={true}
-                    />
-                  );
-                }
-              })}
-            </ComposedChart>
-          </ResponsiveContainer>
-        </div>
       </CardContent>
     </Card>
   );

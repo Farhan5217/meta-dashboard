@@ -1,4 +1,7 @@
 import { useState, useEffect, useRef } from "react";
+
+import { X } from "lucide-react"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { getCampaignInsights, getCombinedAdAccountInsights } from "@/services/api";
 import { toast } from "sonner";
@@ -45,6 +48,8 @@ const Index = () => {
   const [objectiveFilter, setObjectiveFilter] = useState<string>();
   const [showAllRows, setShowAllRows] = useState(false);
   const [leadCount, setLeadCount] = useState(0);
+  const [showNoDataPopup, setShowNoDataPopup] = useState(false);
+
   
   // Track campaigns with missing creatives for refetching
   const campaignsWithoutCreativesRef = useRef(new Set());
@@ -59,6 +64,25 @@ const Index = () => {
       to: today
     };
   });
+
+const isEmptyMetrics = (metrics: any) => {
+  if (!metrics) return true;
+  
+  // Check if all numeric values are zero or empty strings
+  return [
+    metrics.impressions,
+    metrics.reach,
+    metrics.clicks,
+    metrics.spend,
+    metrics.ctr,
+    metrics.cpc,
+    metrics.cpm,
+    metrics.frequency
+  ].every(val => !val || val === "0" || val === "0.00" || val === "");
+};
+
+
+
 
   const { accounts } = useAdAccounts(statusFilter);
   const { campaigns } = useCampaigns(selectedAccount, campaignStatusFilter, objectiveFilter);
@@ -243,6 +267,16 @@ const Index = () => {
     }
   }
 
+
+useEffect(() => {
+  if (!insightsLoading && combinedInsights) {
+    // Only check if data is empty when loading has finished
+    const isEmpty = isEmptyMetrics(combinedInsights.percentChangeData);
+    setShowNoDataPopup(isEmpty);
+  }
+}, [insightsLoading, combinedInsights]);
+
+
   // Create a map of campaignId -> creatives for quick lookup
   const campaignCreativesMap = campaignsWithCreatives.reduce((acc, campaign) => {
     acc[campaign.id] = campaign.creatives || [];
@@ -425,95 +459,104 @@ const Index = () => {
                           </TableHead>
                         </TableRow>
                       </TableHeader>
-                      <TableBody>
-                        {displayCampaigns.map((campaign, index) => {
-                          const insights = campaignInsights[campaign.id] || {};
-                          const creatives = campaignCreativesMap[campaign.id] || [];
-                          const hasMissingCreatives = !creatives || creatives.length === 0;
-                          
-                          return (
-                            <motion.tr
-                              key={campaign.id}
-                              className="group cursor-pointer border-b border-blue-200 dark:border-blue-700 hover:bg-blue-50 dark:hover:bg-blue-800/50 transition-colors duration-200"
-                              onClick={() => navigate && navigate(`/campaign/${campaign.id}`)}
-                              whileHover={{ scale: 1.01 }}
-                              initial={{ opacity: 0, y: 5 }}
-                              animate={{ opacity: 1, y: 0 }}
-                              transition={{ type: "spring", stiffness: 300, delay: index * 0.03 }}
-                            >
-                              <TableCell className="py-3 px-4 align-middle h-16">
-                                <div className="font-medium text-blue-900 dark:text-blue-100">{campaign.name}</div>
-                              </TableCell>
-                              <TableCell className="py-3 px-4 align-middle h-16">
-                                <Badge variant="outline" className={`text-xs ${getStatusBadgeClass(campaign.status)}`}>
-                                  {campaign.status}
-                                </Badge>
-                              </TableCell>
-                              <TableCell className="py-3 px-4 text-blue-700 dark:text-blue-300 align-middle h-16">
-                                <div className="flex items-center gap-2">
-                                  <TrendingUp className="w-4 h-4" />
-                                  {campaign.objective.replace("OUTCOME_", "")}
-                                </div>
-                              </TableCell>
-                              <TableCell className="py-3 px-4 text-blue-700 dark:text-blue-300 align-middle h-16">
-                                <div className="flex items-center gap-2">
-                                  <DollarSign className="w-4 h-4" />
-                                  <span className="font-medium">${Number.parseFloat(insights.spend || "0").toFixed(2)}</span>
-                                </div>
-                              </TableCell>
-                              <TableCell className="py-3 px-4 text-blue-700 dark:text-blue-300 align-middle h-16">
-                                <div className="flex items-center gap-2">
-                                  <Repeat className="h-4 w-4" />
-                                  {Number.parseFloat(insights.frequency || "0").toFixed(2)}
-                                </div>
-                              </TableCell>
-                              <TableCell className="py-3 px-4 text-blue-700 dark:text-blue-300 align-middle h-16">
-                                <div className="flex items-center gap-2">
-                                  <Eye className="w-4 h-4" />
-                                  {Number.parseInt(insights.impressions || "0").toLocaleString()}
-                                </div>
-                              </TableCell>
-                              <TableCell className="py-3 px-4 text-blue-700 dark:text-blue-300 align-middle h-16">
-                                <div className="flex items-center gap-2">
-                                  <MousePointerClick className="w-4 h-4" />
-                                  {Number.parseInt(insights.clicks || "0").toLocaleString()}
-                                </div>
-                              </TableCell>
-                              <TableCell 
-                                className="py-3 px-4 text-blue-700 dark:text-blue-300 align-middle h-16"
-                                onClick={(e) => {
-                                  // Prevent navigation when clicking on creatives
-                                  e.stopPropagation();
-                                  
-                                  // Add click-to-refresh functionality for missing creatives
-                                  if (hasMissingCreatives && !creativesLoading && !refetchingMissingCreatives) {
-                                    handleRefetchMissingCreatives();
-                                  }
-                                }}
-                              >
-                                <div className="flex items-center justify-center h-16">
-                                  {creativesLoading || (hasMissingCreatives && refetchingMissingCreatives) ? (
-                                    <div className="flex items-center justify-center">
-                                      <div className="w-5 h-5 border-2 border-blue-300 border-t-blue-600 rounded-full animate-spin"></div>
-                                    </div>
-                                  ) : creatives.length > 0 ? (
-                                    <div className="flex justify-center">
-                                      <CreativeThumbnails creatives={creatives} />
-                                    </div>
-                                  ) : (
-                                    <div className="flex items-center gap-2 text-gray-400 cursor-pointer hover:text-blue-500 transition-colors duration-200" >
-                                      <Film className="w-4 h-4" />
-                                      <div><h5>Something went wrong</h5>
-                                      <h6>Please wait a few minutes before you try again.</h6>
-                                      </div>
-                                      {/* <RefreshCw className="w-3 h-3 ml-1" /> */}
-                                    </div>
-                                  )}
-                                </div>
-                              </TableCell>
-                            </motion.tr>
-                          );
-                        })}
+                     <TableBody>
+  {displayCampaigns.length === 0 ? (
+    <tr>
+      <td colSpan={8} className="text-center py-10 text-gray-500 text-sm">
+        No data available.
+      </td>
+    </tr>
+  ) : (
+    displayCampaigns.map((campaign, index) => {
+      const insights = campaignInsights[campaign.id] || {};
+      const creatives = campaignCreativesMap[campaign.id] || [];
+      const hasMissingCreatives = !creatives || creatives.length === 0;
+
+      return (
+        <motion.tr
+          key={campaign.id}
+          className="group cursor-pointer border-b border-blue-200 dark:border-blue-700 hover:bg-blue-50 dark:hover:bg-blue-800/50 transition-colors duration-200"
+          onClick={() => navigate && navigate(`/campaign/${campaign.id}`)}
+          whileHover={{ scale: 1.01 }}
+          initial={{ opacity: 0, y: 5 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ type: "spring", stiffness: 300, delay: index * 0.03 }}
+        >
+          <TableCell className="py-3 px-4 align-middle h-16">
+            <div className="font-medium text-blue-900 dark:text-blue-100">
+              {campaign.name}
+            </div>
+          </TableCell>
+          <TableCell className="py-3 px-4 align-middle h-16">
+            <Badge variant="outline" className={`text-xs ${getStatusBadgeClass(campaign.status)}`}>
+              {campaign.status}
+            </Badge>
+          </TableCell>
+          <TableCell className="py-3 px-4 text-blue-700 dark:text-blue-300 align-middle h-16">
+            <div className="flex items-center gap-2">
+              <TrendingUp className="w-4 h-4" />
+              {campaign.objective.replace("OUTCOME_", "")}
+            </div>
+          </TableCell>
+          <TableCell className="py-3 px-4 text-blue-700 dark:text-blue-300 align-middle h-16">
+            <div className="flex items-center gap-2">
+              <DollarSign className="w-4 h-4" />
+              <span className="font-medium">
+                ${Number.parseFloat(insights.spend || "0").toFixed(2)}
+              </span>
+            </div>
+          </TableCell>
+          <TableCell className="py-3 px-4 text-blue-700 dark:text-blue-300 align-middle h-16">
+            <div className="flex items-center gap-2">
+              <Repeat className="h-4 w-4" />
+              {Number.parseFloat(insights.frequency || "0").toFixed(2)}
+            </div>
+          </TableCell>
+          <TableCell className="py-3 px-4 text-blue-700 dark:text-blue-300 align-middle h-16">
+            <div className="flex items-center gap-2">
+              <Eye className="w-4 h-4" />
+              {Number.parseInt(insights.impressions || "0").toLocaleString()}
+            </div>
+          </TableCell>
+          <TableCell className="py-3 px-4 text-blue-700 dark:text-blue-300 align-middle h-16">
+            <div className="flex items-center gap-2">
+              <MousePointerClick className="w-4 h-4" />
+              {Number.parseInt(insights.clicks || "0").toLocaleString()}
+            </div>
+          </TableCell>
+          <TableCell
+            className="py-3 px-4 text-blue-700 dark:text-blue-300 align-middle h-16"
+            onClick={(e) => {
+              e.stopPropagation();
+              if (hasMissingCreatives && !creativesLoading && !refetchingMissingCreatives) {
+                handleRefetchMissingCreatives();
+              }
+            }}
+          >
+            <div className="flex items-center justify-center h-16">
+              {creativesLoading || (hasMissingCreatives && refetchingMissingCreatives) ? (
+                <div className="flex items-center justify-center">
+                  <div className="w-5 h-5 border-2 border-blue-300 border-t-blue-600 rounded-full animate-spin"></div>
+                </div>
+              ) : creatives.length > 0 ? (
+                <div className="flex justify-center">
+                  <CreativeThumbnails creatives={creatives} />
+                </div>
+              ) : (
+                <div className="flex items-center gap-2 text-gray-400 cursor-pointer hover:text-blue-500 transition-colors duration-200">
+                  <Film className="w-4 h-4" />
+                  <div>
+                    <h5>Something went wrong</h5>
+                    <h6>Please wait a few minutes before you try again.</h6>
+                  </div>
+                </div>
+              )}
+            </div>
+          </TableCell>
+        </motion.tr>
+      );
+    })
+  )}
                         
                         {/* Totals row */}
                         {displayCampaigns.length > 0 && (
@@ -628,6 +671,25 @@ const Index = () => {
             </div>
           </>
         )}
+
+{showNoDataPopup && !insightsLoading && (
+  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg text-center max-w-md w-full">
+      <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-4">
+        No Data Available
+      </h2>
+      <p className="text-gray-600 dark:text-gray-300">
+        There is no data available for the selected filters or time period. Try adjusting your selection.
+      </p>
+      <button
+        onClick={() => setShowNoDataPopup(false)}
+        className="mt-4 px-4 py-2 bg-teal-600 text-white rounded hover:bg-teal-700"
+      >
+        Close
+      </button>
+    </div>
+  </div>
+)}
 
         {/* Loading State */}
         {/* {(insightsLoading || creativesLoading) && (

@@ -463,42 +463,49 @@ const ActionInsights = ({ data, isLoading }: ActionInsightsProps) => {
           </div>
         </div>
         <CardContent className="p-0">
-          <div className="overflow-x-auto">
-            <Table className="w-full max-w-full table-fixed">
-              <TableHeader>
-                <TableRow className="bg-blue-50">
-                  <TableHead className="py-3 px-4 text-xs font-medium text-teal-800 uppercase w-1/2">Action Type</TableHead>
-                  <TableHead className="py-3 px-4 text-xs font-medium text-teal-800 uppercase w-1/4 text-center">Value</TableHead>
-                  <TableHead className="py-3 px-4 text-xs font-medium text-teal-800 uppercase w-1/4 text-center">Cost Per Action</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {data?.[0]?.actions?.map((action, index) => {
-                  const costPerAction = data[0]?.cost_per_action_type?.find(
-                    (item) => item.action_type === action.action_type
-                  );
-                  
-                  return (
-                    <TableRow 
-                      key={index}
-                      className="border-b border-blue-200 dark:border-blue-700 hover:bg-blue-50 dark:hover:bg-blue-800/50 transition-colors duration-200"
-                    >
-                      <TableCell className="py-3 px-4 font-medium text-blue-900 dark:text-blue-100 truncate">
-                        {action.action_type.replace(/_/g, ' ')}
-                      </TableCell>
-                      <TableCell className="py-3 px-4 text-blue-700 dark:text-blue-300 text-center">
-                        {Number.parseInt(action.value || "0").toLocaleString()}
-                      </TableCell>
-                      <TableCell className="py-3 px-4 text-blue-700 dark:text-blue-300 text-center">
-                        {costPerAction ? `$${Number.parseFloat(costPerAction.value).toFixed(2)}` : "-"}
-                      </TableCell>
-                    </TableRow>
-                  );
-                })}
-              </TableBody>
-            </Table>
-          </div>
-        </CardContent>
+  <div className="overflow-x-auto">
+    {data?.[0]?.actions?.length > 0 ? (
+      <Table className="w-full max-w-full table-fixed">
+        <TableHeader>
+          <TableRow className="bg-blue-50">
+            <TableHead className="py-3 px-4 text-xs font-medium text-teal-800 uppercase w-1/2">Action Type</TableHead>
+            <TableHead className="py-3 px-4 text-xs font-medium text-teal-800 uppercase w-1/4 text-center">Value</TableHead>
+            <TableHead className="py-3 px-4 text-xs font-medium text-teal-800 uppercase w-1/4 text-center">Cost Per Action</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {data?.[0]?.actions.map((action, index) => {
+            const costPerAction = data[0]?.cost_per_action_type?.find(
+              (item) => item.action_type === action.action_type
+            );
+
+            return (
+              <TableRow
+                key={index}
+                className="border-b border-blue-200 dark:border-blue-700 hover:bg-blue-50 dark:hover:bg-blue-800/50 transition-colors duration-200"
+              >
+                <TableCell className="py-3 px-4 font-medium text-blue-900 dark:text-blue-100 truncate">
+                  {action.action_type.replace(/_/g, ' ')}
+                </TableCell>
+                <TableCell className="py-3 px-4 text-blue-700 dark:text-blue-300 text-center">
+                  {Number.parseInt(action.value || "0").toLocaleString()}
+                </TableCell>
+                <TableCell className="py-3 px-4 text-blue-700 dark:text-blue-300 text-center">
+                  {costPerAction ? `$${Number.parseFloat(costPerAction.value).toFixed(2)}` : "-"}
+                </TableCell>
+              </TableRow>
+            );
+          })}
+        </TableBody>
+      </Table>
+    ) : (
+      <div className="text-center text-gray-500  py-6 text-sm font-medium">
+No Data Available
+      </div>
+    )}
+  </div>
+</CardContent>
+
       </Card>
     </motion.div>
   );
