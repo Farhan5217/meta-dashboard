@@ -204,23 +204,31 @@ useEffect(() => {
   {dateRange && (
   <>
     {/* Always render MetricsGrid, even when data is empty */}
-    {(!firstLoadRef.current || !insightsLoading) && (
-  <div className="relative">
-    {/* Overlay with loading indicator during API requests */}
-    {/* {insightsLoading && (
-      <div className="absolute inset-0 bg-white/70 dark:bg-gray-800/70 z-10 flex items-center justify-center">
-        <div className="w-8 h-8 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin"></div>
-      </div>
-    )} */}
-    
-    {/* Always render MetricsGrid with either fresh or cached data */}
+    {/* Always render something in this space */}
+<div className="relative">
+  {/* Loading overlay - shows on any load */}
+  {insightsLoading && (
+    <div className="absolute inset-0 bg-white/70 dark:bg-gray-800/70 z-10 flex items-center justify-center">
+      <div className="w-8 h-8 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin"></div>
+    </div>
+  )}
+  
+  {/* Show skeleton placeholders OR the actual grid */}
+  {(insightsLoading && firstLoadRef.current) ? (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4 gap-6 mb-8">
+      {/* Skeleton cards for first load */}
+      {Array(8).fill(0).map((_, index) => (
+        <div key={index} className="bg-gray-100 dark:bg-gray-800 rounded-lg h-40 animate-pulse"></div>
+      ))}
+    </div>
+  ) : (
     <MetricsGrid
       aggregatedMetrics={!insightsLoading ? aggregatedMetrics : cachedMetrics}
       timeSeriesInsights={!insightsLoading ? timeSeriesInsights : cachedTimeSeriesInsights}
       showCharts={false}
     />
-  </div>
-)}
+  )}
+</div>
     
 
             {/* Campaign Creatives Section */}
