@@ -207,14 +207,16 @@ useEffect(() => {
     {/* Always render something in this space */}
 <div className="relative">
   {/* Loading overlay - shows on any load */}
-  {insightsLoading && (
-    <div className="absolute inset-0 bg-white/70 dark:bg-gray-800/70 z-10 flex items-center justify-center">
-      <div className="w-8 h-8 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin"></div>
-    </div>
-  )}
+  {insightsLoading && firstLoadRef.current && (
+        <div className="flex justify-center my-8">
+          <div className="w-12 h-12 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin"></div>
+        </div>
+      )}
+      
   
   {/* Show skeleton placeholders OR the actual grid */}
-  {(insightsLoading && firstLoadRef.current) ? (
+        {(insightsLoading && firstLoadRef.current) ? (
+
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4 gap-6 mb-8">
       {/* Skeleton cards for first load */}
       {Array(8).fill(0).map((_, index) => (
