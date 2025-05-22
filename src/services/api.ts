@@ -459,7 +459,7 @@ export const getCampaignsWithCreatives = async (
 
       while (attempts <= MAX_RETRIES) {
         try {
-          const response = await api.get(
+          const response = await url_API.get(
             `/adaccounts/${adAccountId}/campaigns-with-creatives`,
             {
               params,
