@@ -547,7 +547,7 @@ useEffect(() => {
                   <Film className="w-4 h-4" />
                   <div>
                     <h5>Something went wrong</h5>
-                    <h6>Please wait a few minutes before you try again.</h6>
+                    <h6>No Creatives Found!</h6>
                   </div>
                 </div>
               )}
